@@ -1,23 +1,25 @@
 package com.tomkeuper.bedwars.api.arena;
 
 import com.tomkeuper.bedwars.api.arena.generator.IGenerator;
+import com.tomkeuper.bedwars.api.arena.shop.ShopHolo;
 import com.tomkeuper.bedwars.api.arena.team.ITeam;
 import com.tomkeuper.bedwars.api.arena.team.ITeamAssigner;
 import com.tomkeuper.bedwars.api.configuration.ConfigManager;
 import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.region.Region;
+import com.tomkeuper.bedwars.api.shop.IShopIndex;
 import com.tomkeuper.bedwars.api.tasks.AnnouncementTask;
 import com.tomkeuper.bedwars.api.tasks.PlayingTask;
 import com.tomkeuper.bedwars.api.tasks.RestartingTask;
 import com.tomkeuper.bedwars.api.tasks.StartingTask;
-import lombok.Getter;
-import lombok.Setter;
+import com.tomkeuper.bedwars.api.upgrades.UpgradesIndex;
 import me.neznamy.tab.api.bossbar.BossBar;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.LinkedList;
@@ -25,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import org.jetbrains.annotations.Nullable;
 
 public interface IArena {
 
@@ -44,6 +45,25 @@ public interface IArena {
      * @return `true` if the player is spectating, `false` otherwise.
      */
     boolean isSpectator(UUID player);
+
+
+    /**
+     * Linked shop layout for this arena. Implementations may resolve per-arena/group/default.
+     */
+    default @Nullable IShopIndex getLinkedShop() {
+        return null;
+    }
+    default void setLinkedShop(@Nullable IShopIndex shop) {
+    }
+
+    /**
+     * Linked upgrades layout for this arena.
+     */
+    default @Nullable UpgradesIndex getLinkedUpgrades() {
+        return null;
+    }
+    default void setLinkedUpgrades(@Nullable UpgradesIndex upgrades) {
+    }
 
     /**
      * Check if a player is respawning in this arena.
@@ -221,8 +241,8 @@ public interface IArena {
     /**
      * Remove a spectator from the arena
      *
-     * @param p          Player to be removed
-     * @param disconnect True if the player was disconnected
+     * @param p              Player to be removed
+     * @param disconnect     True if the player was disconnected
      * @param skipPartyCheck (default false) True if you want to skip the party checking for this player. This will stop the player
      *                       from leaving a party if he is in one. or will stop the party from being disbanded if the
      *                       player is the owner.
@@ -331,7 +351,7 @@ public interface IArena {
     /**
      * Get a player total kills count.
      *
-     * @param p          Target player
+     * @param p Target player
      */
     int getPlayerTotalKills(Player p);
 
@@ -398,9 +418,9 @@ public interface IArena {
     /**
      * Add a player kill to the game statistics.
      *
-     * @param p          The player who made the kill.
-     * @param finalKill  Whether it was a final kill.
-     * @param victim     The player who was killed.
+     * @param p         The player who made the kill.
+     * @param finalKill Whether it was a final kill.
+     * @param victim    The player who was killed.
      */
     void addPlayerKill(Player p, boolean finalKill, Player victim);
 
@@ -498,6 +518,14 @@ public interface IArena {
     List<IGenerator> getOreGenerators();
 
     /**
+     * Get the shop holograms for a specific language ISO code.
+     *
+     * @param iso The ISO code of the language.
+     * @return The list of shop holograms for the specified language.
+     */
+    List<ShopHolo> getShopHolograms(String iso);
+
+    /**
      * Get the list of next events to come in the arena.
      * Note: The events are not ordered.
      *
@@ -509,8 +537,8 @@ public interface IArena {
     /**
      * Get the number of deaths for a specific player in the arena.
      *
-     * @param p            The player.
-     * @param finalDeaths  Whether to retrieve final deaths or all deaths.
+     * @param p           The player.
+     * @param finalDeaths Whether to retrieve final deaths or all deaths.
      * @return The number of deaths for the player.
      */
     int getPlayerDeaths(Player p, boolean finalDeaths);
@@ -745,7 +773,7 @@ public interface IArena {
     @SuppressWarnings("unused")
     void setAllowEnderDragonDestroy(boolean allowDestory);
 
-     /**
+    /**
      * Get the time in seconds when the magic milk effect will expire.
      *
      * @return The time when the magic milk effect will expire.

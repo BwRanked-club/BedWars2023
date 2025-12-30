@@ -56,7 +56,6 @@ public class ItemDropPickListener {
     public static class ArrowCollect implements Listener {
         @EventHandler
         public void onArrowPick(PlayerPickupArrowEvent e){
-            Bukkit.getLogger().info("onArrowPick");
             if (api.getArenaUtil().isSpectating(e.getPlayer())) {
                 e.setCancelled(true);
             }

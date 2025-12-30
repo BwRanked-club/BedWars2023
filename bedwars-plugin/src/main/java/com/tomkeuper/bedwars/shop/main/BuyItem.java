@@ -6,6 +6,8 @@ import com.tomkeuper.bedwars.api.arena.shop.IBuyItem;
 import com.tomkeuper.bedwars.api.arena.team.TeamEnchant;
 import com.tomkeuper.bedwars.api.configuration.ConfigPath;
 import com.tomkeuper.bedwars.configuration.Sounds;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -18,14 +20,28 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+@Getter
 @SuppressWarnings("WeakerAccess")
 public class BuyItem implements IBuyItem {
 
+    @Setter
     private ItemStack itemStack;
+    @Setter
     private boolean autoEquip = false;
+    @Setter
     private boolean permanent = false;
+    @Setter
     private boolean unbreakable = false;
+    /**
+     * -- GETTER --
+     *  Check if object created properly
+     */
     private boolean loaded = false;
+    /**
+     * -- GETTER --
+     *  Get upgrade identifier.
+     *  Used to remove old tier items.
+     */
     private final String upgradeIdentifier;
 
     /**
@@ -47,7 +63,7 @@ public class BuyItem implements IBuyItem {
         if (yml.get(path + ".name") != null) {
             ItemMeta im = itemStack.getItemMeta();
             if (im != null) {
-                im.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&r"+yml.getString(path + ".name")));
+                im.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&r" + yml.getString(path + ".name")));
                 itemStack.setItemMeta(im);
             }
         }
@@ -131,21 +147,27 @@ public class BuyItem implements IBuyItem {
         if (yml.get(path + ".auto-equip") != null) {
             autoEquip = yml.getBoolean(path + ".auto-equip");
         }
-        if (yml.get(upgradeIdentifier + "." + ConfigPath.SHOP_CATEGORY_CONTENT_IS_PERMANENT) != null) {
+        // Resolve content root from the current buy-item path (e.g., ...category-content.<name>.tiers.<tier>.buy-items.<item>)
+        String contentRoot = path;
+        int idx = contentRoot.indexOf(".tiers.");
+        if (idx > 0) {
+            contentRoot = contentRoot.substring(0, idx);
+        }
+        // Preferred: read flags relative to content root, with legacy fallback using the identifier path
+        if (yml.get(contentRoot + "." + ConfigPath.SHOP_CATEGORY_CONTENT_IS_PERMANENT) != null) {
+            permanent = yml.getBoolean(contentRoot + "." + ConfigPath.SHOP_CATEGORY_CONTENT_IS_PERMANENT);
+        } else if (yml.get(upgradeIdentifier + "." + ConfigPath.SHOP_CATEGORY_CONTENT_IS_PERMANENT) != null) {
+            // Backward compatibility: old loaders used the (un)scoped identifier as a YAML path
             permanent = yml.getBoolean(upgradeIdentifier + "." + ConfigPath.SHOP_CATEGORY_CONTENT_IS_PERMANENT);
         }
-        if (yml.get(upgradeIdentifier + "." + ConfigPath.SHOP_CATEGORY_CONTENT_IS_UNBREAKABLE) != null) {
+        if (yml.get(contentRoot + "." + ConfigPath.SHOP_CATEGORY_CONTENT_IS_UNBREAKABLE) != null) {
+            unbreakable = yml.getBoolean(contentRoot + "." + ConfigPath.SHOP_CATEGORY_CONTENT_IS_UNBREAKABLE);
+        } else if (yml.get(upgradeIdentifier + "." + ConfigPath.SHOP_CATEGORY_CONTENT_IS_UNBREAKABLE) != null) {
+            // Backward compatibility
             unbreakable = yml.getBoolean(upgradeIdentifier + "." + ConfigPath.SHOP_CATEGORY_CONTENT_IS_UNBREAKABLE);
         }
 
         loaded = true;
-    }
-
-    /**
-     * Check if object created properly
-     */
-    public boolean isLoaded() {
-        return loaded;
     }
 
     /**
@@ -178,7 +200,7 @@ public class BuyItem implements IBuyItem {
             } else if (m == Material.LEATHER_CHESTPLATE || m == Material.CHAINMAIL_CHESTPLATE || m == Material.IRON_CHESTPLATE || m == Material.DIAMOND_CHESTPLATE || m == BedWars.nms.materialGoldenChestPlate() || m == BedWars.nms.materialNetheriteChestPlate() || m == BedWars.nms.materialElytra()) {
                 if (permanent) i = BedWars.nms.setShopUpgradeIdentifier(i, upgradeIdentifier);
                 player.getInventory().setChestplate(i);
-            } else if (m == Material.LEATHER_LEGGINGS || m == Material.CHAINMAIL_LEGGINGS || m == Material.IRON_LEGGINGS  || m == Material.DIAMOND_LEGGINGS || m == BedWars.nms.materialGoldenLeggings()|| m == BedWars.nms.materialNetheriteLeggings()) {
+            } else if (m == Material.LEATHER_LEGGINGS || m == Material.CHAINMAIL_LEGGINGS || m == Material.IRON_LEGGINGS || m == Material.DIAMOND_LEGGINGS || m == BedWars.nms.materialGoldenLeggings() || m == BedWars.nms.materialNetheriteLeggings()) {
                 if (permanent) i = BedWars.nms.setShopUpgradeIdentifier(i, upgradeIdentifier);
                 player.getInventory().setLeggings(i);
             } else {
@@ -201,18 +223,39 @@ public class BuyItem implements IBuyItem {
         } else {
 
             ItemMeta im = i.getItemMeta();
-            i = BedWars.nms.colourItem(i, arena.getTeam(player));
+            // Attempt to color the item based on team; if colouring fails, keep the original item
+            ItemStack original = i.clone();
+            ItemStack coloured = null;
+            try {
+                if (arena.getTeam(player) != null) {
+                    coloured = BedWars.nms.colourItem(i, arena.getTeam(player));
+                } else {
+                    BedWars.debug("Skipping colourItem for " + player.getName() + ": team is null");
+                }
+            } catch (Throwable t) {
+                BedWars.debug("colourItem error for " + player.getName() + ": " + t.getMessage());
+            }
+            if (coloured != null && coloured.getType() != Material.AIR) {
+                i = coloured;
+            } else {
+                BedWars.debug("colourItem returned null/AIR for " + player.getName() + ". Using original item: " + original.getType());
+                i = original;
+            }
             if (im != null) {
                 if (permanent) BedWars.nms.setUnbreakable(im);
                 if (unbreakable) BedWars.nms.setUnbreakable(im);
                 if (i.getType() == Material.BOW) {
                     if (permanent) BedWars.nms.setUnbreakable(im);
-                    for (TeamEnchant e : arena.getTeam(player).getBowsEnchantments()) {
-                        im.addEnchant(e.getEnchantment(), e.getAmplifier(), true);
+                    if (arena.getTeam(player) != null) {
+                        for (TeamEnchant e : arena.getTeam(player).getBowsEnchantments()) {
+                            im.addEnchant(e.getEnchantment(), e.getAmplifier(), true);
+                        }
                     }
                 } else if (BedWars.nms.isSword(i) || BedWars.nms.isAxe(i)) {
-                    for (TeamEnchant e : arena.getTeam(player).getSwordsEnchantments()) {
-                        im.addEnchant(e.getEnchantment(), e.getAmplifier(), true);
+                    if (arena.getTeam(player) != null) {
+                        for (TeamEnchant e : arena.getTeam(player).getSwordsEnchantments()) {
+                            im.addEnchant(e.getEnchantment(), e.getAmplifier(), true);
+                        }
                     }
                 }
                 i.setItemMeta(im);
@@ -221,6 +264,12 @@ public class BuyItem implements IBuyItem {
             if (permanent) {
                 i = BedWars.nms.setShopUpgradeIdentifier(i, upgradeIdentifier);
             }
+        }
+
+        // Extra debug info before adding to inventory
+        try {
+            BedWars.debug("About to add item: type=" + i.getType() + ", amount=" + i.getAmount() + ", firstEmpty=" + player.getInventory().firstEmpty());
+        } catch (Throwable ignored) {
         }
 
         //Remove swords with lower damage
@@ -237,49 +286,12 @@ public class BuyItem implements IBuyItem {
                 }
             }
         }
-        //
-        player.getInventory().addItem(i);
-        player.updateInventory();
-    }
 
-
-    /**
-     * Get upgrade identifier.
-     * Used to remove old tier items.
-     */
-    public String getUpgradeIdentifier() {
-        return upgradeIdentifier;
-    }
-
-    public ItemStack getItemStack() {
-        return itemStack;
-    }
-
-    public void setItemStack(ItemStack itemStack) {
-        this.itemStack = itemStack;
-    }
-
-    public boolean isAutoEquip() {
-        return autoEquip;
-    }
-
-    public void setAutoEquip(boolean autoEquip) {
-        this.autoEquip = autoEquip;
-    }
-
-    public boolean isPermanent() {
-        return permanent;
-    }
-
-    public void setPermanent(boolean permanent) {
-        this.permanent = permanent;
-    }
-
-    public boolean isUnbreakable() {
-        return unbreakable;
-    }
-
-    public void setUnbreakable(boolean unbreakable) {
-        this.unbreakable = unbreakable;
+        if (i != null && i.getType() != Material.AIR) {
+            player.getInventory().addItem(i);
+            player.updateInventory();
+        } else {
+            BedWars.debug("Attempted to give AIR/null item to " + player.getName() + " for upgrade: " + getUpgradeIdentifier());
+        }
     }
 }

@@ -6,6 +6,7 @@ import com.tomkeuper.bedwars.api.shop.ICachedItem;
 import com.tomkeuper.bedwars.api.shop.IShopCache;
 import com.tomkeuper.bedwars.api.shop.IShopCategory;
 import com.tomkeuper.bedwars.arena.Arena;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -18,22 +19,19 @@ public class ShopCache implements IShopCache {
         instance = this;
     }
 
+    @Getter
     private UUID player;
     private List<CachedItem> cachedItems = new LinkedList<>();
     private int selectedCategory;
     private HashMap<IShopCategory, Byte> categoryWeight = new HashMap<>();
 
-    private static List<ShopCache> shopCaches = new ArrayList<>();
+    private static final List<ShopCache> shopCaches = new ArrayList<>();
     private static ShopCache instance;
 
     public ShopCache(UUID player) {
         this.player = player;
         this.selectedCategory = ShopManager.shop.getQuickBuyButton().getSlot();
         shopCaches.add(this);
-    }
-
-    public UUID getPlayer() {
-        return player;
     }
 
     @Override
@@ -85,7 +83,8 @@ public class ShopCache implements IShopCache {
      */
     @SuppressWarnings("WeakerAccess")
     public class CachedItem implements ICachedItem {
-        private ICategoryContent cc;
+        @Getter
+        private final ICategoryContent cc;
         private int tier = 1;
 
         public CachedItem(ICategoryContent cc) {
@@ -97,10 +96,6 @@ public class ShopCache implements IShopCache {
         @Override
         public int getTier() {
             return tier;
-        }
-
-        public ICategoryContent getCc() {
-            return cc;
         }
 
         /**

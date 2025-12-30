@@ -28,10 +28,12 @@ import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.api.region.Region;
 import com.tomkeuper.bedwars.api.server.ServerType;
+import com.tomkeuper.bedwars.api.shop.IShopIndex;
 import com.tomkeuper.bedwars.api.tasks.AnnouncementTask;
 import com.tomkeuper.bedwars.api.tasks.PlayingTask;
 import com.tomkeuper.bedwars.api.tasks.RestartingTask;
 import com.tomkeuper.bedwars.api.tasks.StartingTask;
+import com.tomkeuper.bedwars.api.upgrades.UpgradesIndex;
 import com.tomkeuper.bedwars.arena.tasks.*;
 import com.tomkeuper.bedwars.arena.team.BedWarsTeam;
 import com.tomkeuper.bedwars.arena.team.TeamAssigner;
@@ -44,6 +46,8 @@ import com.tomkeuper.bedwars.listeners.dropshandler.PlayerDrops;
 import com.tomkeuper.bedwars.listeners.offline.OfflineGraceService;
 import com.tomkeuper.bedwars.money.internal.MoneyPerMinuteTask;
 import com.tomkeuper.bedwars.shop.ShopCache;
+import com.tomkeuper.bedwars.shop.ShopManager;
+import com.tomkeuper.bedwars.shop.main.ShopIndex;
 import com.tomkeuper.bedwars.sidebar.BoardManager;
 import com.tomkeuper.bedwars.support.citizens.JoinNPC;
 import com.tomkeuper.bedwars.support.paper.PaperSupport;
@@ -145,8 +149,6 @@ public class Arena implements IArena {
     private LinkedList<Vector> placed = new LinkedList<>();
     private List<String> nextEvents = new ArrayList<>();
     @Getter
-    private final List<String> shopOverrideCategories = new ArrayList<>();
-    @Getter
     private List<Region> regionsList = new ArrayList<>();
     private final List<ServerPlaceholder> serverPlaceholders = new ArrayList<>();
     private List<BossBar> dragonBossbars = new ArrayList<>();
@@ -165,6 +167,9 @@ public class Arena implements IArena {
 
     private static final Map<Player, Location> playerLocation = new HashMap<>();
 
+    private IShopIndex linkedShop;
+    private UpgradesIndex linkedUpgrades;
+
     private Map<String, Integer> playerKills = new HashMap<>();
     private Map<String, Integer> playerTotalKills = new HashMap<>();
     private Map<Player, Integer> playerBedsDestroyed = new HashMap<>();
@@ -182,6 +187,7 @@ public class Arena implements IArena {
 
     @Getter
     private List<IGenerator> oreGenerators = new ArrayList<>();
+    private HashMap<String, List<ShopHolo>> shopHolosIso = new HashMap<>();
     private PerMinuteTask perMinuteTask;
     private MoneyPerMinuteTask moneyperMinuteTask;
 
@@ -353,6 +359,18 @@ public class Arena implements IArena {
         this.world = world;
         this.worldName = world.getName();
         getConfig().setName(worldName);
+
+        try {
+            this.linkedShop = ShopManager.shop;
+            if (this.linkedShop != null) {
+                ((ShopIndex) this.linkedShop).preResolveForArena(this);
+            }
+        } catch (Throwable ignored) {
+        }
+        try {
+            this.linkedUpgrades = BedWars.getUpgradeManager().getMenuForArena(this);
+        } catch (Throwable ignored) {
+        }
 
         world.getEntities().stream().filter(e -> e.getType() != EntityType.PLAYER && e.getType() != EntityType.PAINTING && e.getType() != EntityType.ITEM_FRAME).forEach(Entity::remove);
 
@@ -541,7 +559,7 @@ public class Arena implements IArena {
             }
 
             if (getServerType() != ServerType.BUNGEE) {
-                new PlayerGoods(p, true);
+                PlayerGoods.createIfNeeded(p, true);
                 playerLocation.put(p, p.getLocation());
             }
             PaperSupport.teleportC(p, getWaitingLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
@@ -626,7 +644,7 @@ public class Arena implements IArena {
 
         if (!playerBefore) {
             if (getServerType() != ServerType.BUNGEE) {
-                new PlayerGoods(p, true);
+                PlayerGoods.createIfNeeded(p, true);
                 playerLocation.put(p, p.getLocation());
             }
             setArenaByPlayer(p, this);
@@ -821,7 +839,9 @@ public class Arena implements IArena {
             this.sendToMainLobby(p);
         }
 
-        ShopHolo.clearForPlayer(p);
+        String iso = Language.getPlayerLanguage(p).getIso();
+        List<ShopHolo> holos = shopHolosIso.getOrDefault(iso, Collections.emptyList());
+        for (ShopHolo holo : holos) holo.clearForPlayer(p);
 
         PlayerGoods pg = PlayerGoods.getPlayerGoods(p);
         if (pg == null) {
@@ -907,7 +927,9 @@ public class Arena implements IArena {
             this.sendToMainLobby(p);
         }
 
-        ShopHolo.clearForPlayer(p);
+        String iso = Language.getPlayerLanguage(p).getIso();
+        List<ShopHolo> holos = shopHolosIso.getOrDefault(iso, Collections.emptyList());
+        for (ShopHolo holo : holos) holo.clearForPlayer(p);
 
         for (PotionEffect pf : p.getActivePotionEffects()) p.removePotionEffect(pf.getType());
 
@@ -1219,7 +1241,8 @@ public class Arena implements IArena {
     }
 
     public void changeStatus(GameState newStatus) {
-        BedWars.debug("changeStatus: " + status + " -> " + newStatus + " (arena " + arenaName + ")");
+        if (newStatus == GameState.restarting && this.status == GameState.restarting) return;
+
         GameState old = this.status;
         if (old != GameState.playing && newStatus == GameState.playing) startTime = Instant.now();
         this.status = newStatus;
@@ -1810,10 +1833,6 @@ public class Arena implements IArena {
         return new ArrayList<>(nextEvents);
     }
 
-    public void addShopOverrideCategory(String shopOverrideCategory) {
-        this.shopOverrideCategories.add(shopOverrideCategory);
-    }
-
     public int getPlayerDeaths(Player p, boolean finalDeaths) {
         return finalDeaths ? playerFinalKillDeaths.getOrDefault(p, 0) : playerDeaths.getOrDefault(p, 0);
     }
@@ -1945,6 +1964,26 @@ public class Arena implements IArena {
     }
 
     @Override
+    public @Nullable IShopIndex getLinkedShop() {
+        return linkedShop;
+    }
+
+    @Override
+    public void setLinkedShop(@Nullable IShopIndex shop) {
+        this.linkedShop = shop;
+    }
+
+    @Override
+    public @Nullable UpgradesIndex getLinkedUpgrades() {
+        return linkedUpgrades;
+    }
+
+    @Override
+    public void setLinkedUpgrades(@Nullable UpgradesIndex upgrades) {
+        this.linkedUpgrades = upgrades;
+    }
+
+    @Override
     public boolean isAllowEnderDragonDestroy() {
         return enderDragonDestory;
     }
@@ -2070,6 +2109,11 @@ public class Arena implements IArena {
     @Override
     public ITeamAssigner getTeamAssigner() {
         return teamAssigner;
+    }
+
+    @Override
+    public List<ShopHolo> getShopHolograms(String iso) {
+        return shopHolosIso.get(iso);
     }
 
     @Override

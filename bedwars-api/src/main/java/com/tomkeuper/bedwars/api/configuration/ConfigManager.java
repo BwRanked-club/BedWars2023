@@ -2,6 +2,7 @@ package com.tomkeuper.bedwars.api.configuration;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
@@ -18,6 +19,7 @@ public class ConfigManager {
     private File config;
     private String name;
     private boolean firstTime = false;
+    private boolean loadError = false;
 
     /**
      * Create a new configuration file.
@@ -48,8 +50,20 @@ public class ConfigManager {
             }
         }
 
-        yml = YamlConfiguration.loadConfiguration(config);
-        yml.options().copyDefaults(true);
+        yml = new YamlConfiguration();
+        try {
+            yml.load(config);
+            yml.options().copyDefaults(true);
+        } catch (InvalidConfigurationException e) {
+            loadError = true;
+            plugin.getLogger().log(Level.SEVERE, "Failed to parse configuration file due to invalid YAML syntax: " + config.getPath());
+            plugin.getLogger().log(Level.SEVERE, e.getMessage());
+            // Do NOT overwrite the file later on save; keep loadError=true to block saving.
+        } catch (IOException e) {
+            // IO error while reading: log and prevent saving to avoid overwriting existing content
+            loadError = true;
+            plugin.getLogger().log(Level.SEVERE, "I/O error while reading configuration file: " + config.getPath(), e);
+        }
         this.name = name;
     }
 

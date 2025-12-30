@@ -1,0 +1,40 @@
+allprojects {
+    group = 'com.tomkeuper.bedwars'
+    version = rootProject.version
+    description = 'BedWars minigame by Tom Keuper forked from BedWars1058'
+
+    ext {
+        id = 'bedwars'
+        website = 'https://github.com/tomkeuper/BedWars2023'
+        author = 'Mr. Ceasar'
+    }
+}
+
+// Projects that should use the versioned shaded jar conventions
+def versions = [
+        ':versionsupport_common',
+        ':versionsupport_1_8_r3',
+        ':resetadapter_slime',
+        ':bedwars-api'
+] as Set
+
+// Projects with special conventions
+def special = [
+        ':bedwars-plugin'
+] as Set
+
+subprojects {
+    if (versions.contains(path)) {
+        plugins.apply('bedwars.version-conventions')
+    } else if (special.contains(path)) {
+        plugins.apply('bedwars.standard-conventions')
+    } else {
+        plugins.apply('bedwars.base-conventions')
+    }
+}
+
+tasks.register('printTag') {
+    doLast {
+        println "Generated Tag: ${rootProject.version}"
+    }
+}

@@ -10,10 +10,7 @@ import com.tomkeuper.bedwars.stats.PlayerStats;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class SQLite implements IDatabase {
 
@@ -69,8 +66,11 @@ public class SQLite implements IDatabase {
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate(sql);
             }
+
+            migrateQuickBuyTable();
+
             try (Statement st = connection.createStatement()) {
-                sql = "CREATE TABLE IF NOT EXISTS quick_buy_2 (uuid VARCHAR(36) PRIMARY KEY, " +
+                sql = "CREATE TABLE IF NOT EXISTS quick_buy (uuid VARCHAR(36) PRIMARY KEY, " +
                         "slot_19 VARCHAR(200), slot_20 VARCHAR(200), slot_21 VARCHAR(200), slot_22 VARCHAR(200), slot_23 VARCHAR(200), slot_24 VARCHAR(200), slot_25 VARCHAR(200)," +
                         "slot_28 VARCHAR(200), slot_29 VARCHAR(200), slot_30 VARCHAR(200), slot_31 VARCHAR(200), slot_32 VARCHAR(200), slot_33 VARCHAR(200), slot_34 VARCHAR(200)," +
                         "slot_37 VARCHAR(200), slot_38 VARCHAR(200), slot_39 VARCHAR(200), slot_40 VARCHAR(200), slot_41 VARCHAR(200), slot_42 VARCHAR(200), slot_43 VARCHAR(200));";
@@ -86,7 +86,7 @@ public class SQLite implements IDatabase {
                         "iso VARCHAR(200));";
                 st.executeUpdate(sql);
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -192,14 +192,14 @@ public class SQLite implements IDatabase {
             checkConnection();
 
             if (hasStats(player)) {
-                sql = "UPDATE global_stats SET "+columnName+"=? WHERE uuid = ?;";
+                sql = "UPDATE global_stats SET " + columnName + "=? WHERE uuid = ?;";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setObject(1, value);
                     statement.setString(2, player.toString());
                     statement.executeUpdate();
                 }
             } else {
-                sql = "INSERT INTO global_stats (uuid, "+columnName+") VALUES (?, ?);";
+                sql = "INSERT INTO global_stats (uuid, " + columnName + ") VALUES (?, ?);";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setString(1, player.toString());
                     statement.setObject(2, value);
@@ -211,7 +211,7 @@ public class SQLite implements IDatabase {
         }
     }
 
-    public void checkCustomColumnExists(String columnName, String dataType){
+    public void checkCustomColumnExists(String columnName, String dataType) {
         String sql = "PRAGMA table_info(global_stats)";
         try {
             checkConnection();
@@ -226,21 +226,21 @@ public class SQLite implements IDatabase {
                         break;
                     }
                 }
-                if (!columnExists){
-                    sql = "ALTER TABLE global_stats ADD COLUMN " +columnName+ " " + dataType;
+                if (!columnExists) {
+                    sql = "ALTER TABLE global_stats ADD COLUMN " + columnName + " " + dataType;
                     try (PreparedStatement statement1 = connection.prepareStatement(sql)) {
                         statement1.executeUpdate();
                     }
                 }
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     @Override
     public Object getCustomStat(String columnName, UUID player) {
-        String sql = "SELECT "+columnName+" FROM global_stats WHERE uuid = ?;";
+        String sql = "SELECT " + columnName + " FROM global_stats WHERE uuid = ?;";
         try {
             checkConnection();
 
@@ -259,12 +259,34 @@ public class SQLite implements IDatabase {
     }
 
     @Override
+    public List<UUID> listQuickBuyUUIDs() {
+        List<UUID> list = new ArrayList<>();
+        try {
+            checkConnection();
+            try (PreparedStatement ps = connection.prepareStatement("SELECT uuid FROM quick_buy;")) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String s = rs.getString("uuid");
+                        try {
+                            list.add(UUID.fromString(s));
+                        } catch (Exception ignored) {
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    @Override
     public String getQuickBuySlots(UUID p, int slot) {
         String result = "";
         try {
             checkConnection();
 
-            try (PreparedStatement ps = connection.prepareStatement("SELECT slot_" + slot + " FROM quick_buy_2 WHERE uuid = ?;")) {
+            try (PreparedStatement ps = connection.prepareStatement("SELECT slot_" + slot + " FROM quick_buy WHERE uuid = ?;")) {
                 ps.setString(1, p.toString());
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
@@ -284,7 +306,7 @@ public class SQLite implements IDatabase {
             checkConnection();
 
             try (Statement statement = connection.createStatement()) {
-                try (ResultSet rs = statement.executeQuery("SELECT uuid FROM quick_buy_2 WHERE uuid = '" + uuid.toString() + "';")) {
+                try (ResultSet rs = statement.executeQuery("SELECT uuid FROM quick_buy WHERE uuid = '" + uuid.toString() + "';")) {
                     if (rs.next()) {
                         rs.close();
                         return true;
@@ -313,8 +335,7 @@ public class SQLite implements IDatabase {
                     }
                 }
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             ex.printStackTrace();
             return 0;
         }
@@ -458,7 +479,7 @@ public class SQLite implements IDatabase {
                 }
             }
         }
-        String sql = hasQuick ? "UPDATE quick_buy_2 SET " + columns + " WHERE uuid=?;" : "INSERT INTO quick_buy_2 (uuid," + columns + ") VALUES (?," + values + ");";
+        String sql = hasQuick ? "UPDATE quick_buy SET " + columns + " WHERE uuid=?;" : "INSERT INTO quick_buy (uuid," + columns + ") VALUES (?," + values + ");";
         try {
             checkConnection();
 
@@ -469,7 +490,7 @@ public class SQLite implements IDatabase {
                     String identifier = updateSlots.get(key);
                     ps.setString(index, identifier.trim().isEmpty() ? null : identifier);
                 }
-                ps.setString(hasQuick ? updateSlots.size()+1 : 1, uuid.toString());
+                ps.setString(hasQuick ? updateSlots.size() + 1 : 1, uuid.toString());
                 ps.execute();
             }
         } catch (SQLException e) {
@@ -486,7 +507,7 @@ public class SQLite implements IDatabase {
         try {
             checkConnection();
 
-            try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM quick_buy_2 WHERE uuid = ?;")) {
+            try (PreparedStatement ps = connection.prepareStatement("SELECT * FROM quick_buy WHERE uuid = ?;")) {
                 ps.setString(1, uuid.toString());
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
@@ -510,12 +531,38 @@ public class SQLite implements IDatabase {
 
         if (this.connection == null)
             renew = true;
-        else
-            if (this.connection.isClosed())
-                renew = true;
+        else if (this.connection.isClosed())
+            renew = true;
 
         if (renew)
             this.connection = DriverManager.getConnection(url);
+    }
+
+    private void migrateQuickBuyTable() {
+        try {
+            checkConnection();
+
+            boolean hasQuickBuy2 = tableExists("quick_buy_2");
+            if (!hasQuickBuy2) return;
+
+            boolean hasQuickBuy = tableExists("quick_buy");
+            if (!hasQuickBuy) {
+                try (Statement st = connection.createStatement()) {
+                    st.executeUpdate("ALTER TABLE quick_buy_2 RENAME TO quick_buy;");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean tableExists(String tableName) throws SQLException {
+        try (PreparedStatement ps = connection.prepareStatement("SELECT name FROM sqlite_master WHERE type='table' AND name=?;")) {
+            ps.setString(1, tableName);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
     }
 
 }

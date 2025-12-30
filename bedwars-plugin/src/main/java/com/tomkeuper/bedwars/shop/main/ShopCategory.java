@@ -20,6 +20,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class ShopCategory implements IShopCategory {
@@ -32,6 +33,7 @@ public class ShopCategory implements IShopCategory {
     public static List<UUID> categoryViewers = new ArrayList<>();
     public String name;
     public static ShopCategory instance;
+
     ShopCategory() {
     }
 
@@ -58,10 +60,14 @@ public class ShopCategory implements IShopCategory {
             return;
         }
 
-        for (IShopCategory sc : ShopManager.shop.getCategoryList()){
-            if (sc.getSlot() == slot){
-                BedWars.plugin.getLogger().severe("Slot is already in use at: " + path);
-                return;
+        // Enforce unique slot only for default categories. Allow overrides to reuse slots so
+        // per-arena/group priority can replace defaults at render time.
+        if (this.name != null && this.name.toLowerCase().startsWith("default-")) {
+            for (IShopCategory sc : ShopManager.shop.getCategoryList()) {
+                if (sc.getSlot() == slot) {
+                    BedWars.plugin.getLogger().severe("Slot is already in use at: " + path);
+                    return;
+                }
             }
         }
 
@@ -97,35 +103,71 @@ public class ShopCategory implements IShopCategory {
         CategoryContent cc;
         for (String s : yml.getConfigurationSection(path + "." + ConfigPath.SHOP_CATEGORY_CONTENT_PATH).getKeys(false)) {
             cc = new CategoryContent(path + ConfigPath.SHOP_CATEGORY_CONTENT_PATH + "." + s, s, path, yml, this);
-            cc.setCategoryIdentifier("default-" + cc.getCategoryIdentifier());
+            String currId = cc.getCategoryIdentifier();
+            if (currId != null && currId.startsWith(path)) {
+                cc.setCategoryIdentifier(this.name + currId.substring(path.length()));
+            }
             if (cc.isLoaded()) {
                 categoryContentList.add(cc);
-                BedWars.debug("Adding CategoryContent: " + s + " to Shop Category: " + path);
+                BedWars.debug("Adding CategoryContent: " + s + " to Shop Category: " + cc.getCategoryIdentifier());
             }
         }
         instance = this;
     }
 
-    public void open(Player player, IShopIndex index, IShopCache shopCache){
+    /**
+     * Open this category for the player using the arena-linked shop index.
+     * This avoids passing a ShopIndex at call sites and uses pre-resolved data.
+     */
+    public void open(Player player, IShopCache shopCache) {
+        IArena arena = Arena.getArenaByPlayer(player);
+        IShopIndex idxToUse = (arena != null && arena.getLinkedShop() != null) ? arena.getLinkedShop() : ShopManager.shop;
+        open(player, idxToUse, shopCache);
+    }
+
+    /**
+     * Deprecated: prefer {@link #open(Player, IShopCache)} which resolves the shop from the arena.
+     */
+    public void open(Player player, IShopIndex index, IShopCache shopCache) {
         BedWars.debug("opening ShopCategory: " + name + " for player: " + player.getName());
         if (player.getOpenInventory().getTopInventory() == null) return;
         ShopIndex.indexViewers.remove(player.getUniqueId());
 
-        Inventory inv = Bukkit.createInventory(null, index.getInvSize(), Language.getMsg(player, invNamePath));
-
-        inv.setItem(index.getQuickBuyButton().getSlot(), index.getQuickBuyButton().getItemStack(player));
-
         IArena arena = Arena.getArenaByPlayer(player);
+        IShopIndex idxToUse = (arena != null && arena.getLinkedShop() != null) ? arena.getLinkedShop() : index;
 
-        for (IShopCategory sc : index.getCategoryList()) {
-            // If we don't check this, the shop will be displayed in all arenas
-            if (sc.getName().startsWith("default") || sc.getName().startsWith(arena.getGroup().toLowerCase()))
-                inv.setItem(sc.getSlot(), sc.getItemStack(player));
+        Inventory inv = Bukkit.createInventory(null, idxToUse.getInvSize(), Language.getMsg(player, invNamePath));
+
+        inv.setItem(idxToUse.getQuickBuyButton().getSlot(), idxToUse.getQuickBuyButton().getItemStack(player));
+
+        if (arena != null && idxToUse instanceof ShopIndex) {
+            Map<Integer, IShopCategory> chosenBySlot = ((ShopIndex) idxToUse).getResolvedBySlot(arena);
+            if (chosenBySlot == null || chosenBySlot.isEmpty()) {
+                // Fallback: defaults only
+                for (IShopCategory sc : idxToUse.getCategoryList()) {
+                    String n = sc.getName() == null ? "" : sc.getName().toLowerCase();
+                    if (n.startsWith("default-")) {
+                        inv.setItem(sc.getSlot(), sc.getItemStack(player));
+                    }
+                }
+            } else {
+                for (Map.Entry<Integer, IShopCategory> e : chosenBySlot.entrySet()) {
+                    inv.setItem(e.getKey(), e.getValue().getItemStack(player));
+                }
+            }
+        } else {
+            // No arena context: show defaults only to be safe
+            for (IShopCategory sc : idxToUse.getCategoryList()) {
+                String n = sc.getName() == null ? "" : sc.getName().toLowerCase();
+                if (n.startsWith("default-")) {
+                    inv.setItem(sc.getSlot(), sc.getItemStack(player));
+                }
+            }
         }
 
-        index.addSeparator(player, inv);
+        idxToUse.addSeparator(player, inv);
 
-        inv.setItem(getSlot() + 9, index.getSelectedItem(player));
+        inv.setItem(getSlot() + 9, idxToUse.getSelectedItem(player));
 
         shopCache.setSelectedCategory(getSlot());
 
@@ -134,7 +176,7 @@ public class ShopCategory implements IShopCategory {
         }
 
         player.openInventory(inv);
-        if (!categoryViewers.contains(player.getUniqueId())){
+        if (!categoryViewers.contains(player.getUniqueId())) {
             categoryViewers.add(player.getUniqueId());
         }
     }
@@ -175,12 +217,28 @@ public class ShopCategory implements IShopCategory {
         return categoryContentList;
     }
 
-    /**Get a category content by identifier*/
+    /**
+     * Get a category content by identifier
+     */
     @Override
-    public ICategoryContent getCategoryContent(String identifier, IShopIndex shopIndex){
-        for (IShopCategory sc : shopIndex.getCategoryList()){
-            for (ICategoryContent cc : sc.getCategoryContentList()){
+    public ICategoryContent getCategoryContent(String identifier, IShopIndex shopIndex) {
+        for (IShopCategory sc : shopIndex.getCategoryList()) {
+            for (ICategoryContent cc : sc.getCategoryContentList()) {
                 if (cc.getIdentifier().equals(identifier)) return cc;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Static helper to resolve a category content by its identifier within a given shop index.
+     * Uses the same logic as the instance method but avoids relying on a singleton instance.
+     */
+    public static ICategoryContent resolveCategoryContent(String identifier, IShopIndex shopIndex) {
+        if (identifier == null || shopIndex == null) return null;
+        for (IShopCategory sc : shopIndex.getCategoryList()) {
+            for (ICategoryContent cc : sc.getCategoryContentList()) {
+                if (identifier.equals(cc.getIdentifier())) return cc;
             }
         }
         return null;

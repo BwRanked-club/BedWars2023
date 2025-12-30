@@ -1,21 +1,26 @@
 package com.tomkeuper.bedwars.shop;
 
 import com.tomkeuper.bedwars.BedWars;
+import com.tomkeuper.bedwars.api.arena.IArena;
 import com.tomkeuper.bedwars.api.configuration.ConfigManager;
 import com.tomkeuper.bedwars.api.configuration.ConfigPath;
 import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.api.shop.IShopManager;
+import com.tomkeuper.bedwars.arena.Arena;
 import com.tomkeuper.bedwars.shop.listeners.*;
 import com.tomkeuper.bedwars.shop.main.QuickBuyButton;
 import com.tomkeuper.bedwars.shop.main.ShopCategory;
 import com.tomkeuper.bedwars.shop.main.ShopIndex;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
+
+import java.io.File;
 
 @SuppressWarnings("WeakerAccess")
 public class ShopManager extends ConfigManager implements IShopManager {
@@ -78,32 +83,32 @@ public class ShopManager extends ConfigManager implements IShopManager {
 
         if (isFirstTime()) {
             //quick buy defaults
-            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element1.path", "blocks-category.category-content.wool");
+            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element1.path", "default-blocks-category.category-content.wool");
             getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element1.slot", 19);
-            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element2.path", "melee-category.category-content.stone-sword");
+            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element2.path", "default-melee-category.category-content.stone-sword");
             getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element2.slot", 20);
-            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element3.path", "armor-category.category-content.chainmail");
+            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element3.path", "default-armor-category.category-content.chainmail");
             getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element3.slot", 21);
-            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element4.path", "ranged-category.category-content.bow1");
+            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element4.path", "default-ranged-category.category-content.bow1");
             getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element4.slot", 23);
-            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element5.path", "potions-category.category-content.speed-potion");
+            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element5.path", "default-potions-category.category-content.speed-potion");
             getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element5.slot", 24);
-            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element6.path", "utility-category.category-content.tnt");
+            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element6.path", "default-utility-category.category-content.tnt");
             getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element6.slot", 25);
 
-            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element7.path", "blocks-category.category-content.wood");
+            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element7.path", "default-blocks-category.category-content.wood");
             getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element7.slot", 28);
-            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element8.path", "melee-category.category-content.iron-sword");
+            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element8.path", "default-melee-category.category-content.iron-sword");
             getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element8.slot", 29);
-            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element9.path", "armor-category.category-content.iron-armor");
+            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element9.path", "default-armor-category.category-content.iron-armor");
             getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element9.slot", 30);
-            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element10.path", "tools-category.category-content.shears");
+            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element10.path", "default-tools-category.category-content.shears");
             getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element10.slot", 31);
-            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element11.path", "ranged-category.category-content.arrow");
+            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element11.path", "default-ranged-category.category-content.arrow");
             getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element11.slot", 32);
-            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element12.path", "potions-category.category-content.jump-potion");
+            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element12.path", "default-potions-category.category-content.jump-potion");
             getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element12.slot", 33);
-            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element13.path", "utility-category.category-content.water-bucket");
+            getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element13.path", "default-utility-category.category-content.water-bucket");
             getYml().addDefault(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + ".element13.slot", 34);
         }
 
@@ -393,6 +398,53 @@ public class ShopManager extends ConfigManager implements IShopManager {
             if (s.equalsIgnoreCase(ConfigPath.SHOP_SPECIALS_PATH)) continue;
             ShopCategory sc = new ShopCategory(s, getYml(), "default-" + s); // Identify shop with default name + shop name
             if (sc.isLoaded()) shop.addShopCategory(sc);
+        }
+        // Clear any previous caches and pre-resolve for already enabled arenas (if any)
+        try {
+            shop.clearAllCaches();
+        } catch (Throwable ignored) {
+        }
+        try {
+            for (IArena a : Arena.getArenas()) {
+                shop.preResolveForArena(a);
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
+    /**
+     * Load override shop files (arena/group specific) directly, without OverrideShop helper.
+     */
+    public void loadOverrides() {
+        File dir = new File(BedWars.plugin.getDataFolder(), "/Shops");
+        if (!dir.exists()) return;
+        File[] files = dir.listFiles();
+        if (files == null) return;
+        for (File file : files) {
+            if (!file.isFile()) continue;
+            if (!file.getName().endsWith(".yml")) continue;
+            if (file.getName().equalsIgnoreCase("default-shop.yml")) continue;
+            String name = file.getName().replace(".yml", "");
+            YamlConfiguration yml = YamlConfiguration.loadConfiguration(file);
+            for (String s : yml.getConfigurationSection("").getKeys(false)) {
+                BedWars.debug("adding shop category: " + s);
+                if (s.equalsIgnoreCase(ConfigPath.SHOP_SETTINGS_PATH)) continue;
+                if (s.equals(ConfigPath.SHOP_QUICK_DEFAULTS_PATH)) continue;
+                if (s.equalsIgnoreCase(ConfigPath.SHOP_SPECIALS_PATH)) continue;
+                ShopCategory sc = new ShopCategory(s, yml, name + "-" + s);
+                if (sc.isLoaded()) shop.addShopCategory(sc);
+            }
+        }
+        // After loading overrides, clear caches and pre-resolve for enabled arenas
+        try {
+            shop.clearAllCaches();
+        } catch (Throwable ignored) {
+        }
+        try {
+            for (IArena a : Arena.getArenas()) {
+                shop.preResolveForArena(a);
+            }
+        } catch (Throwable ignored) {
         }
     }
 

@@ -47,6 +47,7 @@ import com.tomkeuper.bedwars.arena.feature.GenSplitFeature;
 import com.tomkeuper.bedwars.arena.feature.ResourceChestFeature;
 import com.tomkeuper.bedwars.arena.feature.SpoilPlayerTNTFeature;
 import com.tomkeuper.bedwars.arena.spectator.SpectatorListeners;
+import com.tomkeuper.bedwars.arena.tasks.HologramTask;
 import com.tomkeuper.bedwars.arena.tasks.OneTick;
 import com.tomkeuper.bedwars.arena.tasks.Refresh;
 import com.tomkeuper.bedwars.arena.upgrades.BaseListener;
@@ -83,8 +84,8 @@ import com.tomkeuper.bedwars.listeners.joinhandler.JoinHandlerCommon;
 import com.tomkeuper.bedwars.listeners.joinhandler.JoinListenerMultiArena;
 import com.tomkeuper.bedwars.maprestore.internal.InternalAdapter;
 import com.tomkeuper.bedwars.money.internal.MoneyListeners;
-import com.tomkeuper.bedwars.shop.OverrideShop;
 import com.tomkeuper.bedwars.shop.ShopCache;
+import com.tomkeuper.bedwars.shop.ShopDataMigrator;
 import com.tomkeuper.bedwars.shop.ShopManager;
 import com.tomkeuper.bedwars.shop.quickbuy.PlayerQuickBuyCache;
 import com.tomkeuper.bedwars.sidebar.BoardManager;
@@ -342,9 +343,9 @@ public class BedWars extends JavaPlugin {
         }, 10L);
         setLevelAdapter(new InternalLevel());
         Bukkit.getScheduler().runTaskTimer(this, new Refresh(), 20L, 20L);
-        if (config.getBoolean(ConfigPath.GENERAL_CONFIGURATION_PERFORMANCE_ROTATE_GEN)) {
-            Bukkit.getScheduler().runTaskTimer(this, new OneTick(), 120, 1);
-        }
+        if (config.getBoolean(ConfigPath.GENERAL_CONFIGURATION_PERFORMANCE_ROTATE_GEN)) Bukkit.getScheduler().runTaskTimer(this, new OneTick(), 120, 1);
+
+        Bukkit.getScheduler().runTaskLater(this, new HologramTask(), config.getInt(ConfigPath.GENERAL_CONFIGURATION_PERFORMANCE_HOLOGRAM_UPDATE_RATE));
 
         nms.registerEntities();
         if (config.getString(ConfigPath.GENERAL_CONFIGURATION_DATABASE_TYPE).equalsIgnoreCase("mysql")) {
@@ -421,20 +422,10 @@ public class BedWars extends JavaPlugin {
         Sounds.init();
         shop = new ShopManager();
         shop.loadShop();
-        File dir = new File(BedWars.plugin.getDataFolder(), "/Shops");
-        if (dir.exists()) {
-            List<File> files = new ArrayList<>();
-            File[] fls = dir.listFiles();
-            for (File fl : Objects.requireNonNull(fls)) {
-                if (fl.isFile() && fl.getName().endsWith(".yml")) {
-                    files.add(fl);
-                }
-            }
-            for (File file : files) {
-                if (file.getName().equalsIgnoreCase("default-shop.yml")) continue;
-                new OverrideShop(shop, file.getName().replace(".yml", ""));
-            }
-        }
+        shop.loadOverrides();
+
+        ShopDataMigrator.runIfNeeded();
+
         registerItemHandlers(new StatsItemHandler("stats", this, api), new CommandItemHandler("command", this, api), new LeaveItemHandler("leave", this, api));
         shopCache = new ShopCache();
         playerQuickBuyCache = new PlayerQuickBuyCache();

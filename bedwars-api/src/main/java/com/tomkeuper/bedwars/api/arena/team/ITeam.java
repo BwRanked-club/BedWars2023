@@ -75,9 +75,11 @@ public interface ITeam {
     Location getBed();
 
     /**
-     * Get the bed hologram of a player
+     * Get the bed hologram of a language
+     *
+     * @param iso target language ISO code.
      */
-    IBedHolo getBedHologram(Player player);
+    IBedHolo getBedHologram(String iso);
 
     /**
      * Set the bed destoryer for the team
@@ -313,6 +315,13 @@ public interface ITeam {
      * @param player target player.
      */
     void destroyBedHolo(Player player);
+
+    /**
+     * Destroy bed hologram for player
+     *
+     * @param iso target language ISO code.
+     */
+    void destroyBedHolo(String iso);
 
     /**
      * Get queued traps for a team.

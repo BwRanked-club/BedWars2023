@@ -44,7 +44,7 @@ class PlayerGoods {
 
         // ✅ Caso já exista snapshot, não retorna: apenas inicializa com dados atuais
         if (hasGoods(player)) {
-            plugin.getLogger().severe(player.getName() + " already has a PlayerGoods snapshot!");
+            plugin.getLogger().severe("Skipping PlayerGoods creation for " + player.getName() + " because a snapshot already exists.");
         }
 
         // --- Snapshot always initialized (fix for "not initialized") ---
@@ -87,6 +87,44 @@ class PlayerGoods {
         }
     }
 
+    /**
+     * Safely create a PlayerGoods snapshot when needed.
+     * - Returns existing snapshot if present.
+     * - Skips creation during rejoin or in-game phases.
+     * - Otherwise creates and returns a new snapshot.
+     */
+    static PlayerGoods createIfNeeded(Player p, boolean prepare) {
+        // If there's already a snapshot, return it as-is
+        PlayerGoods existing = getPlayerGoods(p);
+        if (existing != null) {
+            BedWars.debug("PlayerGoods already exists for " + p.getName() + ", returning existing snapshot.");
+            return existing;
+        }
+
+        // Rejoin/in-game detection
+        boolean skip;
+        try {
+            boolean isRejoin = ReJoin.exists(p);
+            com.tomkeuper.bedwars.api.arena.IArena currentArena = Arena.getArenaByPlayer(p);
+            boolean inGamePhase = false;
+            if (currentArena != null) {
+                inGamePhase = currentArena.getStatus() == com.tomkeuper.bedwars.api.arena.GameState.playing
+                        || currentArena.getStatus() == com.tomkeuper.bedwars.api.arena.GameState.starting;
+            }
+            skip = isRejoin || inGamePhase;
+        } catch (Throwable t) {
+            skip = false; // be conservative and allow snapshot if detection failed
+        }
+
+        if (skip) {
+            BedWars.debug("Skipping PlayerGoods snapshot creation for " + p.getName() + " (rejoin/in-game).");
+            return null;
+        }
+
+        // Safe to create a new snapshot
+        return new PlayerGoods(p, prepare);
+    }
+
     static boolean hasGoods(Player player) {
         return PLAYER_GOODS.containsKey(player.getUniqueId());
     }
@@ -96,6 +134,8 @@ class PlayerGoods {
     }
 
     void restore() {
+        BedWars.debug("Restoring PlayerGoods for player " + uuid.toString());
+
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) return;
 

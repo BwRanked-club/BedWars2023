@@ -6,10 +6,7 @@ import com.tomkeuper.bedwars.api.arena.shop.ICategoryContent;
 import com.tomkeuper.bedwars.api.configuration.ConfigPath;
 import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.language.Messages;
-import com.tomkeuper.bedwars.api.shop.IPlayerQuickBuyCache;
-import com.tomkeuper.bedwars.api.shop.IQuickBuyElement;
-import com.tomkeuper.bedwars.api.shop.IShopCache;
-import com.tomkeuper.bedwars.api.shop.IShopCategory;
+import com.tomkeuper.bedwars.api.shop.*;
 import com.tomkeuper.bedwars.arena.Arena;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -65,43 +62,76 @@ public class PlayerQuickBuyCache implements IPlayerQuickBuyCache {
         Player p = Bukkit.getPlayer(player);
         IArena arena = Arena.getArenaByPlayer(p);
 
-        List<IShopCategory> registeredShops = BedWars.getAPI().getShopUtil().getShopManager().getShop().getCategoryList();
+        // Resolve the arena-linked shop index (no global scans)
+        IShopIndex idx = (arena != null && arena.getLinkedShop() != null)
+                ? arena.getLinkedShop()
+                : BedWars.getAPI().getShopUtil().getShopManager().getShop();
 
-        // First, identify and remove categories with overrides
-        List<IQuickBuyElement> elementsToRemove = new ArrayList<>();
-
-        List<IShopCategory> matchingShops = registeredShops.stream()
-                .filter(shopCategory -> shopCategory.getName().toLowerCase().startsWith(arena.getGroup().toLowerCase()))
-                .collect(Collectors.toList());
-
-        for (IQuickBuyElement qbe : elements) {
-            String categoryIdentifier = qbe.getCategoryContent().getCategoryIdentifier().toLowerCase();
-            if (categoryIdentifier.startsWith("default")) {
-                for (IShopCategory matchingShop : matchingShops) {
-                    String matchingShopName = matchingShop.getName().toLowerCase().replace(arena.getGroup() + "-shop-", "");
-                    String qbeCategoryName = qbe.getCategoryContent().getCategoryIdentifier().toLowerCase().replace("default-", "").split("\\.")[0];
-                    if (matchingShopName.equalsIgnoreCase(qbeCategoryName)) {
-                        elementsToRemove.add(qbe);
-                    }
+        // Collect contents available in this arena only
+        java.util.List<ICategoryContent> arenaContents = new java.util.ArrayList<>();
+        if (arena != null && idx instanceof com.tomkeuper.bedwars.shop.main.ShopIndex) {
+            java.util.Map<Integer, IShopCategory> chosen = ((com.tomkeuper.bedwars.shop.main.ShopIndex) idx).getResolvedBySlot(arena);
+            for (IShopCategory sc : chosen.values()) {
+                arenaContents.addAll(sc.getCategoryContentList());
+            }
+        } else {
+            // Fallback: defaults only when no arena context or no pre-resolved data
+            for (IShopCategory sc : idx.getCategoryList()) {
+                String n = sc.getName() == null ? "" : sc.getName().toLowerCase();
+                if (n.startsWith("default-")) {
+                    arenaContents.addAll(sc.getCategoryContentList());
                 }
             }
         }
 
-        // Remove categories with overrides
-        elements.removeAll(elementsToRemove);
+        // Map of slot -> element to render (no priority; keep first encountered)
+        Map<Integer, IQuickBuyElement> toRenderBySlot = new java.util.HashMap<>();
 
-        // Second, add the remaining categories to the inventory
         for (IQuickBuyElement qbe : elements) {
-            ICategoryContent categoryContent = qbe.getCategoryContent();
-            inv.setItem(qbe.getSlot(), categoryContent.getItemStack(p, shopCache));
+            ICategoryContent content = qbe.getCategoryContent();
+            if (content == null) continue;
+
+            // Find exact match by identifier within arena contents; if not found, skip
+            ICategoryContent match = null;
+            String idExact = content.getIdentifier();
+            for (ICategoryContent c : arenaContents) {
+                if (idExact.equalsIgnoreCase(c.getIdentifier())) {
+                    match = c;
+                    break;
+                }
+            }
+            if (match == null) {
+                // Not available in this arena; do not render this element
+                continue;
+            }
+
+            // Rebind to arena instance if needed
+            if (match != content && qbe instanceof QuickBuyElement) {
+                ((QuickBuyElement) qbe).setCategoryContent(match);
+                content = match;
+            }
+
+            // Put in its saved slot if not already occupied
+            int slot = qbe.getSlot();
+            if (!toRenderBySlot.containsKey(slot)) {
+                toRenderBySlot.put(slot, qbe);
+            }
         }
 
-        if (elements.size() == 21) return;
+        // Render quick-buy elements that are available in this arena
+        for (Map.Entry<Integer, IQuickBuyElement> e : toRenderBySlot.entrySet()) {
+            IQuickBuyElement qbe = e.getValue();
+            ICategoryContent cc = qbe.getCategoryContent();
+            if (cc != null) {
+                inv.setItem(e.getKey(), cc.getItemStack(p, shopCache));
+            }
+        }
 
-        ItemStack i = getEmptyItem(p);
+        // Fill empty quick slots with the empty placeholder
+        ItemStack empty = getEmptyItem(p);
         for (int x : quickSlots) {
             if (inv.getItem(x) == null) {
-                inv.setItem(x, i);
+                inv.setItem(x, empty);
             }
         }
     }
@@ -163,7 +193,7 @@ public class PlayerQuickBuyCache implements IPlayerQuickBuyCache {
     }
 
     @Override
-    public void applyLayout(java.util.Map<Integer, String> layout) {
+    public void applyLayout(Map<Integer, String> layout) {
         elements.clear();
         updateSlots.clear();
         if (layout != null) {
@@ -179,7 +209,7 @@ public class PlayerQuickBuyCache implements IPlayerQuickBuyCache {
     @Override
     public String serializeCompact() {
         String joined = exportLayout().entrySet().stream()
-                .sorted(java.util.Map.Entry.comparingByKey())
+                .sorted(Map.Entry.comparingByKey())
                 .map(e -> e.getKey() + "=" + e.getValue())
                 .collect(Collectors.joining(";"));
         return Base64.getUrlEncoder().withoutPadding()
@@ -260,4 +290,16 @@ public class PlayerQuickBuyCache implements IPlayerQuickBuyCache {
         return instance;
     }
 
+    // Normalize an identifier by stripping the arena/group/default prefix from the base category
+    private static String normalizeIdentifier(String id) {
+        if (id == null) return "";
+        int idxMarker = id.indexOf(".category-content.");
+        if (idxMarker < 0) return id;
+        String cat = id.substring(0, idxMarker);
+        int dash = cat.indexOf('-');
+        if (dash >= 0) {
+            cat = cat.substring(dash + 1);
+        }
+        return cat + id.substring(idxMarker);
+    }
 }

@@ -36,6 +36,7 @@ public class GenSplitFeature implements Listener {
             Player p = e.getPlayer();
 
             int splitRange = Arena.getArenaByPlayer(p).getConfig().getInt(ConfigPath.ARENA_GENERATOR_SPLIT_RANGE);
+            assert pl.getWorld() != null;
             List<Entity> nearbyEntities = (List) pl.getWorld().getNearbyEntities(pl, splitRange, splitRange, 2.0);
 
             for (Entity entity : pl.getWorld().getEntities()) {

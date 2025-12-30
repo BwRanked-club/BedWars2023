@@ -100,10 +100,10 @@ public interface IDatabase {
      *
      * @param player The UUID of the player.
      * @return An Object array containing the player's level, XP, display name, and next level cost.
-     *         Index 0: player level (int)
-     *         Index 1: player XP (int)
-     *         Index 2: display name (String)
-     *         Index 3: next level cost (int)
+     * Index 0: player level (int)
+     * Index 1: player XP (int)
+     * Index 2: display name (String)
+     * Index 3: next level cost (int)
      */
     Object[] getLevelData(UUID player);
 
@@ -137,9 +137,17 @@ public interface IDatabase {
     /**
      * Pushes the changes to the quick buy slots for a player.
      *
-     * @param updateSlots  A HashMap where the key is the slot ID and the value is the element.
-     * @param uuid         The UUID of the player.
-     * @param elementList  A list of quick buy elements.
+     * @param updateSlots A HashMap where the key is the slot ID and the value is the element.
+     * @param uuid        The UUID of the player.
+     * @param elementList A list of quick buy elements.
      */
     void pushQuickBuyChanges(HashMap<Integer, String> updateSlots, UUID uuid, List<IQuickBuyElement> elementList);
+
+    /**
+     * List all players that have a Quick Buy row.
+     * Used for startup migrations.
+     *
+     * @return list of player UUIDs that have Quick Buy data.
+     */
+    List<UUID> listQuickBuyUUIDs();
 }

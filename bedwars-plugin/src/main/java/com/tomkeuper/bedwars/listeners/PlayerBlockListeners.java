@@ -81,6 +81,20 @@ public class PlayerBlockListeners implements Listener {
         }
     }
 
+    @EventHandler
+    public void onWaterFlow(BlockFromToEvent e) {
+        IArena arena = Arena.getArenaByIdentifier(e.getBlock().getWorld().getName());
+        if (arena == null) return;
+        if (!e.getBlock().getType().toString().equalsIgnoreCase("WATER")) return;
+        if (e.getToBlock().isEmpty()) return;
+
+        for (Region region : arena.getRegionsList()) {
+            if (region.isInRegion(e.getToBlock().getLocation()) && region.isProtected()) {
+                e.setCancelled(true);
+                return;
+            }
+        }
+    }
 
     @EventHandler(ignoreCancelled = true)
     public void onBurn(@NotNull BlockBurnEvent event) {
@@ -636,6 +650,8 @@ public class PlayerBlockListeners implements Listener {
                 || name.equals("DOUBLE_PLANT")
                 || name.equals("GRASS_PATH")
                 || name.equals("SUGAR_CANE")
-                || name.equals("SUGAR_CANE_BLOCK");
+                || name.equals("SUGAR_CANE_BLOCK")
+                || name.equalsIgnoreCase("RED_MUSHROOM")
+                || name.equalsIgnoreCase("BROWN_MUSHROOM");
     }
 }

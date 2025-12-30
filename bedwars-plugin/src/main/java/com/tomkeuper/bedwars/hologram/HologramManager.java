@@ -7,11 +7,18 @@ import com.tomkeuper.bedwars.api.hologram.containers.IHologram;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 public class HologramManager implements IHologramManager {
 
     @Override
     public IHologram createHologram(Player p, Location location, String... lines) {
         return BedWars.nms.createHologram(p, location, lines);
+    }
+
+    @Override
+    public IHologram createHologram(List<Player> players, Location location, String... lines) {
+        return BedWars.nms.createHologram(players, location, lines);
     }
 
     @Override

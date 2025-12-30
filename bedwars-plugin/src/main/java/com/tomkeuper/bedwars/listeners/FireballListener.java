@@ -1,5 +1,7 @@
 package com.tomkeuper.bedwars.listeners;
 
+import com.google.common.base.Functions;
+import com.google.common.collect.ImmutableMap;
 import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.arena.GameState;
 import com.tomkeuper.bedwars.api.arena.IArena;
@@ -12,20 +14,15 @@ import com.tomkeuper.bedwars.arena.LastHit;
 import com.tomkeuper.bedwars.arena.team.BedWarsTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.ExplosionPrimeEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -33,207 +30,218 @@ import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
 import java.util.Collection;
-import java.util.EnumSet;
-import java.util.Set;
+import java.util.EnumMap;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static com.tomkeuper.bedwars.BedWars.config;
 
 public class FireballListener implements Listener {
 
-    private static final double MAX_KB = 4.0;
 
-    private final double fireballExplosionSize;
-    private final double fireballHorizontalSelf;
-    private final double fireballHorizontalOthers;
-    private final double fireballVerticalSelf;
-    private final double fireballVerticalOthers;
-    private final double damageSelf;
-    private final double damageEnemy;
-    private final double damageTeammates;
-    private final double fireballSpeedMultiplier;
-    private final double fireballCooldown;
-    private final double jumpTolerance;
+    private final List<String> explosionProofMaterials;
+    private final double fireballExplosionSize, fireballHorizontalSelf, fireballHorizontalOthers, fireballVerticalSelf, fireballVerticalOthers;
+    private final double damageSelf, damageEnemy, damageTeammates;
+    private final double fireballSpeedMultiplier, fireballCooldown;
     private final boolean fireballMakeFire;
-    private final Set<Material> explosionProof;
 
     public FireballListener() {
-        YamlConfiguration yml = BedWars.config.getYml();
-        fireballExplosionSize = yml.getDouble(ConfigPath.GENERAL_FIREBALL_EXPLOSION_SIZE);
-        fireballMakeFire = yml.getBoolean(ConfigPath.GENERAL_FIREBALL_MAKE_FIRE);
-        fireballHorizontalSelf = yml.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_HORIZONTAL_SELF) * -1;
-        fireballHorizontalOthers = yml.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_HORIZONTAL_OTHERS) * -1;
-        fireballVerticalSelf = yml.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_VERTICAL_SELF);
-        fireballVerticalOthers = yml.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_VERTICAL_OTHERS);
-        damageSelf = yml.getDouble(ConfigPath.GENERAL_FIREBALL_DAMAGE_SELF);
-        damageEnemy = yml.getDouble(ConfigPath.GENERAL_FIREBALL_DAMAGE_ENEMY);
-        damageTeammates = yml.getDouble(ConfigPath.GENERAL_FIREBALL_DAMAGE_TEAMMATES);
-        fireballSpeedMultiplier = yml.getDouble(ConfigPath.GENERAL_FIREBALL_SPEED_MULTIPLIER);
-        fireballCooldown = yml.getDouble(ConfigPath.GENERAL_FIREBALL_COOLDOWN);
-        jumpTolerance = yml.getDouble(ConfigPath.GENERAL_FIREBALL_JUMP_TOLERANCE);
-
-        explosionProof = EnumSet.noneOf(Material.class);
-        for (String type : BedWars.config.getList(ConfigPath.GENERAL_FIREBALL_EXPLOSION_PROOF_BLOCKS)) {
-            try {
-                explosionProof.add(Material.valueOf(type));
-            } catch (IllegalArgumentException ignored) {
-            }
-        }
+        YamlConfiguration config = BedWars.config.getYml();
+        explosionProofMaterials = config.getList(ConfigPath.GENERAL_FIREBALL_EXPLOSION_PROOF_BLOCKS).stream().map(Object::toString).collect(Collectors.toList());
+        fireballExplosionSize = config.getDouble(ConfigPath.GENERAL_FIREBALL_EXPLOSION_SIZE);
+        fireballMakeFire = config.getBoolean(ConfigPath.GENERAL_FIREBALL_MAKE_FIRE);
+        fireballHorizontalSelf = config.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_HORIZONTAL_SELF) * -1;
+        fireballHorizontalOthers = config.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_HORIZONTAL_OTHERS) * -1;
+        fireballVerticalSelf = config.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_VERTICAL_SELF);
+        fireballVerticalOthers = config.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_VERTICAL_OTHERS);
+        damageSelf = config.getDouble(ConfigPath.GENERAL_FIREBALL_DAMAGE_SELF);
+        damageEnemy = config.getDouble(ConfigPath.GENERAL_FIREBALL_DAMAGE_ENEMY);
+        damageTeammates = config.getDouble(ConfigPath.GENERAL_FIREBALL_DAMAGE_TEAMMATES);
+        fireballSpeedMultiplier = config.getDouble(ConfigPath.GENERAL_FIREBALL_SPEED_MULTIPLIER);
+        fireballCooldown = config.getDouble(ConfigPath.GENERAL_FIREBALL_COOLDOWN);
     }
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onFireballInteract(PlayerInteractEvent e) {
+        Player player = e.getPlayer();
         ItemStack handItem = e.getItem();
         Action action = e.getAction();
-        if ((action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) || handItem == null) return;
 
-        Player player = e.getPlayer();
+        if (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR || handItem == null) return;
+
         IArena arena = Arena.getArenaByPlayer(player);
         if (arena == null || arena.getStatus() != GameState.playing || handItem.getType() != BedWars.nms.materialFireball())
             return;
 
         e.setCancelled(true);
 
-        long now = System.currentTimeMillis();
-        long last = arena.getFireballCooldowns().getOrDefault(player.getUniqueId(), 0L);
-        long cdMs = (long) (fireballCooldown * 1000);
-        long left = cdMs - (now - last);
-        if (left > 0) {
+        long cooldown = (long) (fireballCooldown * 1000);
+        long timeDifference = System.currentTimeMillis() - arena.getFireballCooldowns().getOrDefault(player.getUniqueId(), 0L);
+        if (timeDifference <= cooldown) {
             if (fireballCooldown >= 1.0) {
-                long secs = (left + 999) / 1000;
                 player.sendMessage(Language.getMsg(player, Messages.ARENA_FIREBALL_COOLDOWN)
-                        .replace("%bw_cooldown%", String.valueOf(secs)));
+                        .replace("%bw_cooldown%", String.valueOf((cooldown - timeDifference) / 1000)));
             }
             return;
         }
-        arena.getFireballCooldowns().put(player.getUniqueId(), now);
 
+        arena.getFireballCooldowns().put(player.getUniqueId(), System.currentTimeMillis());
         Fireball fireball = player.launchProjectile(Fireball.class);
         Vector direction = player.getEyeLocation().getDirection();
         fireball = BedWars.nms.setFireballDirection(fireball, direction);
         fireball.setVelocity(fireball.getDirection().multiply(fireballSpeedMultiplier));
         fireball.setYield((float) fireballExplosionSize);
-        fireball.setIsIncendiary(fireballMakeFire);
-        fireball.setMetadata("bw2023", new FixedMetadataValue(BedWars.plugin, "1"));
-
+        fireball.setMetadata("bw2023", new FixedMetadataValue(BedWars.plugin, "ceva"));
         BedWars.nms.minusAmount(player, handItem, 1);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void fireballHit(ProjectileHitEvent e) {
         if (!(e.getEntity() instanceof Fireball)) return;
 
+        Location location = e.getEntity().getLocation();
         ProjectileSource projectileSource = e.getEntity().getShooter();
-        if (!(projectileSource instanceof Player source)) return;
+        if (!(projectileSource instanceof Player)) return;
 
+        Player source = (Player) projectileSource;
         IArena arena = Arena.getArenaByPlayer(source);
+
         if (arena == null || arena.getStatus() != GameState.playing) return;
 
-        Location loc = e.getEntity().getLocation();
-        World world = loc.getWorld();
+        Vector vector = location.toVector();
+        World world = location.getWorld();
         if (world == null) return;
 
-        Vector center = loc.toVector();
-        Collection<Entity> nearby = world.getNearbyEntities(loc, fireballExplosionSize, fireballExplosionSize, fireballExplosionSize);
+        Collection<Entity> nearbyEntities = world.getNearbyEntities(location, fireballExplosionSize, fireballExplosionSize, fireballExplosionSize);
 
-        for (Entity entity : nearby) {
-            if (!(entity instanceof Player player)) continue;
+        for (Entity entity : nearbyEntities) {
+            if (!(entity instanceof Player)) continue;
+            Player player = (Player) entity;
+
             if (!Arena.isInArena(player) || arena.isSpectator(player) || arena.isReSpawning(player)) continue;
 
-            UUID pid = player.getUniqueId();
-            long invuln = BedWarsTeam.reSpawnInvulnerability.getOrDefault(pid, 0L);
-            if (invuln > System.currentTimeMillis()) continue;
-            BedWarsTeam.reSpawnInvulnerability.remove(pid);
+            UUID playerUUID = player.getUniqueId();
+            long respawnInvulnerability = BedWarsTeam.reSpawnInvulnerability.getOrDefault(playerUUID, 0L);
 
-            Vector playerVec = player.getLocation().toVector();
-            Vector unit = safeNormalize(center.clone().subtract(playerVec));
-            double baseY = unit.getY() < 0 ? unit.getY() + 1.5 : unit.getY();
-            baseY = Math.max(baseY, 0);
+            if (respawnInvulnerability > System.currentTimeMillis()) continue;
+            BedWarsTeam.reSpawnInvulnerability.remove(playerUUID);
 
-            boolean self = player.getUniqueId().equals(source.getUniqueId());
-            double y = (baseY <= jumpTolerance)
-                    ? (self ? fireballVerticalSelf : fireballVerticalOthers) * 1.5
-                    : baseY * (self ? fireballVerticalSelf : fireballVerticalOthers) * 1.5;
+            Vector playerVector = player.getLocation().toVector();
+            Vector normalizedVector = playerVector.subtract(vector).normalize();
+            Vector horizontalVector;
+            double y;
 
-            Vector horiz = unit.multiply(self ? fireballHorizontalSelf : fireballHorizontalOthers);
-            Vector kb = clamp(horiz.setY(y));
+            if (entity.getUniqueId() == source.getUniqueId()) {
+                horizontalVector = normalizedVector.multiply(Math.abs(fireballHorizontalSelf));
+                y = normalizedVector.getY();
 
-            if (isFinite(kb)) {
-                try {
-                    player.setVelocity(kb);
-                } catch (IllegalArgumentException ex) {
-                    Bukkit.getLogger().warning("Invalid KB vector for " + player.getName() + " at " + player.getLocation() + " vec=" + kb);
+                // FIXED: Check horizontal distance instead of just Y tolerance
+                double horizontalDistance = Math.sqrt(normalizedVector.getX() * normalizedVector.getX() +
+                        normalizedVector.getZ() * normalizedVector.getZ());
+
+                if (horizontalDistance <= config.getDouble(ConfigPath.GENERAL_FIREBALL_JUMP_TOLERANCE)) {
+                    // Mostly vertical explosion (including straight down)
+                    y = fireballVerticalSelf * 1.5;
+                } else {
+                    // Has horizontal component
+                    y = Math.abs(y) * fireballVerticalSelf * 1.5;
+                }
+            } else {
+                horizontalVector = normalizedVector.multiply(Math.abs(fireballHorizontalOthers));
+                y = normalizedVector.getY();
+
+                // FIXED: Check horizontal distance instead of just Y tolerance
+                double horizontalDistance = Math.sqrt(normalizedVector.getX() * normalizedVector.getX() +
+                        normalizedVector.getZ() * normalizedVector.getZ());
+
+                if (horizontalDistance <= config.getDouble(ConfigPath.GENERAL_FIREBALL_JUMP_TOLERANCE)) {
+                    // Mostly vertical explosion (including straight down)
+                    y = fireballVerticalOthers * 1.5;
+                } else {
+                    // Has horizontal component
+                    y = Math.abs(y) * fireballVerticalOthers * 1.5;
                 }
             }
 
-            touch(player, source);
+            // FIXED: Delay velocity application for newer versions to avoid being overridden
+            final Vector finalVelocity = horizontalVector.setY(y);
+            final Player finalPlayer = player;
+            Bukkit.getScheduler().runTask(BedWars.plugin, () -> {
+                try {
+                    finalPlayer.setVelocity(finalVelocity);
+                } catch (IllegalArgumentException ignored) {
+                }
+            });
 
-            if (self) {
-                if (damageSelf > 0) damageFromExplosion(player, damageSelf, source);
+            LastHit lh = LastHit.getLastHit(player);
+            if (lh != null) {
+                lh.setDamager(source);
+                lh.setTime(System.currentTimeMillis());
+            } else new LastHit(player, source, System.currentTimeMillis());
+
+            if (player.equals(source)) {
+                if (damageSelf > 0) player.damage(damageSelf);
             } else {
-                ITeam pt = arena.getTeam(player);
-                ITeam st = arena.getTeam(source);
-                double amount = (pt != null && pt.equals(st)) ? damageTeammates : damageEnemy;
-                damageFromExplosion(player, amount, source);
+                ITeam playerTeam = arena.getTeam(player);
+                ITeam sourceTeam = arena.getTeam(source);
+
+                if (playerTeam != null && playerTeam.equals(sourceTeam)) damagePlayer(player, damageTeammates);
+                else damagePlayer(player, damageEnemy);
             }
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void onFireballExplode(EntityExplodeEvent event) {
         if (!(event.getEntity() instanceof Fireball)) return;
 
         ProjectileSource projectileSource = ((Fireball) event.getEntity()).getShooter();
-        if (!(projectileSource instanceof Player source)) return;
+        if (!(projectileSource instanceof Player)) return;
 
+        Player source = (Player) projectileSource;
         IArena arena = Arena.getArenaByPlayer(source);
+
         if (arena == null || arena.getStatus() != GameState.playing) return;
 
-        event.blockList().removeIf(block -> explosionProof.contains(block.getType()));
+        Location explosionLocation = event.getLocation();
+        World world = explosionLocation.getWorld();
+        if (world == null) return;
+
+        event.blockList().removeIf(block -> explosionProofMaterials.contains(block.getType().toString()));
     }
 
-    @EventHandler(ignoreCancelled = true)
+    private void damagePlayer(Player player, double damageTeammates) {
+        if (damageTeammates > 0) {
+            EntityDamageEvent damageEvent = new EntityDamageEvent(
+                    player,
+                    EntityDamageEvent.DamageCause.ENTITY_EXPLOSION,
+                    new EnumMap<>(ImmutableMap.of(EntityDamageEvent.DamageModifier.BASE, damageTeammates)),
+                    new EnumMap<>(ImmutableMap.of(EntityDamageEvent.DamageModifier.BASE, Functions.constant(damageTeammates)))
+            );
+            player.setLastDamageCause(damageEvent);
+            player.damage(damageTeammates); // damage teammates
+        }
+    }
+
+    @EventHandler
     public void fireballDirectHit(EntityDamageByEntityEvent e) {
-        if (!(e.getDamager() instanceof Fireball) || !(e.getEntity() instanceof Player player)) return;
+        if (!(e.getDamager() instanceof Fireball) || !(e.getEntity() instanceof Player)) return;
+
+        Player player = (Player) e.getEntity();
         if (!Arena.isInArena(player)) return;
         e.setCancelled(true);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void fireballPrime(ExplosionPrimeEvent e) {
-        if (!(e.getEntity() instanceof Fireball fireball)) return;
+        if (!(e.getEntity() instanceof Fireball)) return;
+
+        Fireball fireball = (Fireball) e.getEntity();
         ProjectileSource shooter = fireball.getShooter();
-        if (!(shooter instanceof Player shooterPlayer) || !Arena.isInArena(shooterPlayer)) return;
+
+        if (!(shooter instanceof Player) || !Arena.isInArena((Player) shooter)) return;
+
         e.setFire(fireballMakeFire);
-    }
-
-    private static boolean isFinite(Vector v) {
-        return Double.isFinite(v.getX()) && Double.isFinite(v.getY()) && Double.isFinite(v.getZ());
-    }
-
-    private static Vector safeNormalize(Vector v) {
-        double len = v.length();
-        if (len < 1.0e-6) return new Vector(0, 0.1, 0);
-        return v.multiply(1.0 / len);
-    }
-
-    private static Vector clamp(Vector v) {
-        double len = v.length();
-        if (len > FireballListener.MAX_KB) v.multiply(FireballListener.MAX_KB / len);
-        return v;
-    }
-
-    private static void damageFromExplosion(Player victim, double amount, Player source) {
-        if (amount <= 0) return;
-        if (source != null) victim.damage(amount, source);
-        else victim.damage(amount);
-    }
-
-    private static void touch(Player victim, Player damager) {
-        LastHit lh = LastHit.getLastHit(victim);
-        if (lh != null) {
-            lh.setDamager(damager);
-            lh.setTime(System.currentTimeMillis());
-        } else {
-            new LastHit(victim, damager, System.currentTimeMillis());
-        }
     }
 }

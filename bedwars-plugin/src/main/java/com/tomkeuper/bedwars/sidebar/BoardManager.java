@@ -359,7 +359,7 @@ public class BoardManager implements IScoreboardService {
             if (arenaStatus == null) {
                 if (BedWars.config.getBoolean(ConfigPath.SB_CONFIG_SIDEBAR_USE_LOBBY_SIDEBAR))
                     scoreboardName = "bw_lobby_" + playerLanguage.getIso();
-                tabPlayer.setTemporaryGroup(null);
+                tabPlayer.setTemporaryGroup("default");
             } else {
                 String arenaSuffix = "_" + arena.getArenaName();
                 scoreboardName = switch (arenaStatus) {
