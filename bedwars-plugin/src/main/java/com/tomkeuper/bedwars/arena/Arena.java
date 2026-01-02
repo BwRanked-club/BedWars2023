@@ -65,6 +65,8 @@ import me.neznamy.tab.api.placeholder.PlayerPlaceholder;
 import me.neznamy.tab.api.placeholder.ServerPlaceholder;
 import me.neznamy.tab.api.scoreboard.Scoreboard;
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -1637,6 +1639,8 @@ public class Arena implements IArena {
 
                 player.sendMessage(SupportPAPI.getSupportPAPI().replace(player, message));
             }
+
+            sendMapRatingPrompt(player);
         }
 
         changeStatus(GameState.restarting);
@@ -1651,6 +1655,42 @@ public class Arena implements IArena {
             for (Player p : bwt.getMembersCache()) losers.add(p.getUniqueId());
         }
         Bukkit.getPluginManager().callEvent(new GameEndEvent(this, winnersList, losers, winnerTeam, aliveWinners));
+    }
+
+    private void sendMapRatingPrompt(Player player) {
+        if (player == null) return;
+
+        String question = getMsg(player, Messages.GAME_END_MAP_RATING_QUESTION)
+                .replace("%bw_map%", getDisplayName())
+                .replace("%bw_arena%", getArenaName())
+                .replace("%bw_group%", getGroup());
+        if (!question.isEmpty()) {
+            player.sendMessage(question);
+        }
+
+        String starText = getMsg(player, Messages.GAME_END_MAP_RATING_STAR);
+        String hoverTemplate = getMsg(player, Messages.GAME_END_MAP_RATING_HOVER);
+        TextComponent stars = new TextComponent("");
+
+        for (int i = 1; i <= 5; i++) {
+            TextComponent star = new TextComponent(starText);
+            String command = "/" + BedWars.mainCmd + " rateMap " + getArenaName() + " " + i;
+            star.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
+            if (!hoverTemplate.isEmpty()) {
+                String hoverText = hoverTemplate
+                        .replace("%bw_rating%", String.valueOf(i))
+                        .replace("%bw_map%", getDisplayName())
+                        .replace("%bw_arena%", getArenaName())
+                        .replace("%bw_group%", getGroup());
+                star.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverText).create()));
+            }
+            stars.addExtra(star);
+            if (i < 5) {
+                stars.addExtra(" ");
+            }
+        }
+
+        player.spigot().sendMessage(stars);
     }
 
     public void addPlayerDeath(Player p) {

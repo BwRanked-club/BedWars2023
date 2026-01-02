@@ -10,6 +10,7 @@ import com.tomkeuper.bedwars.api.party.Party;
 import com.tomkeuper.bedwars.api.stats.IPlayerStats;
 import com.tomkeuper.bedwars.arena.Arena;
 import com.tomkeuper.bedwars.commands.shout.ShoutCommand;
+import com.tomkeuper.bedwars.ratings.MapRatingService;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -98,6 +99,25 @@ public class PAPISupport extends PlaceholderExpansion {
                 return arena.getGroup();
             }
             return "-";
+        }
+
+        if (s.startsWith("arena_average_rating_")) {
+            String arenaName = s.replace("arena_average_rating_", "").trim();
+            if (arenaName.startsWith("{") && arenaName.endsWith("}")) {
+                arenaName = arenaName.substring(1, arenaName.length() - 1);
+            }
+            double average = MapRatingService.getAverageRating(arenaName);
+            if (average <= 0D) {
+                return "§7" + getStarChar() + getStarChar() + getStarChar() + getStarChar() + getStarChar();
+            }
+            int fullStars = (int) Math.floor(average);
+            if (fullStars < 0) fullStars = 0;
+            if (fullStars > 5) fullStars = 5;
+            StringBuilder out = new StringBuilder();
+            for (int i = 1; i <= 5; i++) {
+                out.append(i <= fullStars ? "§6" : "§7").append(getStarChar());
+            }
+            return out.toString();
         }
 
         /* Player required placeholders */
@@ -435,5 +455,13 @@ public class PAPISupport extends PlaceholderExpansion {
             default:
                 return 0;
         }
+    }
+
+    private String getStarChar() {
+        String star = ChatColor.stripColor(Language.getDefaultLanguage().m(Messages.GAME_END_MAP_RATING_STAR));
+        if (star == null || star.isBlank()) {
+            return "*";
+        }
+        return star;
     }
 }

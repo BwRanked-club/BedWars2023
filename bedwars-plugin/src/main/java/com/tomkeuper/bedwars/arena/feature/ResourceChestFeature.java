@@ -11,6 +11,7 @@ import com.tomkeuper.bedwars.arena.Arena;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
@@ -104,6 +105,8 @@ public class ResourceChestFeature implements Listener {
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) return;
 
+        player.playSound(player.getLocation(), Sound.CLICK, 1.0f, 1.0f);
+
         int inserted = safeDeposit(event.getPlayer(), event.getItem(), event.getTargetInventory());
         if (inserted > 0) {
             sendDepositMessage(event.getPlayer(), event.getItem(), inserted);
@@ -127,17 +130,15 @@ public class ResourceChestFeature implements Listener {
             return 0;
         }
 
-        ItemStack toRemove = hand.clone();
-        toRemove.setAmount(inserted);
-        player.getInventory().removeItem(toRemove);
-
-        if (!leftovers.isEmpty()) {
-            for (ItemStack leftover : leftovers.values()) {
-                if (leftover != null && leftover.getType() != Material.AIR) {
-                    player.getInventory().addItem(leftover);
-                }
-            }
+        if (notInserted <= 0) {
+            player.getInventory().setItemInHand(new ItemStack(Material.AIR));
+        } else {
+            ItemStack newHand = hand.clone();
+            newHand.setAmount(notInserted);
+            player.getInventory().setItemInHand(newHand);
         }
+
+        player.updateInventory();
         return inserted;
     }
 

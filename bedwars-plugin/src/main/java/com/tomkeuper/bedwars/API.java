@@ -14,6 +14,7 @@ import com.tomkeuper.bedwars.api.hologram.IHologramManager;
 import com.tomkeuper.bedwars.api.items.handlers.IPermanentItem;
 import com.tomkeuper.bedwars.api.items.handlers.IPermanentItemHandler;
 import com.tomkeuper.bedwars.api.language.Language;
+import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.api.language.SupportPAPI;
 import com.tomkeuper.bedwars.api.party.Party;
 import com.tomkeuper.bedwars.api.server.ISetupSession;
@@ -30,6 +31,7 @@ import com.tomkeuper.bedwars.api.upgrades.UpgradesIndex;
 import com.tomkeuper.bedwars.arena.Arena;
 import com.tomkeuper.bedwars.arena.SetupSession;
 import com.tomkeuper.bedwars.commands.bedwars.MainCommand;
+import com.tomkeuper.bedwars.ratings.MapRatingService;
 import com.tomkeuper.bedwars.shop.main.CategoryContent;
 import com.tomkeuper.bedwars.sidebar.BoardManager;
 import com.tomkeuper.bedwars.stats.StatsAPI;
@@ -567,6 +569,32 @@ public class API implements com.tomkeuper.bedwars.api.BedWars {
         return scoreboardUtil;
     }
 
+    private final MapRatingUtil mapRatingUtil = new MapRatingUtil() {
+        @Override
+        public double getAverageRating(String arenaName) {
+            return MapRatingService.getAverageRating(arenaName);
+        }
+
+        @Override
+        public String getAverageRatingStars(String arenaName) {
+            double average = MapRatingService.getAverageRating(arenaName);
+            String star = getRatingStarChar();
+            int fullStars = (int) Math.floor(average);
+            if (fullStars < 0) fullStars = 0;
+            if (fullStars > 5) fullStars = 5;
+            StringBuilder out = new StringBuilder();
+            for (int i = 1; i <= 5; i++) {
+                out.append(i <= fullStars ? "§6" : "§7").append(star);
+            }
+            return out.toString();
+        }
+    };
+
+    @Override
+    public MapRatingUtil getMapRatingUtil() {
+        return mapRatingUtil;
+    }
+
     @SuppressWarnings("unused")
     @Override
     public boolean isShuttingDown() {
@@ -617,6 +645,14 @@ public class API implements com.tomkeuper.bedwars.api.BedWars {
     @Override
     public ItemUtil getItemUtil() {
         return itemUtil;
+    }
+
+    private String getRatingStarChar() {
+        String star = ChatColor.stripColor(Language.getDefaultLanguage().m(Messages.GAME_END_MAP_RATING_STAR));
+        if (star == null || star.isBlank()) {
+            return "*";
+        }
+        return star;
     }
 
     private final ItemUtil itemUtil = new ItemUtil() {

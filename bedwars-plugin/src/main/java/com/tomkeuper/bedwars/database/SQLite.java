@@ -86,6 +86,19 @@ public class SQLite implements IDatabase {
                         "iso VARCHAR(200));";
                 st.executeUpdate(sql);
             }
+            try (Statement st = connection.createStatement()) {
+                sql = "CREATE TABLE IF NOT EXISTS map_ratings (" +
+                        "uuid VARCHAR(36) NOT NULL, " +
+                        "arena_name VARCHAR(200) NOT NULL, " +
+                        "arena_display VARCHAR(200), " +
+                        "arena_group VARCHAR(64), " +
+                        "rating INTEGER NOT NULL, " +
+                        "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                        "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                        "PRIMARY KEY (uuid, arena_name)" +
+                        ");";
+                st.executeUpdate(sql);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -496,6 +509,44 @@ public class SQLite implements IDatabase {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public void saveMapRating(UUID player, String arenaName, String arenaDisplay, String arenaGroup, int rating) {
+        String sql = "INSERT OR REPLACE INTO map_ratings " +
+                "(uuid, arena_name, arena_display, arena_group, rating, updated_at) " +
+                "VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP);";
+        try {
+            checkConnection();
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, player.toString());
+                statement.setString(2, arenaName);
+                statement.setString(3, arenaDisplay);
+                statement.setString(4, arenaGroup);
+                statement.setInt(5, rating);
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public double getAverageRating(String arenaName) {
+        String sql = "SELECT AVG(rating) FROM map_ratings WHERE arena_name = ?;";
+        try {
+            checkConnection();
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, arenaName);
+                try (ResultSet result = statement.executeQuery()) {
+                    if (result.next()) {
+                        double avg = result.getDouble(1);
+                        return result.wasNull() ? 0D : avg;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0D;
     }
 
     @Override

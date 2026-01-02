@@ -153,6 +153,21 @@ public class MySQL implements IDatabase {
             try (Statement st = connection.createStatement()) {
                 st.executeUpdate(sql);
             }
+
+            sql = "CREATE TABLE IF NOT EXISTS map_ratings (" +
+                    "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+                    "uuid VARCHAR(36) NOT NULL," +
+                    "arena_name VARCHAR(200) NOT NULL," +
+                    "arena_display VARCHAR(200)," +
+                    "arena_group VARCHAR(64)," +
+                    "rating TINYINT NOT NULL," +
+                    "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                    "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
+                    "UNIQUE KEY uniq_player_map (uuid, arena_name)" +
+                    ");";
+            try (Statement st = connection.createStatement()) {
+                st.executeUpdate(sql);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -605,6 +620,43 @@ public class MySQL implements IDatabase {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public void saveMapRating(UUID player, String arenaName, String arenaDisplay, String arenaGroup, int rating) {
+        String sql = "INSERT INTO map_ratings (uuid, arena_name, arena_display, arena_group, rating) " +
+                "VALUES (?, ?, ?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE rating=VALUES(rating), arena_display=VALUES(arena_display), " +
+                "arena_group=VALUES(arena_group), updated_at=CURRENT_TIMESTAMP;";
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, player.toString());
+                statement.setString(2, arenaName);
+                statement.setString(3, arenaDisplay);
+                statement.setString(4, arenaGroup);
+                statement.setInt(5, rating);
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public double getAverageRating(String arenaName) {
+        String sql = "SELECT AVG(rating) FROM map_ratings WHERE arena_name = ?;";
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, arenaName);
+                try (ResultSet result = statement.executeQuery()) {
+                    if (result.next()) {
+                        double avg = result.getDouble(1);
+                        return result.wasNull() ? 0D : avg;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0D;
     }
 
 }

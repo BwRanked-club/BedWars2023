@@ -294,6 +294,12 @@ public class Portuguese extends Language {
                 "&e1º %bw_bedbreaker_format% &7- &f%bw_beds%",
                 "&8&m----------------------------------------"
         ));
+        yml.addDefault(Messages.GAME_END_MAP_RATING_QUESTION, "%bw_lang_prefix%&fPor favor, classifique esse mapa de acordo com sua experiência. &c(%bw_map%)");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_STAR, "&7✯");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_HOVER, "&eClique para avaliar com &6%bw_rating% &eestrela(s)");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_SUCCESS, "%bw_lang_prefix%&aVocê avaliou o mapa &f%bw_map% &acom &e%bw_rating% &aestrela(s)!");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_NOT_AVAILABLE, "%bw_lang_prefix%&cVocê só pode avaliar o mapa no fim da partida.");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_INVALID, "%bw_lang_prefix%&cAvaliação inválida.");
         yml.addDefault(Messages.BED_HOLOGRAM_DEFEND, "&c&lDefenda sua cama!");
         yml.addDefault(Messages.BED_HOLOGRAM_DESTROYED, "&c&lSua cama foi destruída!");
         yml.addDefault(Messages.TEAM_ELIMINATED_CHAT, "\n&f&lEQUIPE ELIMINADA > &cO time %bw_team_color%%bw_team_name% &cfoi eliminado!\n");

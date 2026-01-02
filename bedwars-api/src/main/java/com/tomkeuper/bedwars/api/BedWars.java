@@ -758,6 +758,13 @@ public interface BedWars {
     ScoreboardUtil getScoreboardUtil();
 
     /**
+     * Get the utility class for retrieving map rating data.
+     *
+     * @return the {@link MapRatingUtil} utility class
+     */
+    MapRatingUtil getMapRatingUtil();
+
+    /**
      * The utility interface for managing scoreboards in BedWars.
      */
     interface ScoreboardUtil {
@@ -776,6 +783,27 @@ public interface BedWars {
          * @param delay  true if there should be a 5-second delay, false otherwise
          */
         void givePlayerScoreboard(Player player, boolean delay);
+    }
+
+    /**
+     * Utility interface for map ratings.
+     */
+    interface MapRatingUtil {
+        /**
+         * Get the average rating for a given arena name.
+         *
+         * @param arenaName the arena name (config/world name)
+         * @return average rating, 0 if none
+         */
+        double getAverageRating(String arenaName);
+
+        /**
+         * Get the average rating formatted as 5 colored stars.
+         *
+         * @param arenaName the arena name (config/world name)
+         * @return formatted star string
+         */
+        String getAverageRatingStars(String arenaName);
     }
 
 

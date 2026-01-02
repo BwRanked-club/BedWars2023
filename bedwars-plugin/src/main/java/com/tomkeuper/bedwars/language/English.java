@@ -289,6 +289,12 @@ public class English extends Language {
                 "&6                          &l2nd Killer &7- %bw_second_format% - %bw_second_kills%",
                 "&c                          &l3rd Killer &7- %bw_third_format% - %bw_third_kills%", "",
                 "&a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"));
+        yml.addDefault(Messages.GAME_END_MAP_RATING_QUESTION, "%bw_lang_prefix%&7How many stars do you think this map deserves? &8(%bw_map%)");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_STAR, "&7✯");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_HOVER, "&eClick to rate &6%bw_rating% &estars");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_SUCCESS, "%bw_lang_prefix%&aYou rated &f%bw_map% &awith &e%bw_rating% &astars!");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_NOT_AVAILABLE, "%bw_lang_prefix%&cYou can only rate the map at the end of the match.");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_INVALID, "%bw_lang_prefix%&cInvalid rating.");
         yml.addDefault(Messages.BED_HOLOGRAM_DEFEND, "&c&lDefend your bed!");
         yml.addDefault(Messages.BED_HOLOGRAM_DESTROYED, "&c&lYour bed was destroyed!");
         yml.addDefault(Messages.TEAM_ELIMINATED_CHAT, "\n&f&lTEAM ELIMINATED > %bw_team_color%%bw_team_name% Team &chas been eliminated!\n");
