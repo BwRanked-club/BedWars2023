@@ -1,6 +1,8 @@
 package com.tomkeuper.bedwars.listeners;
 
+import com.tomkeuper.bedwars.api.arena.team.ITeam;
 import com.tomkeuper.bedwars.api.events.gameplay.GameEndEvent;
+import com.tomkeuper.bedwars.arena.team.BedWarsTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -37,6 +39,11 @@ public class GameEndListener implements Listener {
             try {
                 pl.getEnderChest().clear();
             } catch (Throwable ignored) {
+            }
+        }
+        for (ITeam team : event.getArena().getTeams()) {
+            if (team instanceof BedWarsTeam) {
+                ((BedWarsTeam) team).clearSharedEnderChest();
             }
         }
 

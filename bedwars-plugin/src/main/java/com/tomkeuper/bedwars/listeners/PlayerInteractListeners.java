@@ -8,6 +8,7 @@ import com.tomkeuper.bedwars.api.items.handlers.IPermanentItem;
 import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.api.server.ServerType;
 import com.tomkeuper.bedwars.arena.Arena;
+import com.tomkeuper.bedwars.arena.team.BedWarsTeam;
 import com.tomkeuper.bedwars.configuration.Sounds;
 import com.tomkeuper.bedwars.shop.ShopCache;
 import com.tomkeuper.bedwars.shop.listeners.InventoryListener;
@@ -28,6 +29,7 @@ import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.material.Openable;
 
 import static com.tomkeuper.bedwars.BedWars.*;
@@ -160,6 +162,16 @@ public class PlayerInteractListeners implements Listener {
                         }
                     }
                 }
+                if (b.getType() == Material.ENDER_CHEST) {
+                    if (a.isSpectator(p) || a.getRespawnSessions().containsKey(p)) {
+                        e.setCancelled(true);
+                        return;
+                    }
+                    ITeam team = a.getTeam(p);
+                    e.setCancelled(true);
+                    p.openInventory(getSharedEnderChest(team, p));
+                    return;
+                }
                 if (a.isSpectator(p) || a.getRespawnSessions().containsKey(p)) {
                     switch (b.getType().toString()) {
                         case "CHEST":
@@ -272,5 +284,12 @@ public class PlayerInteractListeners implements Listener {
                 e.getInventory().setResult(new ItemStack(Material.AIR));
             }
         }
+    }
+
+    private static Inventory getSharedEnderChest(ITeam team, Player player) {
+        if (team instanceof BedWarsTeam) {
+            return ((BedWarsTeam) team).getSharedEnderChest();
+        }
+        return player.getEnderChest();
     }
 }

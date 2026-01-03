@@ -8,6 +8,7 @@ import com.tomkeuper.bedwars.api.events.player.PlayerItemDepositEvent;
 import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.arena.Arena;
+import com.tomkeuper.bedwars.arena.team.BedWarsTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -84,7 +85,10 @@ public class ResourceChestFeature implements Listener {
         if (!isChest && !isEnderChest) return;
 
         ITeam team = arena.getTeam(e.getPlayer());
-        if (team == null) return;
+        if (team == null) {
+            if (!isEnderChest) return;
+            if (arena.isSpectator(e.getPlayer()) || arena.getRespawnSessions().containsKey(e.getPlayer())) return;
+        }
 
         Player player = e.getPlayer();
         ItemStack hand = e.getItem();
@@ -99,7 +103,7 @@ public class ResourceChestFeature implements Listener {
 
         Inventory inventory = isChest
                 ? ((Chest) block.getState()).getBlockInventory()
-                : player.getEnderChest();
+                : getSharedEnderChest(team, player);
 
         PlayerItemDepositEvent event = new PlayerItemDepositEvent(player, arena, hand, inventory, block.getType());
         Bukkit.getPluginManager().callEvent(event);
@@ -140,6 +144,13 @@ public class ResourceChestFeature implements Listener {
 
         player.updateInventory();
         return inserted;
+    }
+
+    private static Inventory getSharedEnderChest(ITeam team, Player player) {
+        if (team instanceof BedWarsTeam) {
+            return ((BedWarsTeam) team).getSharedEnderChest();
+        }
+        return player.getEnderChest();
     }
 
     private void sendDepositMessage(Player player, ItemStack original, int inserted) {

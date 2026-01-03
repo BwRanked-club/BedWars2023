@@ -28,7 +28,9 @@ import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -111,6 +113,8 @@ public class BedWarsTeam implements ITeam {
     // Player cache, used for losers stats and rejoin
     @Getter
     private List<Player> membersCache = new ArrayList<>();
+
+    private Inventory sharedEnderChest;
 
     // Invulnerability at re-spawn
     // Fall invulnerability when teammates respawn
@@ -828,6 +832,10 @@ public class BedWarsTeam implements ITeam {
         bed = null;
         shop = null;
         teamUpgrades = null;
+        if (sharedEnderChest != null) {
+            sharedEnderChest.clear();
+            sharedEnderChest = null;
+        }
         for (IGenerator ig : new ArrayList<>(generators)) {
             ig.destroyData();
         }
@@ -841,6 +849,19 @@ public class BedWarsTeam implements ITeam {
         membersCache = null;
         dragonEntities = null;
         bedDestroyer = null;
+    }
+
+    public Inventory getSharedEnderChest() {
+        if (sharedEnderChest == null) {
+            sharedEnderChest = Bukkit.createInventory(null, InventoryType.ENDER_CHEST);
+        }
+        return sharedEnderChest;
+    }
+
+    public void clearSharedEnderChest() {
+        if (sharedEnderChest != null) {
+            sharedEnderChest.clear();
+        }
     }
 
     @Override
