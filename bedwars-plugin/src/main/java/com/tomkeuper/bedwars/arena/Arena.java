@@ -1588,10 +1588,6 @@ public class Arena implements IArena {
         }
 
         for (Player player : world.getPlayers()) {
-            player.sendMessage(getMsg(player, Messages.GAME_END_TEAM_WON_CHAT)
-                    .replace("%bw_team_color%", winnerCandidate.getColor().chat().toString())
-                    .replace("%bw_team_name%", winnerCandidate.getDisplayName(getPlayerLanguage(player))));
-
             if (!winnerCandidate.getMembers().contains(player))
                 nms.sendTitle(player, getMsg(player, Messages.GAME_END_GAME_OVER_PLAYER_TITLE), null, 0, 70, 20);
 

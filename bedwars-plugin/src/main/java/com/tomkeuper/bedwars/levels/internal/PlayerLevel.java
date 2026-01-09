@@ -221,17 +221,28 @@ public class PlayerLevel {
      * Used to upgrade player level.
      */
     public void upgradeLevel() {
-        if (currentXp >= nextLevelCost) {
-            currentXp = currentXp - nextLevelCost;
+        if (nextLevelCost <= 0) {
+            nextLevelCost = LevelsConfig.getNextCost(level);
+            if (nextLevelCost <= 0) return;
+        }
+
+        boolean leveledUp = false;
+        while (currentXp >= nextLevelCost) {
+            currentXp -= nextLevelCost;
             level++;
             nextLevelCost = LevelsConfig.getNextCost(level);
-            this.levelName = ChatColor.translateAlternateColorCodes('&',
-                            LevelsConfig.getLevelName(level))
-                    .replace("{number}", String.valueOf(level));
+            setLevelName(level);
+
+            Bukkit.getPluginManager().callEvent(new PlayerLevelUpEvent(
+                    Bukkit.getPlayer(getUuid()), level, nextLevelCost
+            ));
+
+            leveledUp = true;
+        }
+
+        if (leveledUp) {
             requiredXp = formatNumber(nextLevelCost);
             formattedCurrentXp = formatNumber(currentXp);
-            Bukkit.getPluginManager().callEvent(new PlayerLevelUpEvent(
-                    Bukkit.getPlayer(getUuid()), level, nextLevelCost));
             modified = true;
         }
     }
@@ -252,15 +263,29 @@ public class PlayerLevel {
     }
 
     public void updateDatabase() {
-        if (modified) {
-            Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, () ->
-                    BedWars.getRemoteDatabase().setLevelData(
-                            uuid, level, currentXp,
-                            LevelsConfig.getLevelName(level),
-                            nextLevelCost
-                    )
-            );
-            modified = false;
+        if (!modified) return;
+
+        Runnable saveTask = () -> BedWars.getRemoteDatabase().setLevelData(
+                uuid, level, currentXp,
+                LevelsConfig.getLevelName(level),
+                nextLevelCost
+        );
+
+        if (BedWars.plugin != null && BedWars.plugin.isEnabled()) {
+            Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, saveTask);
+        } else {
+            try {
+                saveTask.run();
+            } catch (Exception ignored) {
+            }
+        }
+
+        modified = false;
+    }
+
+    public static void saveAll() {
+        for (PlayerLevel pl : levelByPlayer.values()) {
+            if (pl != null) pl.updateDatabase();
         }
     }
 }
