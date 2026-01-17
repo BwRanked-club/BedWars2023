@@ -24,7 +24,7 @@ public class H2 implements IDatabase {
                 BedWars.plugin.getLogger().severe("Could not create /Cache folder!");
             }
         }
-        this.url = "jdbc:h2:" + BedWars.plugin.getDataFolder().getAbsolutePath() + File.separator + "Cache"+ File.separator + "player_data.h2" + ";TRACE_LEVEL_FILE=0";
+        this.url = "jdbc:h2:" + BedWars.plugin.getDataFolder().getAbsolutePath() + File.separator + "Cache" + File.separator + "player_data.h2" + ";TRACE_LEVEL_FILE=0";
         try {
             Class.forName("com.tomkeuper.bedwars.libs.h2.Driver");
             DriverManager.getConnection(url);
@@ -79,7 +79,7 @@ public class H2 implements IDatabase {
                         ");";
                 st.executeUpdate(sql);
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -185,14 +185,14 @@ public class H2 implements IDatabase {
             checkConnection();
 
             if (hasStats(player)) {
-                sql = "UPDATE GLOBAL_STATS SET "+columnName+"=? WHERE UUID = ?;";
+                sql = "UPDATE GLOBAL_STATS SET " + columnName + "=? WHERE UUID = ?;";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setObject(1, value);
                     statement.setString(2, player.toString());
                     statement.executeUpdate();
                 }
             } else {
-                sql = "INSERT INTO GLOBAL_STATS (UUID, "+columnName+") VALUES (?, ?);";
+                sql = "INSERT INTO GLOBAL_STATS (UUID, " + columnName + ") VALUES (?, ?);";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setString(1, player.toString());
                     statement.setObject(2, value);
@@ -204,23 +204,23 @@ public class H2 implements IDatabase {
         }
     }
 
-    public void checkCustomColumnExists(String columnName, String dataType){
+    public void checkCustomColumnExists(String columnName, String dataType) {
         String sql = "SHOW COLUMNS FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?;";
         try {
             checkConnection();
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, columnName);
-                try (ResultSet result = statement.executeQuery()){
-                    if (!result.next()){
-                        sql = "ALTER TABLE GLOBAL_STATS ADD COLUMN " +columnName+ " " + dataType;
-                        try (PreparedStatement statement1 = connection.prepareStatement(sql)){
+                try (ResultSet result = statement.executeQuery()) {
+                    if (!result.next()) {
+                        sql = "ALTER TABLE GLOBAL_STATS ADD COLUMN " + columnName + " " + dataType;
+                        try (PreparedStatement statement1 = connection.prepareStatement(sql)) {
                             statement1.executeUpdate();
                         }
                     }
                 }
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -254,7 +254,10 @@ public class H2 implements IDatabase {
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         String s = rs.getString("UUID");
-                        try { list.add(java.util.UUID.fromString(s)); } catch (Exception ignored) {}
+                        try {
+                            list.add(java.util.UUID.fromString(s));
+                        } catch (Exception ignored) {
+                        }
                     }
                 }
             }
@@ -319,8 +322,7 @@ public class H2 implements IDatabase {
                     }
                 }
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             ex.printStackTrace();
             return 0;
         }
@@ -369,7 +371,7 @@ public class H2 implements IDatabase {
                             ps.executeUpdate();
                         }
                     } else {
-                        try (PreparedStatement ps = displayName == null ? connection.prepareStatement("UPDATE PLAYER_LEVELS SET LEVEL=?, XP=? WHERE UUID = '" + player.toString() + "';") : connection.prepareStatement("UPDATE PLAYER_LEVELS SET LEVEL=?, XP=?, NAME=?, NEXT_COST=? WHERE UUID = '" + player.toString() + "';")) {
+                        try (PreparedStatement ps = displayName == null ? connection.prepareStatement("UPDATE PLAYER_LEVELS SET LEVEL=?, XP=? WHERE UUID = '" + player + "';") : connection.prepareStatement("UPDATE PLAYER_LEVELS SET LEVEL=?, XP=?, NAME=?, NEXT_COST=? WHERE UUID = '" + player + "';")) {
                             ps.setInt(1, level);
                             ps.setInt(2, xp);
                             if (displayName != null) {
@@ -395,7 +397,7 @@ public class H2 implements IDatabase {
                 try (ResultSet rs = statement.executeQuery("SELECT iso FROM PLAYER_LANGUAGE WHERE UUID = '" + player.toString() + "';")) {
                     if (rs.next()) {
                         try (Statement st = connection.createStatement()) {
-                            st.executeUpdate("UPDATE PLAYER_LANGUAGE SET iso='" + iso + "' WHERE UUID = '" + player.toString() + "';");
+                            st.executeUpdate("UPDATE PLAYER_LANGUAGE SET iso='" + iso + "' WHERE UUID = '" + player + "';");
                         }
                     } else {
                         try (PreparedStatement st = connection.prepareStatement("INSERT INTO PLAYER_LANGUAGE (UUID, iso) VALUES (?, ?);")) {
@@ -475,7 +477,7 @@ public class H2 implements IDatabase {
                     String identifier = updateSlots.get(key);
                     ps.setString(index, identifier.trim().isEmpty() ? null : identifier);
                 }
-                ps.setString(hasQuick ? updateSlots.size()+1 : 1, uuid.toString());
+                ps.setString(hasQuick ? updateSlots.size() + 1 : 1, uuid.toString());
                 ps.execute();
             }
         } catch (SQLException e) {
@@ -553,8 +555,7 @@ public class H2 implements IDatabase {
 
         if (this.connection == null)
             renew = true;
-        else
-        if (this.connection.isClosed())
+        else if (this.connection.isClosed())
             renew = true;
 
         if (renew)

@@ -22,8 +22,8 @@ public class Reload extends SubCommand {
         setPriority(11);
         showInList(true);
         setPermission(Permissions.PERMISSION_RELOAD);
-        setDisplayInfo(Misc.msgHoverClick("§6 ▪ §7/" + getParent().getName() + " "+getSubCommandName()+"       §8 - §ereload messages",
-                "§fReload messages.\n§cNot recommended!", "/"+ getParent().getName() + " "+getSubCommandName(), ClickEvent.Action.RUN_COMMAND));
+        setDisplayInfo(Misc.msgHoverClick("§6 ▪ §7/" + getParent().getName() + " " + getSubCommandName() + "       §8 - §ereload messages",
+                "§fReload messages.\n§cNot recommended!", "/" + getParent().getName() + " " + getSubCommandName(), ClickEvent.Action.RUN_COMMAND));
     }
 
     @Override
@@ -32,9 +32,9 @@ public class Reload extends SubCommand {
             s.sendMessage("§c▪ §7You have to set the lobby location first!");
             return true;
         }
-        for (Language l : Language.getLanguages()){
+        for (Language l : Language.getLanguages()) {
             l.reload();
-            s.sendMessage("§6 ▪ §7"+l.getLangName()+" reloaded!");
+            s.sendMessage("§6 ▪ §7" + l.getLangName() + " reloaded!");
         }
         return true;
     }
@@ -46,8 +46,7 @@ public class Reload extends SubCommand {
 
     @Override
     public boolean canSee(CommandSender s, BedWars api) {
-        if (s instanceof Player) {
-            Player p = (Player) s;
+        if (s instanceof Player p) {
             if (Arena.isInArena(p)) return false;
             if (SetupSession.isInSetupSession(p.getUniqueId())) return false;
         }

@@ -30,6 +30,8 @@ import static com.tomkeuper.bedwars.api.language.Language.getMsg;
 
 public class PAPISupport extends PlaceholderExpansion {
 
+    private final SimpleDateFormat nextEventFormat = new SimpleDateFormat("mm:ss");
+
     @NotNull
     @Override
     public String getIdentifier() {
@@ -53,8 +55,6 @@ public class PAPISupport extends PlaceholderExpansion {
         return true;
     }
 
-    private final SimpleDateFormat nextEventFormat = new SimpleDateFormat("mm:ss");
-
     @Override
     public String onPlaceholderRequest(Player player, @NotNull String s) {
 
@@ -70,7 +70,6 @@ public class PAPISupport extends PlaceholderExpansion {
                 }
                 return a.getDisplayStatus(Language.getDefaultLanguage());
             }
-            ;
         }
 
         if (s.startsWith("arena_count_")) {

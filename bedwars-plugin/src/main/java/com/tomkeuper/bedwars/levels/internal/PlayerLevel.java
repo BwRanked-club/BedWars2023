@@ -15,28 +15,14 @@ import java.util.UUID;
 @SuppressWarnings("WeakerAccess")
 public class PlayerLevel {
 
-    private final UUID uuid;
-    private int level;
-    private int nextLevelCost;
-    private String levelName;
-    private int currentXp;
-    private String progressBar;
-    private String requiredXp;
-    private String formattedCurrentXp;
-
-    // keep trace if current level is different than the one in database
-    private boolean modified = false;
-
     private static final Map<UUID, PlayerLevel> levelByPlayer =
             new HashMap<>(256, 0.75f);
-
     private static final ThreadLocal<NumberFormat> NF = ThreadLocal.withInitial(() -> {
         NumberFormat f = NumberFormat.getInstance();
         f.setMaximumFractionDigits(2);
         f.setMinimumFractionDigits(0);
         return f;
     });
-
     private static final String[] PROGRESS_BARS = new String[11];
 
     static {
@@ -56,6 +42,17 @@ public class PlayerLevel {
         }
     }
 
+    private final UUID uuid;
+    private int level;
+    private int nextLevelCost;
+    private String levelName;
+    private int currentXp;
+    private String progressBar;
+    private String requiredXp;
+    private String formattedCurrentXp;
+    // keep trace if current level is different than the one in database
+    private boolean modified = false;
+
     /**
      * Cache a player level.
      */
@@ -74,8 +71,17 @@ public class PlayerLevel {
         if (!levelByPlayer.containsKey(player)) levelByPlayer.put(player, this);
     }
 
-    public void setLevelName(int level) {
-        this.levelName = ChatColor.translateAlternateColorCodes('&', LevelsConfig.getLevelName(level)).replace("{number}", String.valueOf(level));
+    /**
+     * Get PlayerLevel by player.
+     */
+    public static PlayerLevel getLevelByPlayer(UUID player) {
+        return levelByPlayer.getOrDefault(player, new PlayerLevel(player, 1, 0));
+    }
+
+    public static void saveAll() {
+        for (PlayerLevel pl : levelByPlayer.values()) {
+            if (pl != null) pl.updateDatabase();
+        }
     }
 
     public void setNextLevelCost(int level, boolean initialize) {
@@ -117,17 +123,28 @@ public class PlayerLevel {
     }
 
     /**
+     * Set player level.
+     */
+    public void setLevel(int level) {
+        this.level = level;
+        nextLevelCost = LevelsConfig.getNextCost(level);
+        this.levelName = ChatColor.translateAlternateColorCodes('&',
+                        LevelsConfig.getLevelName(level))
+                .replace("{number}", String.valueOf(level));
+        requiredXp = nextLevelCost >= 1000
+                ? nextLevelCost % 1000 == 0
+                ? nextLevelCost / 1000 + "k"
+                : (double) nextLevelCost / 1000 + "k"
+                : String.valueOf(nextLevelCost);
+        updateProgressBar();
+        modified = true;
+    }
+
+    /**
      * Get the amount of xp required to level up.
      */
     public int getNextLevelCost() {
         return nextLevelCost;
-    }
-
-    /**
-     * Get PlayerLevel by player.
-     */
-    public static PlayerLevel getLevelByPlayer(UUID player) {
-        return levelByPlayer.getOrDefault(player, new PlayerLevel(player, 1, 0));
     }
 
     /**
@@ -142,6 +159,10 @@ public class PlayerLevel {
      */
     public String getLevelName() {
         return levelName;
+    }
+
+    public void setLevelName(int level) {
+        this.levelName = ChatColor.translateAlternateColorCodes('&', LevelsConfig.getLevelName(level)).replace("{number}", String.valueOf(level));
     }
 
     /**
@@ -187,24 +208,6 @@ public class PlayerLevel {
         if (currentXp <= 0) currentXp = 0;
         this.currentXp = currentXp;
         upgradeLevel();
-        updateProgressBar();
-        modified = true;
-    }
-
-    /**
-     * Set player level.
-     */
-    public void setLevel(int level) {
-        this.level = level;
-        nextLevelCost = LevelsConfig.getNextCost(level);
-        this.levelName = ChatColor.translateAlternateColorCodes('&',
-                        LevelsConfig.getLevelName(level))
-                .replace("{number}", String.valueOf(level));
-        requiredXp = nextLevelCost >= 1000
-                ? nextLevelCost % 1000 == 0
-                ? nextLevelCost / 1000 + "k"
-                : (double) nextLevelCost / 1000 + "k"
-                : String.valueOf(nextLevelCost);
         updateProgressBar();
         modified = true;
     }
@@ -281,11 +284,5 @@ public class PlayerLevel {
         }
 
         modified = false;
-    }
-
-    public static void saveAll() {
-        for (PlayerLevel pl : levelByPlayer.values()) {
-            if (pl != null) pl.updateDatabase();
-        }
     }
 }

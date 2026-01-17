@@ -23,16 +23,15 @@ import java.util.stream.Collectors;
 
 public class PlayerQuickBuyCache implements IPlayerQuickBuyCache {
 
+    private static final ConcurrentHashMap<UUID, PlayerQuickBuyCache> quickBuyCaches = new ConcurrentHashMap<>();
+    public static int[] quickSlots = new int[]{19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43};
     private static PlayerQuickBuyCache instance;
     private final List<IQuickBuyElement> elements = new ArrayList<>();
+    private final HashMap<Integer, String> updateSlots = new HashMap<>();
     private String emptyItemNamePath, emptyItemLorePath;
     private ItemStack emptyItem;
     private UUID player;
     private QuickBuyTask task;
-
-    public static int[] quickSlots = new int[]{19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43};
-    private static final ConcurrentHashMap<UUID, PlayerQuickBuyCache> quickBuyCaches = new ConcurrentHashMap<>();
-    private final HashMap<Integer, String> updateSlots = new HashMap<>();
 
     public PlayerQuickBuyCache() {
         instance = this;
@@ -51,6 +50,26 @@ public class PlayerQuickBuyCache implements IPlayerQuickBuyCache {
         this.emptyItemLorePath = Messages.SHOP_QUICK_EMPTY_LORE;
         task = new QuickBuyTask(player.getUniqueId());
         quickBuyCaches.put(this.player, this);
+    }
+
+    /**
+     * Get instance
+     */
+    public static PlayerQuickBuyCache getInstance() {
+        return instance;
+    }
+
+    // Normalize an identifier by stripping the arena/group/default prefix from the base category
+    private static String normalizeIdentifier(String id) {
+        if (id == null) return "";
+        int idxMarker = id.indexOf(".category-content.");
+        if (idxMarker < 0) return id;
+        String cat = id.substring(0, idxMarker);
+        int dash = cat.indexOf('-');
+        if (dash >= 0) {
+            cat = cat.substring(dash + 1);
+        }
+        return cat + id.substring(idxMarker);
     }
 
     /**
@@ -281,25 +300,5 @@ public class PlayerQuickBuyCache implements IPlayerQuickBuyCache {
     public void pushChangesToDB() {
         Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin,
                 () -> BedWars.getRemoteDatabase().pushQuickBuyChanges(updateSlots, this.player, elements));
-    }
-
-    /**
-     * Get instance
-     */
-    public static PlayerQuickBuyCache getInstance() {
-        return instance;
-    }
-
-    // Normalize an identifier by stripping the arena/group/default prefix from the base category
-    private static String normalizeIdentifier(String id) {
-        if (id == null) return "";
-        int idxMarker = id.indexOf(".category-content.");
-        if (idxMarker < 0) return id;
-        String cat = id.substring(0, idxMarker);
-        int dash = cat.indexOf('-');
-        if (dash >= 0) {
-            cat = cat.substring(dash + 1);
-        }
-        return cat + id.substring(idxMarker);
     }
 }

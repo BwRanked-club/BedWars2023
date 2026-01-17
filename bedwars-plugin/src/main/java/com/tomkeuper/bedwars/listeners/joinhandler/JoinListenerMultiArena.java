@@ -35,7 +35,7 @@ public class JoinListenerMultiArena implements Listener {
         Bukkit.getScheduler().runTaskLater(BedWars.plugin, () -> {
             // Hide new player to players and spectators, and vice versa
             // Players from lobby will remain visible
-            for (Player online : Bukkit.getOnlinePlayers()){
+            for (Player online : Bukkit.getOnlinePlayers()) {
                 if (Arena.isInArena(online)) {
                     BedWars.nms.spigotHidePlayer(online, p);
                     BedWars.nms.spigotHidePlayer(p, online);

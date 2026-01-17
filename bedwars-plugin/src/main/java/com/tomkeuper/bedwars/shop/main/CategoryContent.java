@@ -38,6 +38,7 @@ public class CategoryContent implements ICategoryContent {
     @Getter
     private final List<IContentTier> contentTiers = new ArrayList<>();
     private final IShopCategory father;
+    private final String contentName;
     private int slot;
     /**
      * -- GETTER --
@@ -46,7 +47,6 @@ public class CategoryContent implements ICategoryContent {
     @Getter
     @Setter
     private boolean loaded = false;
-    private final String contentName;
     private String itemNamePath, itemLorePath;
     @Getter
     private String identifier;
@@ -138,6 +138,135 @@ public class CategoryContent implements ICategoryContent {
         categoryIdentifier = scopedIdentifier;
 
         loaded = true;
+    }
+
+    /**
+     * Get player's money amount
+     */
+    public static int calculateMoney(Player player, Material currency) {
+        if (currency == Material.AIR) return (int) BedWars.getEconomy().getMoney(player);
+
+        int amount = 0;
+        for (ItemStack is : player.getInventory().getContents()) {
+            if (is == null) continue;
+            if (is.getType() == currency) amount += is.getAmount();
+        }
+        return amount;
+    }
+
+    /**
+     * Get currency as material
+     */
+    public static Material getCurrency(String currency) {
+        return switch (currency) {
+            case "gold" -> Material.GOLD_INGOT;
+            case "diamond" -> Material.DIAMOND;
+            case "emerald" -> Material.EMERALD;
+            case "vault" -> Material.AIR;
+            default -> Material.IRON_INGOT;
+        };
+    }
+
+    public static ChatColor getCurrencyColor(Material currency) {
+        ChatColor c = ChatColor.DARK_GREEN;
+        if (currency.toString().toLowerCase().contains("diamond")) c = ChatColor.AQUA;
+        else if (currency.toString().toLowerCase().contains("gold")) c = ChatColor.GOLD;
+        else if (currency.toString().toLowerCase().contains("iron")) c = ChatColor.WHITE;
+        return c;
+    }
+
+    /**
+     * Cet currency path
+     */
+    public static String getCurrencyMsgPath(IContentTier contentTier) {
+        String c;
+
+        if (contentTier.getCurrency().toString().toLowerCase().contains("iron")) {
+            c = contentTier.getPrice() == 1 ? Messages.MEANING_IRON_SINGULAR : Messages.MEANING_IRON_PLURAL;
+        } else if (contentTier.getCurrency().toString().toLowerCase().contains("gold")) {
+            c = contentTier.getPrice() == 1 ? Messages.MEANING_GOLD_SINGULAR : Messages.MEANING_GOLD_PLURAL;
+        } else if (contentTier.getCurrency().toString().toLowerCase().contains("emerald")) {
+            c = contentTier.getPrice() == 1 ? Messages.MEANING_EMERALD_SINGULAR : Messages.MEANING_EMERALD_PLURAL;
+        } else if (contentTier.getCurrency().toString().toLowerCase().contains("diamond")) {
+            c = contentTier.getPrice() == 1 ? Messages.MEANING_DIAMOND_SINGULAR : Messages.MEANING_DIAMOND_PLURAL;
+        } else {
+            c = contentTier.getPrice() == 1 ? Messages.MEANING_VAULT_SINGULAR : Messages.MEANING_VAULT_PLURAL;
+        }
+        return c;
+    }
+
+    /**
+     * Get the roman number for an integer
+     */
+    public static String getRomanNumber(int n) {
+        String s;
+        switch (n) {
+            case 1:
+                s = "I";
+                break;
+            case 2:
+                s = "II";
+                break;
+            case 3:
+                s = "III";
+                break;
+            case 4:
+                s = "IV";
+                break;
+            case 5:
+                s = "V";
+                break;
+            case 6:
+                s = "VI";
+                break;
+            case 7:
+                s = "VII";
+                break;
+            case 8:
+                s = "VIII";
+                break;
+            case 9:
+                s = "IX";
+                break;
+            case 10:
+                s = "X";
+                break;
+            default:
+                s = String.valueOf(n);
+                break;
+        }
+        return s;
+    }
+
+    /**
+     * Take money from player on buy
+     */
+    public static void takeMoney(Player player, Material currency, int amount) {
+        if (currency == Material.AIR) {
+            if (!BedWars.getEconomy().isEconomy()) {
+                player.sendMessage("§4§lERROR: This requires Vault Support! Please install Vault plugin!");
+                return;
+            }
+            BedWars.getEconomy().buyAction(player, amount);
+            return;
+        }
+
+        int cost = amount;
+        for (ItemStack i : player.getInventory().getContents()) {
+            if (i == null) continue;
+            if (i.getType() == currency) {
+                if (i.getAmount() < cost) {
+                    cost -= i.getAmount();
+                    BedWars.nms.minusAmount(player, i, i.getAmount());
+                    player.updateInventory();
+                } else {
+                    BedWars.nms.minusAmount(player, i, cost);
+                    player.updateInventory();
+                    break;
+                }
+            }
+        }
+
     }
 
     @Override
@@ -335,136 +464,6 @@ public class CategoryContent implements ICategoryContent {
     public boolean hasQuick(IPlayerQuickBuyCache c) {
         for (IQuickBuyElement q : c.getElements()) if (q.getCategoryContent() == this) return true;
         return false;
-    }
-
-    /**
-     * Get player's money amount
-     */
-    public static int calculateMoney(Player player, Material currency) {
-        if (currency == Material.AIR) return (int) BedWars.getEconomy().getMoney(player);
-
-        int amount = 0;
-        for (ItemStack is : player.getInventory().getContents()) {
-            if (is == null) continue;
-            if (is.getType() == currency) amount += is.getAmount();
-        }
-        return amount;
-    }
-
-    /**
-     * Get currency as material
-     */
-    public static Material getCurrency(String currency) {
-        return switch (currency) {
-            case "gold" -> Material.GOLD_INGOT;
-            case "diamond" -> Material.DIAMOND;
-            case "emerald" -> Material.EMERALD;
-            case "vault" -> Material.AIR;
-            default -> Material.IRON_INGOT;
-        };
-    }
-
-    public static ChatColor getCurrencyColor(Material currency) {
-        ChatColor c = ChatColor.DARK_GREEN;
-        if (currency.toString().toLowerCase().contains("diamond")) c = ChatColor.AQUA;
-        else if (currency.toString().toLowerCase().contains("gold")) c = ChatColor.GOLD;
-        else if (currency.toString().toLowerCase().contains("iron")) c = ChatColor.WHITE;
-        return c;
-    }
-
-    /**
-     * Cet currency path
-     */
-    public static String getCurrencyMsgPath(IContentTier contentTier) {
-        String c;
-
-        if (contentTier.getCurrency().toString().toLowerCase().contains("iron")) {
-            c = contentTier.getPrice() == 1 ? Messages.MEANING_IRON_SINGULAR : Messages.MEANING_IRON_PLURAL;
-        } else if (contentTier.getCurrency().toString().toLowerCase().contains("gold")) {
-            c = contentTier.getPrice() == 1 ? Messages.MEANING_GOLD_SINGULAR : Messages.MEANING_GOLD_PLURAL;
-        } else if (contentTier.getCurrency().toString().toLowerCase().contains("emerald")) {
-            c = contentTier.getPrice() == 1 ? Messages.MEANING_EMERALD_SINGULAR : Messages.MEANING_EMERALD_PLURAL;
-        } else if (contentTier.getCurrency().toString().toLowerCase().contains("diamond")) {
-            c = contentTier.getPrice() == 1 ? Messages.MEANING_DIAMOND_SINGULAR : Messages.MEANING_DIAMOND_PLURAL;
-        } else {
-            c = contentTier.getPrice() == 1 ? Messages.MEANING_VAULT_SINGULAR : Messages.MEANING_VAULT_PLURAL;
-        }
-        return c;
-    }
-
-    /**
-     * Get the roman number for an integer
-     */
-    public static String getRomanNumber(int n) {
-        String s;
-        switch (n) {
-            default:
-                s = String.valueOf(n);
-                break;
-            case 1:
-                s = "I";
-                break;
-            case 2:
-                s = "II";
-                break;
-            case 3:
-                s = "III";
-                break;
-            case 4:
-                s = "IV";
-                break;
-            case 5:
-                s = "V";
-                break;
-            case 6:
-                s = "VI";
-                break;
-            case 7:
-                s = "VII";
-                break;
-            case 8:
-                s = "VIII";
-                break;
-            case 9:
-                s = "IX";
-                break;
-            case 10:
-                s = "X";
-                break;
-        }
-        return s;
-    }
-
-
-    /**
-     * Take money from player on buy
-     */
-    public static void takeMoney(Player player, Material currency, int amount) {
-        if (currency == Material.AIR) {
-            if (!BedWars.getEconomy().isEconomy()) {
-                player.sendMessage("§4§lERROR: This requires Vault Support! Please install Vault plugin!");
-                return;
-            }
-            BedWars.getEconomy().buyAction(player, amount);
-            return;
-        }
-
-        int cost = amount;
-        for (ItemStack i : player.getInventory().getContents()) {
-            if (i == null) continue;
-            if (i.getType() == currency) {
-                if (i.getAmount() < cost) {
-                    cost -= i.getAmount();
-                    BedWars.nms.minusAmount(player, i, i.getAmount());
-                    player.updateInventory();
-                } else {
-                    BedWars.nms.minusAmount(player, i, cost);
-                    player.updateInventory();
-                    break;
-                }
-            }
-        }
-
     }
 
     public boolean isUpgradable() {

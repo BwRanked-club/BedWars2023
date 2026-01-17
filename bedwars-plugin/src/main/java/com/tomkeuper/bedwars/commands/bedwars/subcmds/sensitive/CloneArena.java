@@ -94,8 +94,7 @@ public class CloneArena extends SubCommand {
 
     @Override
     public boolean canSee(CommandSender s, com.tomkeuper.bedwars.api.BedWars api) {
-        if (s instanceof Player) {
-            Player p = (Player) s;
+        if (s instanceof Player p) {
             if (Arena.isInArena(p)) return false;
             if (SetupSession.isInSetupSession(p.getUniqueId())) return false;
         }

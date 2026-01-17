@@ -32,7 +32,7 @@ public class TeleporterGUI {
 
     /**
      * -- GETTER --
-     *  Get a HashMap of players with Teleporter GUI opened
+     * Get a HashMap of players with Teleporter GUI opened
      */
     @Getter
     private static final HashMap<Player, Inventory> refresh = new HashMap<>();
@@ -122,7 +122,7 @@ public class TeleporterGUI {
                 .replace("%bw_team%", targetPlayerTeam.getDisplayName(Language.getPlayerLanguage(GUIholder)))
                 .replace("%bw_playername%", targetPlayer.getName()));
         List<String> lore = new ArrayList<>();
-        String health = String.valueOf((int)targetPlayer.getHealth() * 100 / targetPlayer.getHealthScale());
+        String health = String.valueOf((int) targetPlayer.getHealth() * 100 / targetPlayer.getHealthScale());
         for (String s : getList(GUIholder, Messages.ARENA_SPECTATOR_TELEPORTER_GUI_HEAD_LORE)) {
             lore.add(s.replace("%bw_player_health%", health).replace("%bw_player_food%", String.valueOf(targetPlayer.getFoodLevel())));
         }

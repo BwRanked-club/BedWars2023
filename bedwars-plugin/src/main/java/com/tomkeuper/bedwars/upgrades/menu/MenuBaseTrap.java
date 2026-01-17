@@ -33,11 +33,11 @@ import java.util.List;
 
 public class MenuBaseTrap implements MenuContent, EnemyBaseEnterTrap, TeamUpgrade {
 
-    private ItemStack displayItem;
-    private String name;
-    private int cost;
-    private Material currency;
-    private List<TrapAction> trapActions = new ArrayList<>();
+    private final ItemStack displayItem;
+    private final String name;
+    private final int cost;
+    private final Material currency;
+    private final List<TrapAction> trapActions = new ArrayList<>();
 
     /**
      * @param name        is the trap identifier.
@@ -211,7 +211,7 @@ public class MenuBaseTrap implements MenuContent, EnemyBaseEnterTrap, TeamUpgrad
             queueLimit = BedWars.getUpgradeManager().getConfiguration().getInt("default-upgrades-settings.trap-queue-limit");
         }
         if (queueLimit <= team.getActiveTraps().size()) {
-            if (announceAlreadyUnlocked){
+            if (announceAlreadyUnlocked) {
                 Sounds.playSound(ConfigPath.SOUNDS_INSUFF_MONEY, player);
                 player.sendMessage(Language.getMsg(player, Messages.UPGRADES_TRAP_QUEUE_LIMIT));
             }
@@ -243,7 +243,7 @@ public class MenuBaseTrap implements MenuContent, EnemyBaseEnterTrap, TeamUpgrad
             cost = cost + (multiplier * incrementer);
         }
 
-        if (!forFree){
+        if (!forFree) {
             int money = BedWars.getUpgradeManager().getMoney(player, currency);
             if (money < cost) {
                 Sounds.playSound(ConfigPath.SOUNDS_INSUFF_MONEY, player);
@@ -258,9 +258,9 @@ public class MenuBaseTrap implements MenuContent, EnemyBaseEnterTrap, TeamUpgrad
 
         final UpgradeBuyEvent event;
         Bukkit.getPluginManager().callEvent(event = new UpgradeBuyEvent(this, player, team));
-        if(event.isCancelled()) return false;
+        if (event.isCancelled()) return false;
 
-        if (!forFree){
+        if (!forFree) {
             if (currency == Material.AIR) {
                 BedWars.getEconomy().buyAction(player, BedWars.getUpgradeManager().getMoney(player, currency));
             } else {
@@ -280,7 +280,7 @@ public class MenuBaseTrap implements MenuContent, EnemyBaseEnterTrap, TeamUpgrad
             }
         }
 
-        if (announcePurchase){
+        if (announcePurchase) {
             for (Player p1 : team.getMembers()) {
                 p1.sendMessage(Language.getMsg(p1, Messages.UPGRADES_UPGRADE_BOUGHT_CHAT).replace("%bw_playername%", player.getName()).replace("%bw_player%", player.getDisplayName()).replace("%bw_upgrade_name%",
                         ChatColor.stripColor(Language.getMsg(p1, Messages.UPGRADES_BASE_TRAP_ITEM_NAME_PATH + getName().replace("base-trap-", "")).replace("%bw_color%", ""))));

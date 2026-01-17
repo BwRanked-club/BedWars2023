@@ -99,6 +99,25 @@ public class PlayerListeners implements Listener {
         });
     }
 
+    private static Vector centerXZ(Vector v) {
+        v.setX(Math.floor(v.getX()) + 0.5);
+        v.setZ(Math.floor(v.getZ()) + 0.5);
+        return v;
+    }
+
+    private static void spawnUtility(String s, Location loc, ITeam t, Player p) {
+        if ("silverfish".equalsIgnoreCase(s)) {
+            BedWars.nms.spawnSilverfish(
+                    loc,
+                    t,
+                    BedWars.shop.getYml().getDouble(ConfigPath.SHOP_SPECIAL_SILVERFISH_SPEED),
+                    BedWars.shop.getYml().getDouble(ConfigPath.SHOP_SPECIAL_SILVERFISH_HEALTH),
+                    BedWars.shop.getInt(ConfigPath.SHOP_SPECIAL_SILVERFISH_DESPAWN),
+                    BedWars.shop.getYml().getDouble(ConfigPath.SHOP_SPECIAL_SILVERFISH_DAMAGE),
+                    BedWars.shop.getInt(ConfigPath.SHOP_SPECIAL_SILVERFISH_PATH_FINDING_TICKS)
+            );
+        }
+    }
 
     @EventHandler
     public void onDamage(EntityDamageEvent e) {
@@ -279,12 +298,6 @@ public class PlayerListeners implements Listener {
         resulting.setY(resulting.getY() / (originalDistance + tntJumpYAxisReductionConstant));
 
         damaged.setVelocity(resulting);
-    }
-
-    private static Vector centerXZ(Vector v) {
-        v.setX(Math.floor(v.getX()) + 0.5);
-        v.setZ(Math.floor(v.getZ()) + 0.5);
-        return v;
     }
 
     @EventHandler
@@ -666,20 +679,6 @@ public class PlayerListeners implements Listener {
     public void onEat(PlayerItemConsumeEvent e) {
         if (e.getItem().getType() == BedWars.nms.materialCake()) {
             if (Arena.getArenaByIdentifier(e.getPlayer().getWorld().getName()) != null) e.setCancelled(true);
-        }
-    }
-
-    private static void spawnUtility(String s, Location loc, ITeam t, Player p) {
-        if ("silverfish".equalsIgnoreCase(s)) {
-            BedWars.nms.spawnSilverfish(
-                    loc,
-                    t,
-                    BedWars.shop.getYml().getDouble(ConfigPath.SHOP_SPECIAL_SILVERFISH_SPEED),
-                    BedWars.shop.getYml().getDouble(ConfigPath.SHOP_SPECIAL_SILVERFISH_HEALTH),
-                    BedWars.shop.getInt(ConfigPath.SHOP_SPECIAL_SILVERFISH_DESPAWN),
-                    BedWars.shop.getYml().getDouble(ConfigPath.SHOP_SPECIAL_SILVERFISH_DAMAGE),
-                    BedWars.shop.getInt(ConfigPath.SHOP_SPECIAL_SILVERFISH_PATH_FINDING_TICKS)
-            );
         }
     }
 }

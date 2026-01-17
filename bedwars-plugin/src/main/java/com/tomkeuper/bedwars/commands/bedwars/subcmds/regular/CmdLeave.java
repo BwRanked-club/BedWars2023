@@ -4,7 +4,6 @@ import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.arena.IArena;
 import com.tomkeuper.bedwars.api.command.ParentCommand;
 import com.tomkeuper.bedwars.api.command.SubCommand;
-import com.tomkeuper.bedwars.api.configuration.ConfigPath;
 import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.api.server.ServerType;
@@ -20,14 +19,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-
-import static com.tomkeuper.bedwars.BedWars.config;
 
 public class CmdLeave extends SubCommand {
 
@@ -38,31 +34,7 @@ public class CmdLeave extends SubCommand {
         super(parent, name);
         setPriority(20);
         showInList(false);
-        setDisplayInfo(MainCommand.createTC("§6 ▪ §7/"+ MainCommand.getInstance().getName()+" leave", "/"+getParent().getName()+" "+getSubCommandName(), "§fLeave an arena."));
-    }
-
-    @Override
-    public boolean execute(String[] args, CommandSender s) {
-        if (s instanceof ConsoleCommandSender) return false;
-        Player p = (Player) s;
-
-        IArena a = Arena.getArenaByPlayer(p);
-        if (p.getWorld().getName().equalsIgnoreCase(BedWars.getLobbyWorld())) {
-            Misc.moveToLobbyOrKick(p, a, a != null && a.isSpectator(p.getUniqueId()));
-            return true;
-        } else {
-            if (a == null) {
-                p.sendMessage(Language.getMsg(p, Messages.COMMAND_LEAVE_DENIED_NOT_IN_ARENA));
-                return true;
-            }
-
-            if (BedWars.getPartyManager().isOwner(p)){
-                openLeaveGUI(p);
-            } else {
-                Misc.moveToLobbyOrKick(p, a, a.isSpectator(p.getUniqueId()));
-            }
-        }
-        return true;
+        setDisplayInfo(MainCommand.createTC("§6 ▪ §7/" + MainCommand.getInstance().getName() + " leave", "/" + getParent().getName() + " " + getSubCommandName(), "§fLeave an arena."));
     }
 
     public static void openLeaveGUI(Player player) {
@@ -89,6 +61,42 @@ public class CmdLeave extends SubCommand {
         player.openInventory(inv);
     }
 
+    private static boolean cancel(UUID player) {
+        return delay.getOrDefault(player, 0L) > System.currentTimeMillis();
+    }
+
+    private static void update(UUID player) {
+        if (delay.containsKey(player)) {
+            delay.replace(player, System.currentTimeMillis() + 2500L);
+            return;
+        }
+        delay.put(player, System.currentTimeMillis() + 2500L);
+    }
+
+    @Override
+    public boolean execute(String[] args, CommandSender s) {
+        if (s instanceof ConsoleCommandSender) return false;
+        Player p = (Player) s;
+
+        IArena a = Arena.getArenaByPlayer(p);
+        if (p.getWorld().getName().equalsIgnoreCase(BedWars.getLobbyWorld())) {
+            Misc.moveToLobbyOrKick(p, a, a != null && a.isSpectator(p.getUniqueId()));
+            return true;
+        } else {
+            if (a == null) {
+                p.sendMessage(Language.getMsg(p, Messages.COMMAND_LEAVE_DENIED_NOT_IN_ARENA));
+                return true;
+            }
+
+            if (BedWars.getPartyManager().isOwner(p)) {
+                openLeaveGUI(p);
+            } else {
+                Misc.moveToLobbyOrKick(p, a, a.isSpectator(p.getUniqueId()));
+            }
+        }
+        return true;
+    }
+
     @Override
     public List<String> getTabComplete() {
         return null;
@@ -106,21 +114,9 @@ public class CmdLeave extends SubCommand {
         return hasPermission(s);
     }
 
-    private static boolean cancel(UUID player){
-        return delay.getOrDefault(player, 0L) > System.currentTimeMillis();
-    }
-
-    private static void update(UUID player){
-        if (delay.containsKey(player)){
-            delay.replace(player, System.currentTimeMillis() + 2500L);
-            return;
-        }
-        delay.put(player, System.currentTimeMillis() + 2500L);
-    }
-
     public static class LeaveGuiHolder implements InventoryHolder {
 
-        public LeaveGuiHolder(){
+        public LeaveGuiHolder() {
         }
 
         @Override

@@ -17,7 +17,13 @@ import java.util.List;
 import static com.tomkeuper.bedwars.api.language.Language.getMsg;
 
 public class Internal implements Party {
-    private static List<Internal.Party> parties = new ArrayList<>();
+    private static final List<Internal.Party> parties = new ArrayList<>();
+
+    @NotNull
+    @Contract(pure = true)
+    public static List<Party> getParties() {
+        return Collections.unmodifiableList(parties);
+    }
 
     @Override
     public boolean hasParty(Player p) {
@@ -150,8 +156,8 @@ public class Internal implements Party {
 
     @Override
     public Player getOwner(Player member) {
-        for (Internal.Party party: Internal.getParties()) {
-            if (party.members.contains(member)){
+        for (Internal.Party party : Internal.getParties()) {
+            if (party.members.contains(member)) {
                 return party.owner;
             }
         }
@@ -179,15 +185,9 @@ public class Internal implements Party {
         return null;
     }
 
-    @NotNull
-    @Contract(pure = true)
-    public static List<Party> getParties() {
-        return Collections.unmodifiableList(parties);
-    }
-
     static class Party {
 
-        private List<Player> members = new ArrayList<>();
+        private final List<Player> members = new ArrayList<>();
         private Player owner;
 
         public Party(Player p) {

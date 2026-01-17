@@ -9,7 +9,7 @@ public class DragonAction implements UpgradeAction {
 
     private final int amount;
 
-    public DragonAction(int amount){
+    public DragonAction(int amount) {
         this.amount = amount;
     }
 

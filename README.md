@@ -1,145 +1,156 @@
 ![Bedwars2023_Logo](https://github.com/tomkeuper/BedWars2023/assets/29728836/5979c0e8-1333-40a5-b43c-49ceabd06a57)
 
-[![Discord](https://discordapp.com/api/guilds/760851292826107926/widget.png?style=shield)](https://discord.gg/kPaBGwhmjf) [![bStats](https://img.shields.io/bstats/servers/18317)](#)
+[![Discord](https://discordapp.com/api/guilds/1313655710508388393/widget.png?style=shield)](https://discord.gg/kPaBGwhmjf)
 
-As of March 2023 development has started on BedWars2023, a fork of the [BedWars1058](https://www.spigotmc.org/resources/bedwars1058-opensource.97320/) plugin. The goal of this fork is to implement new features and to modernize the codebase.
+Este é um fork do plugin [BedWars2023](https://github.com/tomkeuper/BedWars2023/) inicialmente desenvolvido pelo [TomKeuper](https://github.com/tomkeuper/)
 
-The plugin is published under the open-source GNU GPL 3.0 license. You can read the full license [here](https://www.gnu.org/licenses/gpl-3.0.html).
+# Dúvidas
+Caso tenhas dúvidas, chame o Tadeu neste discord: [Brazilian Spigot](https://discord.gg/XdRw3gB2gW)
 
-# Description
-BedWars is a mini-game where you have to defend your bed and destroy the others.  
-Once your bed is destroyed, you cannot respawn.
+# Descrição
+BedWars é um minijogo onde você tem que defender sua cama e destruir os outros.  
+Depois que sua cama for destruída, você não poderá reaparecer.
 
-# System requirements
-This software runs on [Spigot](https://www.spigotmc.org/) and NMS.
-Spigot forks without compiled NMS code are not supported.
-Officially supported servers are [Spigot](https://www.spigotmc.org/) and [Paper](https://papermc.io/).
-You are required to use Java 11 or newer to run this plugin.
+# Requisitos do sistema
+Este software roda em [Spigot](https://www.spigotmc.org/) e NMS.
+Os forks Spigot sem código NMS compilado não são suportados.
+Servidores com suporte oficial são [Spigot](https://www.spigotmc.org/) e [Paper](https://papermc.io/).
+Você precisa usar o Java 17 ou mais recente para executar este plugin.
+Caso esteja na 1.8.8, use o [PandaSpigot](https://github.com/hpfxd/PandaSpigot).
 
-The internal world restore system is based on zipping and unzipping maps which can become
-heavy if you are still making use of HDD in 2024, and you do not have a decent CPU. For a better
-and faster restore system install [SlimeWorldManager](https://www.spigotmc.org/resources/slimeworldmanager.69974/) or [AdvancedWorldManager](https://www.spigotmc.org/resources/advanced-slimeworldmanager.87209/).
-BedWars2023 will hook into it and do everything for you.
+Recomendamos no mínimo 8gb de RAM e um processador de qualidade boa.
 
-# Dependencies
+O uso do [SlimeWorldManager](https://www.spigotmc.org/resources/slimeworldmanager.69974/) é obrigatório para gerenciamento dos mapas.
+
+O uso do [TAB](https://www.spigotmc.org/resources/tab-1-7-x-1-21-11.57806/) é obrigatório para gerenciamento da Scoreboard e Tablist.
+
+# Dependências
 - Java 11
-- Spigot forks with NMS
-- [TAB](https://github.com/NEZNAMY/TAB) plugin
+- Qualquer fork do Spigot com NMS
+- Plugin [TAB](https://github.com/NEZNAMY/TAB)
+- Plugin [SlimeWorldManager](https://www.spigotmc.org/resources/slimeworldmanager.69974/)
 
-# Basic Installation
-- Download the latest release and it's dependency
-- Put it in the plugins folder
-- Restart the server
-- Navigate to TAB's config folder and enable scoreboard
+# Como instalar
+- [Vídeo tutorial](https://youtu.be/WXTs2n4oKFs)
+- [Discord para dúvidas](https://discord.gg/XdRw3gB2gW)
 
-# Pre-made setups and community addons
+# Servidores prontos e addons da comunidade
 
-You can find a list of pre-made setups and community addons [on the wiki](https://wiki.tomkeuper.com/docs/BedWars2023/addons)
+Você pode achar na wiki oficial do TomKeuper, [clique aqui](https://wiki.tomkeuper.com/docs/BedWars2023/addons).
+Tem muitos mais addons no discord oficial dele, [clique aqui](https://wiki.tomkeuper.com/docs/BedWars2023/addons).
 
-# Main features
+Claro! Aqui está a **tradução completa para português**, com a **adição destacando que o modo MULTIARENA possui suporte a arenas infinitas com autoscaling**:
 
-### Flexible | Ways you can run the plugin:
-- **SHARED**: can run among other mini-games on the same spigot instance. Games will only be accessible via commands.
-- **MULTIARENA**: will require an entire server instance for hosting the mini-game. It will protect the lobby world and games can be joined via commands, NPCs, signs and GUIs.
-- **BUNGEE-LEGACY**: the old classic bungee mode where a game means an entire server instance. You'll be added to the game when joining the server. Arena status will be displayed as MOTD.
-- **BUNGEE**: a brand new scalable bungee mode. It can host multiple arenas on the same server instance, clone and start new arenas when needed so other players can join. The server can be automatically restarted after a certain amount of games played. This will require installing [BedWarsProxy](https://www.spigotmc.org/resources/bedwarsproxy.66642/) on your lobby servers so players can join. And of course, you can run as many servers as you want in bungee mode.
+# Principais recursos
 
-### Language | Per player language system:
-- Each player can receive messages, holograms, GUIs etc. in their desired language. /bw lang.
-- You can either remove or add new languages.
-- Team names, group names, shop contents and a lot more can be translated in your languages.
-- Custom titles and subtitles for [starting countdown](https://wiki.tomkeuper.com/docs/BedWars2023/configuration/language-configuration#custom-title-sub-title-for-arena-countdown).
+## Flexível | Formas de executar o plugin:
 
-### Lobby removal | Optional:
-The waiting-lobby inside the map can be removed once the game starts.
+* **SHARED**: pode rodar junto com outros mini-games na mesma instância Spigot. Os jogos serão acessíveis apenas via comandos.
+* **MULTIARENA**: requer uma instância inteira do servidor para hospedar o mini-game. Protege o mundo do lobby e os jogos podem ser acessados por comandos, NPCs, placas e GUIs.
+  👉 **Este modo possui suporte a arenas infinitas com autoscaling automático**, criando e gerenciando arenas dinamicamente conforme a demanda de jogadores.
+* **BUNGEE-LEGACY**: o modo bungee clássico antigo, onde cada jogo ocupa uma instância inteira do servidor. O jogador entra diretamente no jogo ao se conectar. O status da arena é exibido no MOTD.
+* **BUNGEE**: um novo modo bungee escalável. Pode hospedar múltiplas arenas na mesma instância, clonar e iniciar novas arenas conforme necessário para permitir a entrada de mais jogadores. O servidor pode ser reiniciado automaticamente após uma certa quantidade de partidas. Requer a instalação do [BedWarsProxy](https://www.spigotmc.org/resources/bedwarsproxy.66642/) nos servidores de lobby. E, claro, você pode rodar quantos servidores quiser no modo bungee.
 
-### Arena Groups | Customization:
-- You can group arenas by type (4v4, 50v50). You can name them however you want.
-- Groups can have custom scoreboard layouts, team upgrades, start items and custom generator settings.
-- You can join maps by group: /bw join Solo, /bw gui Solo.
+## Idioma | Sistema de idioma por jogador:
 
-### Shop | Customization:
-- You may configure quick-buy default items.
-- You may add or remove categories.
-- You may add new shop items or execute commands when bought.
-- Permanent items are given after you re-spawn.
-- Permanent items can be downgradable which will make you lose one tier per death.
-- Items can have weight, so you can't buy a weaker item than your current one etc.
-- Special items available: BedBug, Dream Defender, Egg Bridge, TNT Jump and Straight Fireball.
-- Quick buy feature is available and is synced between nodes as well in bungee mode.
+* Cada jogador pode receber mensagens, hologramas, GUIs etc. no idioma desejado. `/bw lang`
+* Você pode remover ou adicionar novos idiomas.
+* Nomes de times, grupos, conteúdos da loja e muito mais podem ser traduzidos.
+* Títulos e subtítulos personalizados para a [contagem regressiva inicial](https://wiki.tomkeuper.com/docs/BedWars2023/configuration/language-configuration#custom-title-sub-title-for-arena-countdown).
 
-### Team Upgrades | Customization:
-- You may have different team upgrades per arena group.
-- You may either add and remove categories and contents.
-- You may make upgrade elements that: enchant items, give potion effects (to team-mates/ base/ enemies when they enter the island), you can edit generator settings and change the dragons amount for the Sudden Death phase.
-- You may add new traps that: disenchant-items (sword, armor, bow), give potion effects (team/ base/ enemies), remove potion effect when an enemy enters your island range and trigger commands.
+## Remoção do lobby | Opcional:
 
-### Ways to join an arena:
+O lobby de espera dentro do mapa pode ser removido assim que a partida iniciar.
 
-- Arena selector, which can be configured. /bw gui will display all arena groups while /bw gui Solo will show games from Solo groups and /bw gui Solo+4v4 will show games from Solo and 4v4.
-- You can also join games via NPCs by installing Citizens.
-- Join-signs are also available with status block.
-- Commands can be used as well. /bw join random will bring you the most filled arena, while /bw join mapName will send you to the given arena and /bw join groupName+groupName2 will bring you on a map from the given groups.
+## Grupos de Arenas | Customização:
 
-### Arena Settings | Customization:
-- You can set a custom display name used on signs, GUIs etc.
-- Option to set the amount of min/ max players and team size.
-- Toggle options for: allowing spectators, disabling generators for empty teams, disabling NPCs for empty teams, disabling internal drops management, bed holograms usage.
-- Protection range for team-spawn and team NPCs.
-- Island radius (for features like triggering traps and map) border radius.
-- Instant kill on void based on Y coordinate.
-- You can create as many teams as you want.
-- You can allow map breaking like on a SkyWars game.
-- You can toggle generator split.
-- Custom game rules per map.
-- Unlimited iron/ gold / emerald (this one can pe activated from upgrades) generators per team.
+* Você pode agrupar arenas por tipo (4v4, 50v50).
+* Os grupos podem ter scoreboards personalizados, upgrades de time, itens iniciais e configurações de geradores próprias.
+* É possível entrar em mapas por grupo: `/bw join Solo`, `/bw gui Solo`.
 
-### Vip Kick | Privilege:
-Players with `bw.vip` permission are able to join full arenas in starting phase. This will kick a player without `bw.vip` permission from that game.
+## Loja | Customização:
 
-### Player Statistics:
-- The plugin does not provide top list holograms, but you can use ajLeaderboards or LeaderHeads for this, using the placeholders we provide.
-- Players can see their stats using the internal stats GUI, which can be customized and accessed by /bw stats.
+* Configuração de itens padrão do quick-buy.
+* Adição ou remoção de categorias.
+* Criação de novos itens ou execução de comandos ao comprar.
+* Itens permanentes são recebidos após o respawn.
+* Itens permanentes podem ser degradáveis, perdendo um nível por morte.
+* Itens podem ter peso, impedindo a compra de itens mais fracos.
+* Itens especiais: BedBug, Dream Defender, Egg Bridge, TNT Jump e Straight Fireball.
+* O quick-buy é sincronizado entre nós no modo bungee.
 
-### Party System:
-- We provide a basic and functional internal party system to play with your friends on the same team or arena.
-- We also support Parties by AlessioDP and Party and Friends by Simonsator which could be a better solution if you are a large network.
+## Upgrades de Time | Customização:
 
-### Anti AFK System:
-Inactive players for more than 45 seconds can't pick up items from generators.
+* Upgrades diferentes por grupo de arena.
+* Adição e remoção de categorias e conteúdos.
+* Upgrades podem encantar itens, aplicar efeitos de poção (em aliados, base ou inimigos), alterar geradores e definir a quantidade de dragões no Sudden Death.
+* Armadilhas personalizadas que removem encantamentos, aplicam efeitos, removem efeitos de inimigos e executam comandos.
 
-### Custom Join Items:
-- You can add and remove items that you receive when you join the server (only on multi-arena) and the items you receive when you join a game in starting/ waiting phase or when you join as a spectator.
-- Join items can execute commands.
+## Formas de entrar em uma arena:
 
-### Map Restore System:
-- The default restore adapter from BedWars2023 is based on un-loading the map, unzipping a backup and loading it again. This may be heavy for servers with cheap hardware. We recommend using gaming processors and a SSD.
-- To improve performance we added support for SlimeWorldManager, which loads maps way faster with less performance impact thanks to its slime format. We really encourage you installing this plugin. No manual conversion is required. BedWars2023 will handle everything. Read how to install it here.
-- You can also implement your own map adapter through the API.
-- It may seem heavier than other plugins because we don't simply keep track of modified blocks. We need to restore the entire map because server owners can allow players to destroy the maps like on a SkyWars game. Regions like generators, NPCs and team spawns will be protected.
+* Seletor de arenas configurável. `/bw gui` mostra todos os grupos, `/bw gui Solo` apenas arenas Solo.
+* Entrada via NPCs usando Citizens.
+* Placas de entrada com bloco de status.
+* Comandos:
+  `/bw join random` → arena mais cheia
+  `/bw join nomeMapa` → arena específica
+  `/bw join grupo1+grupo2` → arena de grupos específicos
 
-### Re-Join | Feature:
-If you get disconnected, or if you leave a game (configurable) you can re-join it via command or by joining the server again. This is also available in bungee scalable mode.
+## Configurações de Arena | Customização:
 
-### TNT Jump | Feature:
-- Players are able to do tnt jump with configurable values.
-- Players with tnt in their inventory have a red particle on their head (configurable).
+* Nome de exibição personalizado para placas e GUIs.
+* Definição de jogadores mínimos/máximos e tamanho do time.
+* Opções de toggle: espectadores, geradores para times vazios, NPCs para times vazios, drops internos, hologramas da cama.
+* Alcance de proteção para spawn e NPCs do time.
+* Raio da ilha (armadilhas e borda do mapa).
+* Morte instantânea no void baseada no eixo Y.
+* Criação de quantos times quiser.
+* Permitir quebra do mapa como no SkyWars.
+* Ativar/desativar divisão de geradores.
+* Regras de jogo personalizadas por mapa.
+* Geradores ilimitados de ferro, ouro e esmeralda por time (ativável via upgrades).
 
-### Season events:
-- Halloween special. It is enabled automatically based on your machine timezone and will provide cool effects.
+## Kick VIP | Privilégio:
 
-# 3rd party libraries
-- [bStats](https://bstats.org/getting-started/include-metrics)
-- [Commons IO](https://mvnrepository.com/artifact/commons-io/commons-io)
-- [HikariCP](https://mvnrepository.com/artifact/com.zaxxer/HikariCP)
-- [IridiumColorAPI](https://nexus.iridiumdevelopment.net/#browse/browse:maven-releases:com%2Firidium%2FIridiumColorAP)
-- [SlimJar](https://github.com/slimjar/slimjar)
-- [SLF4J](http://www.slf4j.org/)
-- [Flow-NBT](https://repo.rapture.pw/#browse/browse:maven-releases:com%2Fflowpowered%2Fflow-nbt)
-- [Jedis](https://github.com/redis/jedis)
-- [CloudNet](https://cloudnetservice.eu/docs/3.3/api/start/)
-- [H2](https://www.h2database.com/html/main.html)
-- [VipFeatures](https://gitlab.com/andrei1058/VipFeatures)
+Jogadores com a permissão `bw.vip` podem entrar em arenas cheias na fase inicial, removendo um jogador sem essa permissão.
 
-# Contact
-[![Discord Server](https://discordapp.com/api/guilds/760851292826107926/widget.png?style=banner3)](https://discord.gg/kPaBGwhmjf)
+## Estatísticas do Jogador:
+
+* O plugin não fornece hologramas de ranking, mas suporta ajLeaderboards e LeaderHeads via placeholders.
+* Os jogadores podem ver suas estatísticas em uma GUI interna personalizada com `/bw stats`.
+
+## Sistema de Party:
+
+* Sistema interno simples e funcional para jogar com amigos.
+* Suporte a Parties (AlessioDP) e Party and Friends (Simonsator), ideal para grandes networks.
+
+## Sistema Anti-AFK:
+
+Jogadores inativos por mais de 45 segundos não podem pegar itens dos geradores.
+
+## Itens de Entrada Personalizados:
+
+* Configuração de itens recebidos ao entrar no servidor (apenas multi-arena) ou ao entrar em uma partida ou como espectador.
+* Itens podem executar comandos.
+
+## Sistema de Restauração de Mapas:
+
+* O método padrão restaura o mapa completo (descarrega, descompacta backup e carrega novamente).
+* Recomendado uso de SSD e processadores voltados para jogos.
+* Suporte ao **SlimeWorldManager**, com carregamento muito mais rápido e menor impacto de performance.
+* Suporte a adaptadores personalizados via API.
+* A restauração completa é necessária para permitir destruição total do mapa (estilo SkyWars).
+
+## Reentrada | Re-Join:
+
+Se desconectar ou sair da partida (configurável), você pode retornar via comando ou reconectando. Disponível também no modo bungee escalável.
+
+## TNT Jump | Recurso:
+
+* TNT Jump configurável.
+* Jogadores com TNT possuem partículas vermelhas na cabeça (configurável).
+
+## Eventos Sazonais:
+
+* Evento especial de Halloween ativado automaticamente conforme o fuso horário da máquina, com efeitos especiais.
+

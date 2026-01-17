@@ -33,8 +33,7 @@ public class RemoveGenerator extends SubCommand {
 
     @Override
     public boolean execute(String[] args, CommandSender s) {
-        if (!(s instanceof Player)) return false;
-        Player p = (Player) s;
+        if (!(s instanceof Player p)) return false;
         SetupSession ss = SetupSession.getSession(p.getUniqueId());
         if (ss == null) return false;
 

@@ -12,20 +12,20 @@ import org.bukkit.event.Listener;
 
 public class HealPoolListener implements Listener {
     @EventHandler
-    public void onTeamUpgrade(UpgradeBuyEvent e){
-        if (e.getTeamUpgrade().getName().contains("heal-pool")){
+    public void onTeamUpgrade(UpgradeBuyEvent e) {
+        if (e.getTeamUpgrade().getName().contains("heal-pool")) {
             IArena a = e.getArena();
             if (a == null) return;
             ITeam bwt = a.getTeam(e.getPlayer());
             if (bwt == null) return;
-            if (!HealPoolTask.exists(a, bwt)){
+            if (!HealPoolTask.exists(a, bwt)) {
                 new HealPoolTask(bwt);
             }
         }
     }
 
     @EventHandler
-    public void onDisable(ArenaDisableEvent e){
+    public void onDisable(ArenaDisableEvent e) {
         HealPoolTask.removeForArena(e.getWorldName());
     }
 
@@ -35,13 +35,12 @@ public class HealPoolListener implements Listener {
     }
 
     @EventHandler
-    public void teamDead(TeamEliminatedEvent e)
-    {
+    public void teamDead(TeamEliminatedEvent e) {
         HealPoolTask.removeForTeam(e.getTeam());
     }
 
     @EventHandler
-    public void LastLeave(PlayerLeaveArenaEvent event){
+    public void LastLeave(PlayerLeaveArenaEvent event) {
         if (event.getArena().getPlayers().isEmpty())
             HealPoolTask.removeForArena(event.getArena());
     }

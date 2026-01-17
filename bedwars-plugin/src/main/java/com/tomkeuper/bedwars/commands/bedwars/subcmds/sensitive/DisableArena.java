@@ -23,8 +23,8 @@ public class DisableArena extends SubCommand {
         super(parent, name);
         setPriority(6);
         showInList(true);
-        setDisplayInfo(Misc.msgHoverClick("§6 ▪ §7/" + getParent().getName() + " "+getSubCommandName()+" §6<worldName>", "§fDisable an arena.\nThis will remove the players \n§ffrom the arena before disabling.",
-                "/" + getParent().getName() + " "+getSubCommandName()+" ", ClickEvent.Action.SUGGEST_COMMAND));
+        setDisplayInfo(Misc.msgHoverClick("§6 ▪ §7/" + getParent().getName() + " " + getSubCommandName() + " §6<worldName>", "§fDisable an arena.\nThis will remove the players \n§ffrom the arena before disabling.",
+                "/" + getParent().getName() + " " + getSubCommandName() + " ", ClickEvent.Action.SUGGEST_COMMAND));
         setPermission(Permissions.PERMISSION_ARENA_DISABLE);
     }
 
@@ -35,7 +35,7 @@ public class DisableArena extends SubCommand {
             return true;
         }
         if (args.length != 1) {
-            s.sendMessage("§c▪ §7Usage: §o/" + getParent().getName() + " "+getSubCommandName()+" <mapName>");
+            s.sendMessage("§c▪ §7Usage: §o/" + getParent().getName() + " " + getSubCommandName() + " <mapName>");
             return true;
         }
         if (!BedWars.getAPI().getRestoreAdapter().isWorld(args[0])) {
@@ -59,7 +59,7 @@ public class DisableArena extends SubCommand {
     @Override
     public List<String> getTabComplete() {
         List<String> tab = new ArrayList<>();
-        for (IArena a : Arena.getArenas()){
+        for (IArena a : Arena.getArenas()) {
             tab.add(a.getArenaName());
         }
         return tab;
@@ -67,8 +67,7 @@ public class DisableArena extends SubCommand {
 
     @Override
     public boolean canSee(CommandSender s, com.tomkeuper.bedwars.api.BedWars api) {
-        if (s instanceof Player) {
-            Player p = (Player) s;
+        if (s instanceof Player p) {
             if (Arena.isInArena(p)) return false;
             if (SetupSession.isInSetupSession(p.getUniqueId())) return false;
         }

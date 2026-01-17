@@ -23,15 +23,21 @@ import java.util.List;
 
 public class AutoCreateTeams extends SubCommand {
 
+    private static final HashMap<Player, Long> timeOut = new HashMap<>();
+    private static final HashMap<Player, List<Byte>> teamsFoundOld = new HashMap<>();
+    private static final HashMap<Player, List<String>> teamsFound13 = new HashMap<>();
     public AutoCreateTeams(ParentCommand parent, String name) {
         super(parent, name);
         setArenaSetupCommand(true);
         setPermission(Permissions.PERMISSION_SETUP_ARENA);
     }
 
-    private static HashMap<Player, Long> timeOut = new HashMap<>();
-    private static HashMap<Player, List<Byte>> teamsFoundOld = new HashMap<>();
-    private static HashMap<Player, List<String>> teamsFound13 = new HashMap<>();
+    /**
+     * Check if server version is 1.13 or higher
+     */
+    public static boolean is13Higher() {
+        return !(BedWars.getServerVersion().equals("v1_8_R3") || BedWars.getServerVersion().equals("v1_12_R1"));
+    }
 
     @SuppressWarnings("deprecation")
     @Override
@@ -198,13 +204,6 @@ public class AutoCreateTeams extends SubCommand {
     @Override
     public List<String> getTabComplete() {
         return null;
-    }
-
-    /**
-     * Check if server version is 1.13 or higher
-     */
-    public static boolean is13Higher() {
-        return !(BedWars.getServerVersion().equals("v1_8_R3") || BedWars.getServerVersion().equals("v1_12_R1"));
     }
 
     @Override

@@ -16,13 +16,14 @@ import redis.clients.jedis.JedisPubSub;
 
 public class RedisPubSubListener extends JedisPubSub {
     private final String BW_CHANNEL;
+
     public RedisPubSubListener(String channel) {
         this.BW_CHANNEL = channel;
     }
 
     @Override
     public void onMessage(String channel, String message) {
-        if(channel.equals(BW_CHANNEL)) {
+        if (channel.equals(BW_CHANNEL)) {
             final JsonObject json;
             try {
                 json = new JsonParser().parse(message).getAsJsonObject();
@@ -38,7 +39,7 @@ public class RedisPubSubListener extends JedisPubSub {
                     break;
                 case "Q":
                     Player p = Bukkit.getPlayer(json.get("name").getAsString());
-                    if (p != null && p.isOnline()){
+                    if (p != null && p.isOnline()) {
                         IArena a = Arena.getArenaByPlayer(p);
                         if (a != null) {
                             JsonObject jo = new JsonObject();

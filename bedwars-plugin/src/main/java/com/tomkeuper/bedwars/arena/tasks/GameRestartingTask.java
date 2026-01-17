@@ -23,9 +23,9 @@ import java.util.List;
 
 public class GameRestartingTask implements Runnable, RestartingTask {
 
+    private final BukkitTask task;
     private Arena arena;
     private int restarting = BedWars.config.getInt(ConfigPath.GENERAL_CONFIGURATION_RESTART) + 3;
-    private final BukkitTask task;
 
     public GameRestartingTask(@NotNull Arena arena) {
         this.arena = arena;

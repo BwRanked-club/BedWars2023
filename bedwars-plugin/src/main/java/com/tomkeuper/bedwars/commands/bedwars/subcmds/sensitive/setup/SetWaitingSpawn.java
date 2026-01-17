@@ -26,14 +26,14 @@ public class SetWaitingSpawn extends SubCommand {
         if (s instanceof ConsoleCommandSender) return false;
         Player p = (Player) s;
         SetupSession ss = SetupSession.getSession(p.getUniqueId());
-        if (ss == null){
+        if (ss == null) {
             s.sendMessage("§c ▪ §7You're not in a setup session!");
             return true;
         }
-        p.sendMessage("§6 ▪ §7Waiting spawn set for §e"+ss.getWorldName()+"§7!");
+        p.sendMessage("§6 ▪ §7Waiting spawn set for §e" + ss.getWorldName() + "§7!");
         ss.getConfig().saveArenaLoc("waiting.Loc", p.getLocation());
-        if (ss.getSetupType() == SetupType.ASSISTED){
-            Bukkit.dispatchCommand(s, BedWars.mainCmd+" autocreateteams");
+        if (ss.getSetupType() == SetupType.ASSISTED) {
+            Bukkit.dispatchCommand(s, BedWars.mainCmd + " autocreateteams");
         } else {
             Bukkit.dispatchCommand(s, BedWars.mainCmd);
         }

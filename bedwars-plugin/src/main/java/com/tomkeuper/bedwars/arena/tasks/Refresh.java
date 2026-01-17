@@ -7,7 +7,7 @@ public class Refresh implements Runnable {
 
     @Override
     public void run() {
-        for (Despawnable d : BedWars.nms.getDespawnablesList().values()){
+        for (Despawnable d : BedWars.nms.getDespawnablesList().values()) {
             d.refresh();
         }
     }

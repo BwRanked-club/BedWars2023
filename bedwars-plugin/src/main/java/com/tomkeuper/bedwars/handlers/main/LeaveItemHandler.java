@@ -5,11 +5,11 @@ import com.tomkeuper.bedwars.api.arena.IArena;
 import com.tomkeuper.bedwars.api.configuration.ConfigPath;
 import com.tomkeuper.bedwars.api.items.handlers.HandlerType;
 import com.tomkeuper.bedwars.api.items.handlers.IPermanentItem;
+import com.tomkeuper.bedwars.api.items.handlers.PermanentItemHandler;
 import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.arena.Arena;
 import com.tomkeuper.bedwars.arena.Misc;
-import com.tomkeuper.bedwars.api.items.handlers.PermanentItemHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -25,8 +25,21 @@ public class LeaveItemHandler extends PermanentItemHandler {
 
     private static final HashMap<UUID, Long> delay = new HashMap<>();
     private static final HashMap<UUID, BukkitTask> leaving = new HashMap<>();
+
     public LeaveItemHandler(String id, Plugin plugin, com.tomkeuper.bedwars.api.BedWars api) {
         super(id, plugin, api);
+    }
+
+    private static void update(UUID player) {
+        if (delay.containsKey(player)) {
+            delay.replace(player, System.currentTimeMillis() + 2500L);
+            return;
+        }
+        delay.put(player, System.currentTimeMillis() + 2500L);
+    }
+
+    private static boolean cancel(UUID player) {
+        return delay.getOrDefault(player, 0L) > System.currentTimeMillis();
     }
 
     @Override
@@ -76,18 +89,6 @@ public class LeaveItemHandler extends PermanentItemHandler {
                 }
             }
         }
-    }
-
-    private static void update(UUID player){
-        if (delay.containsKey(player)){
-            delay.replace(player, System.currentTimeMillis() + 2500L);
-            return;
-        }
-        delay.put(player, System.currentTimeMillis() + 2500L);
-    }
-
-    private static boolean cancel(UUID player){
-        return delay.getOrDefault(player, 0L) > System.currentTimeMillis();
     }
 
     @Override

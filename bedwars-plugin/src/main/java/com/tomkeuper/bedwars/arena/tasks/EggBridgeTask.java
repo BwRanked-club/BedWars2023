@@ -110,7 +110,7 @@ public class EggBridgeTask implements Runnable {
         }
     }
 
-    public void cancel(){
+    public void cancel() {
         task.cancel();
     }
 }

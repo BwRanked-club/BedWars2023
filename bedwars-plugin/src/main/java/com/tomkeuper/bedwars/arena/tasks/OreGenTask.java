@@ -8,9 +8,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
 
-public class OreGenTask implements Runnable{
+public class OreGenTask implements Runnable {
     Arena arena;
-    private BukkitTask task;
+    private final BukkitTask task;
+
     public OreGenTask(Arena arena) {
         this.arena = arena;
         this.task = Bukkit.getScheduler().runTaskTimer(BedWars.plugin, this, 0, 5L);
@@ -34,6 +35,7 @@ public class OreGenTask implements Runnable{
     public void cancel() {
         task.cancel();
     }
+
     public Arena getArena() {
         return arena;
     }

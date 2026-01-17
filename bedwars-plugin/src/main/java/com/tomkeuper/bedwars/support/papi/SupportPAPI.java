@@ -9,6 +9,14 @@ public abstract class SupportPAPI implements com.tomkeuper.bedwars.api.language.
 
     private static supp supportPAPI = new noPAPI();
 
+    public static supp getSupportPAPI() {
+        return supportPAPI;
+    }
+
+    public static void setSupportPAPI(supp s) {
+        supportPAPI = s;
+    }
+
     public interface supp extends com.tomkeuper.bedwars.api.language.SupportPAPI {
         String replace(Player p, String s);
 
@@ -39,13 +47,5 @@ public abstract class SupportPAPI implements com.tomkeuper.bedwars.api.language.
         public List<String> replace(Player p, List<String> strings) {
             return PlaceholderAPI.setPlaceholders(p, strings);
         }
-    }
-
-    public static supp getSupportPAPI() {
-        return supportPAPI;
-    }
-
-    public static void setSupportPAPI(supp s) {
-        supportPAPI = s;
     }
 }

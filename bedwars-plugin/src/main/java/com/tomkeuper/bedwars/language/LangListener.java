@@ -21,7 +21,7 @@ public class LangListener implements Listener {
                 BoardManager.getInstance().giveTabFeatures(e.getPlayer(), Arena.getArenaByPlayer(e.getPlayer()), false);
 
                 // save to db
-                Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, ()-> BedWars.getRemoteDatabase().setLanguage(e.getPlayer().getUniqueId(), e.getNewLang()));
+                Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, () -> BedWars.getRemoteDatabase().setLanguage(e.getPlayer().getUniqueId(), e.getNewLang()));
             }, 10L);
         }
     }

@@ -28,8 +28,8 @@ public class DelArena extends SubCommand {
         setPriority(4);
         showInList(true);
         setPermission(Permissions.PERMISSION_DEL_ARENA);
-        setDisplayInfo(Misc.msgHoverClick("§6 ▪ §7/" + MainCommand.getInstance().getName() + " "+getSubCommandName()+" §6<worldName>", "§fDelete a map and its configuration.",
-                "/" + MainCommand.getInstance().getName() + " "+getSubCommandName(), ClickEvent.Action.SUGGEST_COMMAND));
+        setDisplayInfo(Misc.msgHoverClick("§6 ▪ §7/" + MainCommand.getInstance().getName() + " " + getSubCommandName() + " §6<worldName>", "§fDelete a map and its configuration.",
+                "/" + MainCommand.getInstance().getName() + " " + getSubCommandName(), ClickEvent.Action.SUGGEST_COMMAND));
     }
 
     @Override
@@ -51,7 +51,7 @@ public class DelArena extends SubCommand {
             s.sendMessage("§c▪ §7Please disable it first!");
             return true;
         }
-        File ac = new File(BedWars.plugin.getDataFolder(), "/Arenas/" + args[0]+ ".yml");
+        File ac = new File(BedWars.plugin.getDataFolder(), "/Arenas/" + args[0] + ".yml");
         if (!ac.exists()) {
             s.sendMessage("§c▪ §7This arena doesn't exist!");
             return true;
@@ -91,8 +91,7 @@ public class DelArena extends SubCommand {
 
     @Override
     public boolean canSee(CommandSender s, com.tomkeuper.bedwars.api.BedWars api) {
-        if (s instanceof Player) {
-            Player p = (Player) s;
+        if (s instanceof Player p) {
             if (Arena.isInArena(p)) return false;
 
             if (SetupSession.isInSetupSession(p.getUniqueId())) return false;

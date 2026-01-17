@@ -19,16 +19,20 @@ public class QuickBuyAdd {
 
     public static HashMap<UUID, ICategoryContent> quickBuyAdds = new HashMap<>();
 
-    public QuickBuyAdd(Player player, ICategoryContent cc){
+    public QuickBuyAdd(Player player, ICategoryContent cc) {
         ShopCategory.categoryViewers.remove(player.getUniqueId());
         open(player, cc);
     }
 
-    public void open(Player player, ICategoryContent cc){
+    public static HashMap<UUID, ICategoryContent> getQuickBuyAdds() {
+        return new HashMap<>(quickBuyAdds);
+    }
+
+    public void open(Player player, ICategoryContent cc) {
         Inventory inv = Bukkit.createInventory(null, ShopManager.shop.getInvSize(), Language.getMsg(player, Messages.SHOP_QUICK_ADD_NAME));
         IPlayerQuickBuyCache cache = PlayerQuickBuyCache.getInstance().getQuickBuyCache(player.getUniqueId());
         ShopCache sc = ShopCache.getInstance().getShopCache(player.getUniqueId());
-        if (sc == null || cache == null){
+        if (sc == null || cache == null) {
             player.closeInventory();
         }
         inv.setItem(4, cc.getItemStack(player, Objects.requireNonNull(sc)));
@@ -37,9 +41,5 @@ public class QuickBuyAdd {
 
         player.openInventory(inv);
         quickBuyAdds.put(player.getUniqueId(), cc);
-    }
-
-    public static HashMap<UUID, ICategoryContent> getQuickBuyAdds() {
-        return new HashMap<>(quickBuyAdds);
     }
 }

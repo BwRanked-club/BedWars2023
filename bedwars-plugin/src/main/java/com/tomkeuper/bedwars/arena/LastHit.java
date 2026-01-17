@@ -12,12 +12,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Getter
 public class LastHit {
 
+    private static final ConcurrentHashMap<UUID, LastHit> lastHit = new ConcurrentHashMap<>();
     private final UUID victim;
     @Setter
     private Entity damager;
     @Setter
     private long time;
-    private static final ConcurrentHashMap<UUID, LastHit> lastHit = new ConcurrentHashMap<>();
 
     public LastHit(@NotNull Player victim, Entity damager, long time) {
         this.victim = victim.getUniqueId();
@@ -26,11 +26,11 @@ public class LastHit {
         lastHit.put(victim.getUniqueId(), this);
     }
 
-    public void remove() {
-        lastHit.remove(victim);
-    }
-
     public static LastHit getLastHit(@NotNull Player player) {
         return lastHit.getOrDefault(player.getUniqueId(), null);
+    }
+
+    public void remove() {
+        lastHit.remove(victim);
     }
 }

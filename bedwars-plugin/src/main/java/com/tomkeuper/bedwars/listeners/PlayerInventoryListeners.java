@@ -35,6 +35,33 @@ import static org.bukkit.event.inventory.InventoryAction.MOVE_TO_OTHER_INVENTORY
 
 public class PlayerInventoryListeners implements Listener {
 
+    /**
+     * Check if an item is command-item
+     */
+    private static boolean isCommandItem(ItemStack i) {
+        if (i == null) return false;
+        if (i.getType() == Material.AIR) return false;
+        if (nms.isCustomBedWarsItem(i)) {
+            String[] customData = nms.getCustomData(i).split("_");
+            if (customData.length >= 2) {
+                return customData[0].equals("RUNCOMMAND");
+            }
+        }
+        return false;
+    }
+
+    private static boolean isDefaultWoodenSword(ItemStack i) {
+        if (i == null || i.getType() == Material.AIR) return false;
+        if (!nms.isCustomBedWarsItem(i)) return false;
+        String data = nms.getCustomData(i);
+        if (data == null || !data.equalsIgnoreCase("DEFAULT_ITEM")) return false;
+
+        if (!VersionCommon.api.getVersionSupport().isSword(i)) return false;
+
+        final String type = i.getType().name();
+        return type.contains("WOOD") && type.contains("SWORD");
+    }
+
     @EventHandler
     public void onClose(InventoryCloseEvent e) {
         Player p = (Player) e.getPlayer();
@@ -193,7 +220,6 @@ public class PlayerInventoryListeners implements Listener {
         if (a != null) {
             if (a.isSpectator(p)) {
                 e.setCancelled(true);
-                return;
             }
         }
     }
@@ -322,33 +348,6 @@ public class PlayerInventoryListeners implements Listener {
                 }
             }
         }
-    }
-
-    /**
-     * Check if an item is command-item
-     */
-    private static boolean isCommandItem(ItemStack i) {
-        if (i == null) return false;
-        if (i.getType() == Material.AIR) return false;
-        if (nms.isCustomBedWarsItem(i)) {
-            String[] customData = nms.getCustomData(i).split("_");
-            if (customData.length >= 2) {
-                return customData[0].equals("RUNCOMMAND");
-            }
-        }
-        return false;
-    }
-
-    private static boolean isDefaultWoodenSword(ItemStack i) {
-        if (i == null || i.getType() == Material.AIR) return false;
-        if (!nms.isCustomBedWarsItem(i)) return false;
-        String data = nms.getCustomData(i);
-        if (data == null || !data.equalsIgnoreCase("DEFAULT_ITEM")) return false;
-
-        if (!VersionCommon.api.getVersionSupport().isSword(i)) return false;
-
-        final String type = i.getType().name();
-        return type.contains("WOOD") && type.contains("SWORD");
     }
 
     @EventHandler

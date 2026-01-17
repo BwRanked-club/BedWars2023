@@ -1,9 +1,9 @@
 package com.tomkeuper.bedwars.support.vipfeatures;
 
+import com.andrei1058.vipfeatures.api.MiniGame;
 import com.tomkeuper.bedwars.api.arena.GameState;
 import com.tomkeuper.bedwars.api.arena.IArena;
 import com.tomkeuper.bedwars.arena.Arena;
-import com.andrei1058.vipfeatures.api.MiniGame;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 

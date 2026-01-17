@@ -4,6 +4,7 @@ import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.addon.Addon;
 import com.tomkeuper.bedwars.api.addon.IAddonManager;
 import org.bukkit.Bukkit;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,14 +68,14 @@ public class AddonManager implements IAddonManager {
         for (Addon addon : loadedAddons) {
             if (unloadedAddons.contains(addon)) continue;
             String name, author;
-            try{
+            try {
                 name = addon.getName();
-            } catch (AbstractMethodError ignored){
+            } catch (AbstractMethodError ignored) {
                 name = "null";
             }
-            try{
+            try {
                 author = addon.getAuthor();
-            } catch (AbstractMethodError ignored){
+            } catch (AbstractMethodError ignored) {
                 author = "null";
             }
 
@@ -109,23 +110,23 @@ public class AddonManager implements IAddonManager {
         for (Addon addon : registeredAddons) {
             if (loadedAddons.contains(addon)) continue;
             String name, author, version;
-            try{
+            try {
                 name = addon.getName();
-            } catch (AbstractMethodError ignored){
+            } catch (AbstractMethodError ignored) {
                 name = "null";
             }
-            try{
+            try {
                 author = addon.getAuthor();
-            } catch (AbstractMethodError ignored){
+            } catch (AbstractMethodError ignored) {
                 author = "null";
             }
-            try{
+            try {
                 version = addon.getVersion();
-            } catch (AbstractMethodError ignored){
+            } catch (AbstractMethodError ignored) {
                 version = "null";
             }
 
-            log("Loading " + name + " by " + author +". " + "Version " + version);
+            log("Loading " + name + " by " + author + ". " + "Version " + version);
             loadedAddons.add(addon);
             unloadedAddons.remove(addon);
             addon.load();
@@ -134,7 +135,7 @@ public class AddonManager implements IAddonManager {
     }
 
     @Override
-    public void registerAddon(Addon addon){
+    public void registerAddon(Addon addon) {
         if (addon == null) return;
         if (registeredAddons.contains(addon)) return;
         if (registeredAddons.stream().map(Addon::getPlugin).toList().contains(addon.getPlugin())) return;

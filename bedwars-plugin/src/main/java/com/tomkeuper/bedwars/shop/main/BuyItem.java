@@ -24,6 +24,12 @@ import org.bukkit.potion.PotionEffectType;
 @SuppressWarnings("WeakerAccess")
 public class BuyItem implements IBuyItem {
 
+    /**
+     * -- GETTER --
+     * Get upgrade identifier.
+     * Used to remove old tier items.
+     */
+    private final String upgradeIdentifier;
     @Setter
     private ItemStack itemStack;
     @Setter
@@ -34,15 +40,9 @@ public class BuyItem implements IBuyItem {
     private boolean unbreakable = false;
     /**
      * -- GETTER --
-     *  Check if object created properly
+     * Check if object created properly
      */
     private boolean loaded = false;
-    /**
-     * -- GETTER --
-     *  Get upgrade identifier.
-     *  Used to remove old tier items.
-     */
-    private final String upgradeIdentifier;
 
     /**
      * Create a shop item

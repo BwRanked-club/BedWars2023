@@ -9,10 +9,10 @@ import org.bukkit.event.server.ServerListPingEvent;
 
 public class ServerPingListener implements Listener {
     @EventHandler
-    public void onPing(ServerListPingEvent e){
-        if (!Arena.getArenas().isEmpty()){
+    public void onPing(ServerListPingEvent e) {
+        if (!Arena.getArenas().isEmpty()) {
             IArena a = Arena.getArenas().get(0);
-            if (a != null){
+            if (a != null) {
                 e.setMaxPlayers(a.getMaxPlayers());
                 e.setMotd(a.getDisplayStatus(Language.getDefaultLanguage()));
             }

@@ -1,12 +1,12 @@
 package com.tomkeuper.bedwars.support.vipfeatures;
 
+import com.andrei1058.vipfeatures.api.IVipFeatures;
+import com.andrei1058.vipfeatures.api.event.BlockChangeEvent;
 import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.arena.IArena;
 import com.tomkeuper.bedwars.api.arena.team.ITeam;
 import com.tomkeuper.bedwars.api.events.player.PlayerJoinArenaEvent;
 import com.tomkeuper.bedwars.api.server.ServerType;
-import com.andrei1058.vipfeatures.api.IVipFeatures;
-import com.andrei1058.vipfeatures.api.event.BlockChangeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -43,13 +43,14 @@ public class VipListeners implements Listener {
                         if (e.getLocation().getBlockX() == t.getBed().getBlockX() &&
                                 e.getLocation().getBlockY() == t.getBed().getBlockY() &&
                                 e.getLocation().getBlockZ() == t.getBed().getBlockZ()) {
-                            if (BedWars.nms.isBed(t.getBed().clone().add(x, 0, z).getBlock().getType())) e.setCancelled(true);
+                            if (BedWars.nms.isBed(t.getBed().clone().add(x, 0, z).getBlock().getType()))
+                                e.setCancelled(true);
                             return;
                         }
                     }
                 }
             }
-            a.getPlaced().add(new Vector(e.getLocation().getBlockX(), e.getLocation().getBlockY(),e.getLocation().getBlockZ()));
+            a.getPlaced().add(new Vector(e.getLocation().getBlockX(), e.getLocation().getBlockY(), e.getLocation().getBlockZ()));
         }
     }
 }

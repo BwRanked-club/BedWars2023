@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class DisenchantAction implements TrapAction {
 
-    private Enchantment enchantment;
-    private ApplyType type;
+    private final Enchantment enchantment;
+    private final ApplyType type;
 
     public DisenchantAction(Enchantment enchantment, DisenchantAction.ApplyType type) {
         this.enchantment = enchantment;

@@ -22,7 +22,6 @@ import static com.tomkeuper.bedwars.BedWars.config;
 @SuppressWarnings("WeakerAccess")
 public class MySQL implements IDatabase {
 
-    private HikariDataSource dataSource;
     private final String host;
     private final String database;
     private final String user;
@@ -32,6 +31,7 @@ public class MySQL implements IDatabase {
     private final boolean certificateVerification;
     private final int poolSize;
     private final int maxLifetime;
+    private HikariDataSource dataSource;
 
     /**
      * Create new MySQL connection.

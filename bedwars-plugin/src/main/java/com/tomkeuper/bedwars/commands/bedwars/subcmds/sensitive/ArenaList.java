@@ -34,6 +34,10 @@ public class ArenaList extends SubCommand {
                 "§fShow available arenas", "/" + MainCommand.getInstance().getName() + " " + getSubCommandName(), ClickEvent.Action.RUN_COMMAND));
     }
 
+    private static String color(String msg) {
+        return ChatColor.translateAlternateColorCodes('&', msg);
+    }
+
     @Override
     public boolean execute(String[] args, CommandSender s) {
         int page = 1;
@@ -48,7 +52,7 @@ public class ArenaList extends SubCommand {
         }
         int start = (page - 1) * ARENAS_PER_PAGE;
         List<IArena> arenas = new ArrayList<>(Arena.getArenas());
-        if (arenas.size() <= start){
+        if (arenas.size() <= start) {
             page = 1;
             start = 0;
         }
@@ -66,7 +70,7 @@ public class ArenaList extends SubCommand {
             String gameState = arena.getDisplayStatus(s instanceof ConsoleCommandSender ? Language.getDefaultLanguage() : Language.getPlayerLanguage((Player) s));
             String msg = color(
                     "ID: &e" + arena.getWorldName() +
-                            (com.tomkeuper.bedwars.BedWars.autoscale ? " &fN: &e" + arena.getArenaName(): "") +
+                            (com.tomkeuper.bedwars.BedWars.autoscale ? " &fN: &e" + arena.getArenaName() : "") +
                             " &fG: &e" + arena.getDisplayGroup(s instanceof ConsoleCommandSender ? Language.getDefaultLanguage() : Language.getPlayerLanguage((Player) s)) +
                             " &fP: &e" + (arena.getPlayers().size() + arena.getSpectators().size()) +
                             " &fS: " + gameState +
@@ -105,17 +109,12 @@ public class ArenaList extends SubCommand {
     @Override
     public boolean canSee(CommandSender s, BedWars api) {
 
-        if (s instanceof Player) {
-            Player p = (Player) s;
+        if (s instanceof Player p) {
             if (Arena.isInArena(p)) return false;
 
             if (SetupSession.isInSetupSession(p.getUniqueId())) return false;
         }
 
         return hasPermission(s);
-    }
-
-    private static String color(String msg) {
-        return ChatColor.translateAlternateColorCodes('&', msg);
     }
 }

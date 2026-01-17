@@ -21,23 +21,21 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("WeakerAccess")
 public class ShopIndex extends AbstractInventoryLayout implements IShopIndex {
 
+    public static List<UUID> indexViewers = new ArrayList<>();
     /**
      * -- GETTER --
-     *  Get the shop's categories
+     * Get the shop's categories
      */
     @Getter
     private final List<IShopCategory> categoryList = new ArrayList<>();
     /**
      * -- GETTER --
-     *  Get the quick buy button
+     * Get the quick buy button
      */
     @Getter
     private final QuickBuyButton quickBuyButton;
-
     // Caches pre-resolved categories per arena to avoid runtime priority scans
     private final ConcurrentHashMap<IArena, Map<Integer, IShopCategory>> resolvedBySlot = new ConcurrentHashMap<>();
-
-    public static List<UUID> indexViewers = new ArrayList<>();
 
 
     /**
@@ -53,6 +51,10 @@ public class ShopIndex extends AbstractInventoryLayout implements IShopIndex {
     public ShopIndex(String namePath, QuickBuyButton quickBuyButton, String separatorNamePath, String separatorLorePath, ItemStack separatorSelected, ItemStack separatorStandard) {
         super(54, namePath, separatorNamePath, separatorLorePath, separatorSelected, separatorStandard);
         this.quickBuyButton = quickBuyButton;
+    }
+
+    public static List<UUID> getIndexViewers() {
+        return new ArrayList<>(indexViewers);
     }
 
     /**
@@ -111,7 +113,6 @@ public class ShopIndex extends AbstractInventoryLayout implements IShopIndex {
             indexViewers.add(player.getUniqueId());
         }
     }
-
 
     /**
      * Add shop separator between categories and items
@@ -185,9 +186,5 @@ public class ShopIndex extends AbstractInventoryLayout implements IShopIndex {
 
     public void clearAllCaches() {
         resolvedBySlot.clear();
-    }
-
-    public static List<UUID> getIndexViewers() {
-        return new ArrayList<>(indexViewers);
     }
 }

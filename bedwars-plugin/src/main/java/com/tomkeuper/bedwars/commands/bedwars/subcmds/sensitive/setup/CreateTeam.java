@@ -44,6 +44,7 @@ public class CreateTeam extends SubCommand {
             for (TeamColor t : TeamColor.values()) {
                 if (t.toString().equalsIgnoreCase(args[1])) {
                     y = false;
+                    break;
                 }
             }
             if (y) {

@@ -30,12 +30,12 @@ public class RedisConnection implements IRedisClient {
     public RedisConnection() {
         JedisPoolConfig config = new JedisPoolConfig();
         dataPool = new JedisPool(config, BedWars.config.getString(ConfigPath.GENERAL_CONFIGURATION_BUNGEE_OPTION_REDIS_HOST),
-                BedWars.config.getInt(ConfigPath.GENERAL_CONFIGURATION_BUNGEE_OPTION_REDIS_PORT),0,
+                BedWars.config.getInt(ConfigPath.GENERAL_CONFIGURATION_BUNGEE_OPTION_REDIS_PORT), 0,
                 BedWars.config.getString(ConfigPath.GENERAL_CONFIGURATION_BUNGEE_OPTION_REDIS_PASSWORD));
 
         // Need a new pool for the subscriptions since they will allow only `(P|S)SUBSCRIBE / (P|S)UNSUBSCRIBE / PING / QUIT / RESET` commands while being subscribed.
         subscriptionPool = new JedisPool(config, BedWars.config.getString(ConfigPath.GENERAL_CONFIGURATION_BUNGEE_OPTION_REDIS_HOST),
-                BedWars.config.getInt(ConfigPath.GENERAL_CONFIGURATION_BUNGEE_OPTION_REDIS_PORT),0,
+                BedWars.config.getInt(ConfigPath.GENERAL_CONFIGURATION_BUNGEE_OPTION_REDIS_PORT), 0,
                 BedWars.config.getString(ConfigPath.GENERAL_CONFIGURATION_BUNGEE_OPTION_REDIS_PASSWORD));
 
         this.channel = BedWars.config.getYml().getString(ConfigPath.GENERAL_CONFIGURATION_BUNGEE_OPTION_REDIS_CHANNEL);
@@ -46,11 +46,11 @@ public class RedisConnection implements IRedisClient {
         redisPubSubListener = new RedisPubSubListener(channel);
     }
 
-    public boolean connect(){
+    public boolean connect() {
         try {
             listenerPool.execute(() -> {
                 BedWars.debug("Subscribing to redis channel: " + channel);
-                try (final Jedis listenerConnection = subscriptionPool.getResource()){
+                try (final Jedis listenerConnection = subscriptionPool.getResource()) {
                     listenerConnection.subscribe(redisPubSubListener, channel);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -70,10 +70,10 @@ public class RedisConnection implements IRedisClient {
     }
 
 
-    public void cleanupRedisEntries(){
+    public void cleanupRedisEntries() {
         try (Jedis jedis = dataPool.getResource()) {
             // Get all keys starting with the server identifier.
-            Set<String> keys = jedis.keys("bwa-" + BedWars.config.getString(ConfigPath.GENERAL_CONFIGURATION_BUNGEE_OPTION_SERVER_ID)+"*");
+            Set<String> keys = jedis.keys("bwa-" + BedWars.config.getString(ConfigPath.GENERAL_CONFIGURATION_BUNGEE_OPTION_SERVER_ID) + "*");
 
             for (String key : keys) {
                 jedis.del(key);
@@ -83,7 +83,7 @@ public class RedisConnection implements IRedisClient {
         }
     }
 
-    public void cleanupRedisEntry(IArena a){
+    public void cleanupRedisEntry(IArena a) {
         try (Jedis jedis = dataPool.getResource()) {
             String key = "bwa-" + BedWars.config.getString(ConfigPath.GENERAL_CONFIGURATION_BUNGEE_OPTION_SERVER_ID) + "-" + a.getWorldName();
             jedis.del(key);
@@ -105,7 +105,7 @@ public class RedisConnection implements IRedisClient {
         if (a == null) return false;
         if (a.getWorldName() == null) return false;
 
-            // Create a map for the arena information.
+        // Create a map for the arena information.
         Map<String, String> arenaInfoMap = new HashMap<>();
         arenaInfoMap.put("server_name", BedWars.config.getString(ConfigPath.GENERAL_CONFIGURATION_BUNGEE_OPTION_SERVER_ID));
         arenaInfoMap.put("arena_name", a.getArenaName());
@@ -135,13 +135,13 @@ public class RedisConnection implements IRedisClient {
      *
      * @return True if correct or matching the default settings, otherwise false.
      */
-    public boolean checkSettings(String redisSettingIdentifier, String defaultSetting){
+    public boolean checkSettings(String redisSettingIdentifier, String defaultSetting) {
         try (Jedis jedis = dataPool.getResource()) {
-            String key = "settings";;
+            String key = "settings";
             if (jedis.exists(key)) {
                 String retrievedSetting = jedis.hget(key, redisSettingIdentifier);
                 if (!defaultSetting.equals(retrievedSetting)) {
-                    Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Setting '"+ redisSettingIdentifier +"' does not match the stored value of '" + retrievedSetting + "' is '" + defaultSetting + "'.");
+                    Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Setting '" + redisSettingIdentifier + "' does not match the stored value of '" + retrievedSetting + "' is '" + defaultSetting + "'.");
                     return false;
                 }
             } else {
@@ -158,7 +158,7 @@ public class RedisConnection implements IRedisClient {
      * Store the settings in the Redis database.
      *
      * @param redisSettingIdentifier the identifier of the setting to be checked.
-     * @param setting the setting to be stored.
+     * @param setting                the setting to be stored.
      */
     public void storeSettings(String redisSettingIdentifier, String setting) {
         try (Jedis jedis = dataPool.getResource()) {
@@ -175,9 +175,9 @@ public class RedisConnection implements IRedisClient {
      * @param redisSettingIdentifier the identifier of the setting to be checked.
      * @return the data as a string associated with the specified identifier
      */
-    public String retrieveSetting(String redisSettingIdentifier){
+    public String retrieveSetting(String redisSettingIdentifier) {
         try (Jedis jedis = dataPool.getResource()) {
-            String key = "settings";;
+            String key = "settings";
             if (jedis.exists(key)) {
                 String retrievedSetting = jedis.hget(key, redisSettingIdentifier);
                 return retrievedSetting;
@@ -225,7 +225,7 @@ public class RedisConnection implements IRedisClient {
         }
     }
 
-    public void close(){
+    public void close() {
         BedWars.debug("Closing redis connections...");
         cleanupRedisEntries();
         redisPubSubListener.unsubscribe();

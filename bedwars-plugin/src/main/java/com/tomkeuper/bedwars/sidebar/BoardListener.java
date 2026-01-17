@@ -14,11 +14,11 @@ import java.util.Objects;
 
 public class BoardListener implements Listener {
     @EventHandler
-    public void onArenaLeave(PlayerLeaveArenaEvent event){
+    public void onArenaLeave(PlayerLeaveArenaEvent event) {
         IArena arena = Arena.getArenaByPlayer(event.getPlayer());
         if (TabAPI.getInstance().getPlayer(event.getPlayer().getUniqueId()) == null) return;
-        if (TabAPI.getInstance().getBossBarManager() != null && arena != null){
-            for (BossBar bossBar : arena.getDragonBossbars()){
+        if (TabAPI.getInstance().getBossBarManager() != null && arena != null) {
+            for (BossBar bossBar : arena.getDragonBossbars()) {
                 bossBar.removePlayer(Objects.requireNonNull(TabAPI.getInstance().getPlayer(event.getPlayer().getUniqueId())));
             }
         }

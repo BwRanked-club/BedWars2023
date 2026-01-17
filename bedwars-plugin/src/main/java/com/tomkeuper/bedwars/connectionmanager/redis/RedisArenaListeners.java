@@ -22,35 +22,39 @@ public class RedisArenaListeners implements Listener {
     public void onPlayerJoinArena(PlayerJoinArenaEvent e) {
         if (e == null) return;
         final IArena a = e.getArena();
-        Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, ()-> {
-            if (!redisConnection.storeArenaInformation(a)) Bukkit.getLogger().severe("An error occurred while trying to store arena information!");
+        Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, () -> {
+            if (!redisConnection.storeArenaInformation(a))
+                Bukkit.getLogger().severe("An error occurred while trying to store arena information!");
         });
     }
 
     @EventHandler
-    public void onPlayerLeaveArena(PlayerLeaveArenaEvent e){
+    public void onPlayerLeaveArena(PlayerLeaveArenaEvent e) {
         if (e == null) return;
         final IArena a = e.getArena();
-        Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, ()-> {
-            if (!redisConnection.storeArenaInformation(a)) Bukkit.getLogger().severe("An error occurred while trying to store arena information!");
+        Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, () -> {
+            if (!redisConnection.storeArenaInformation(a))
+                Bukkit.getLogger().severe("An error occurred while trying to store arena information!");
         });
     }
 
     @EventHandler
-    public void onArenaStatusChange(GameStateChangeEvent e){
+    public void onArenaStatusChange(GameStateChangeEvent e) {
         if (e == null) return;
         final IArena a = e.getArena();
-        Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, ()-> {
-            if (!redisConnection.storeArenaInformation(a)) Bukkit.getLogger().severe("An error occurred while trying to store arena information!");
+        Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, () -> {
+            if (!redisConnection.storeArenaInformation(a))
+                Bukkit.getLogger().severe("An error occurred while trying to store arena information!");
         });
     }
 
     @EventHandler
-    public void onArenaLoad(ArenaEnableEvent e){
+    public void onArenaLoad(ArenaEnableEvent e) {
         if (e == null) return;
         final IArena a = e.getArena();
-        Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, ()-> {
-            if (!redisConnection.storeArenaInformation(a)) Bukkit.getLogger().severe("An error occurred while trying to store arena information!");
+        Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, () -> {
+            if (!redisConnection.storeArenaInformation(a))
+                Bukkit.getLogger().severe("An error occurred while trying to store arena information!");
         });
     }
 }

@@ -1,5 +1,6 @@
 package com.tomkeuper.bedwars.upgrades.menu;
 
+import com.google.common.collect.ImmutableMap;
 import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.arena.IArena;
 import com.tomkeuper.bedwars.api.arena.team.ITeam;
@@ -10,7 +11,6 @@ import com.tomkeuper.bedwars.api.upgrades.MenuContent;
 import com.tomkeuper.bedwars.api.upgrades.TeamUpgrade;
 import com.tomkeuper.bedwars.api.upgrades.UpgradesIndex;
 import com.tomkeuper.bedwars.arena.Arena;
-import com.google.common.collect.ImmutableMap;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -20,8 +20,8 @@ import java.util.Map;
 
 public class InternalMenu implements UpgradesIndex {
 
-    private String name;
-    private HashMap<Integer, MenuContent> menuContentBySlot = new HashMap<>();
+    private final String name;
+    private final HashMap<Integer, MenuContent> menuContentBySlot = new HashMap<>();
 
     /**
      * Create an upgrade menu for an arena group.
@@ -63,10 +63,9 @@ public class InternalMenu implements UpgradesIndex {
 
     public int countTiers() {
         int count = 0;
-        for (MenuContent content : menuContentBySlot.values()){
-            if (content instanceof TeamUpgrade && !(content instanceof EnemyBaseEnterTrap)){
-                TeamUpgrade tu = (TeamUpgrade) content;
-                count+=tu.getTierCount();
+        for (MenuContent content : menuContentBySlot.values()) {
+            if (content instanceof TeamUpgrade tu && !(content instanceof EnemyBaseEnterTrap)) {
+                count += tu.getTierCount();
             }
         }
         return count;

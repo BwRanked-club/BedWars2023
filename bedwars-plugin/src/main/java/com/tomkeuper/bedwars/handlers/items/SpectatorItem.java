@@ -29,18 +29,13 @@ public class SpectatorItem implements IPermanentItem {
     }
 
     @Override
-    public void setItem(ItemStack item) {
-        this.item = item;
-    }
-
-    @Override
     public ItemStack getItem() {
         return item;
     }
 
     @Override
-    public void setSlot(int slot) {
-        this.slot = slot;
+    public void setItem(ItemStack item) {
+        this.item = item;
     }
 
     @Override
@@ -49,12 +44,17 @@ public class SpectatorItem implements IPermanentItem {
     }
 
     @Override
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setSlot(int slot) {
+        this.slot = slot;
     }
 
     @Override
     public String getIdentifier() {
         return identifier;
+    }
+
+    @Override
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 }

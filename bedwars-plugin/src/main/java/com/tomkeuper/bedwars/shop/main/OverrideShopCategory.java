@@ -4,6 +4,7 @@ import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.configuration.ConfigPath;
 import com.tomkeuper.bedwars.api.language.Messages;
 import org.bukkit.configuration.file.YamlConfiguration;
+
 public class OverrideShopCategory extends ShopCategory {
 
     public OverrideShopCategory(String path, YamlConfiguration yml, String name) {

@@ -26,13 +26,11 @@ import java.util.Map;
 import static com.tomkeuper.bedwars.commands.bedwars.subcmds.sensitive.NPC.createArmorStand;
 
 public class JoinNPC {
-    private static boolean citizensSupport = false;
-
     /* Here are stored NPC holograms without colors and placeholders translated used for refresh*/
     public static HashMap<ArmorStand, List<String>> npcs_holos = new HashMap<>();
     /* Here are stored all the NPCs*/
     public static HashMap<Integer, String> npcs = new HashMap<>();
-
+    private static boolean citizensSupport = false;
 
     /**
      * Check if Citizens is loaded correctly

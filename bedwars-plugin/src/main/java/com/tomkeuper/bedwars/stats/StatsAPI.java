@@ -12,14 +12,14 @@ public class StatsAPI implements BedWars.IStats {
 
     private static StatsAPI instance;
 
+    private StatsAPI() {
+    }
+
     public static StatsAPI getInstance() {
         if (instance == null) {
             instance = new StatsAPI();
         }
         return instance;
-    }
-
-    private StatsAPI() {
     }
 
     private IPlayerStats getData(UUID uuid) {

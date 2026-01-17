@@ -129,7 +129,8 @@ public final class ShopDataMigrator {
             boolean alreadyMigrated = false;
             try {
                 alreadyMigrated = BedWars.config.getYml().getBoolean(CFG_TABLE_MIGRATION, false);
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) {
+            }
 
             if (alreadyMigrated) return;
 
@@ -139,7 +140,8 @@ public final class ShopDataMigrator {
                 try {
                     BedWars.config.getYml().set(CFG_TABLE_MIGRATION, true);
                     BedWars.config.save();
-                } catch (Throwable ignored) {}
+                } catch (Throwable ignored) {
+                }
                 return;
             }
 
@@ -150,7 +152,8 @@ public final class ShopDataMigrator {
                 try {
                     BedWars.config.getYml().set(CFG_TABLE_MIGRATION, true);
                     BedWars.config.save();
-                } catch (Throwable ignored) {}
+                } catch (Throwable ignored) {
+                }
             } else {
                 BedWars.plugin.getLogger().warning("Quick Buy table migration failed. Check the logs for details.");
             }

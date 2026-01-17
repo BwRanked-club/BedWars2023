@@ -14,49 +14,49 @@ import org.bukkit.event.Listener;
 public class RefreshGUI implements Listener {
 
     @EventHandler
-    public void onGameStateChange(GameStateChangeEvent e){
+    public void onGameStateChange(GameStateChangeEvent e) {
         if (e == null) return;
         int size = e.getArena().getPlayers().size();
-        for (Player p : Bukkit.getOnlinePlayers()){
+        for (Player p : Bukkit.getOnlinePlayers()) {
             ArenaGUI.refreshInv(p, e.getArena(), size);
         }
     }
 
     @EventHandler
-    public void onPlayerJoinArena(PlayerJoinArenaEvent e){
+    public void onPlayerJoinArena(PlayerJoinArenaEvent e) {
         if (e == null) return;
         int size = e.getArena().getPlayers().size();
-        if (!e.isSpectator()){
+        if (!e.isSpectator()) {
             size++;
         }
-        for (Player p : Bukkit.getOnlinePlayers()){
+        for (Player p : Bukkit.getOnlinePlayers()) {
             ArenaGUI.refreshInv(p, e.getArena(), size);
         }
     }
 
     @EventHandler
-    public void onPlayerLeaveArena(PlayerLeaveArenaEvent e){
+    public void onPlayerLeaveArena(PlayerLeaveArenaEvent e) {
         if (e == null) return;
         int size = e.getArena().getPlayers().size();
-        if (!e.isSpectator()){
+        if (!e.isSpectator()) {
             size--;
         }
-        for (Player p : Bukkit.getOnlinePlayers()){
+        for (Player p : Bukkit.getOnlinePlayers()) {
             ArenaGUI.refreshInv(p, e.getArena(), size);
         }
     }
 
     @EventHandler
-    public void onArenaEnable(ArenaEnableEvent e){
+    public void onArenaEnable(ArenaEnableEvent e) {
         if (e == null) return;
-        for (Player p : Bukkit.getOnlinePlayers()){
+        for (Player p : Bukkit.getOnlinePlayers()) {
             ArenaGUI.refreshInv(p, e.getArena(), 0);
         }
     }
 
     @EventHandler
-    public void onArenaDisable(ArenaDisableEvent e){
-        for (Player p : Bukkit.getOnlinePlayers()){
+    public void onArenaDisable(ArenaDisableEvent e) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
             ArenaGUI.refreshInv(p, null, 0);
         }
     }

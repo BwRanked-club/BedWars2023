@@ -26,31 +26,53 @@ import static org.bukkit.event.inventory.InventoryAction.MOVE_TO_OTHER_INVENTORY
 
 public class InventoryListener implements Listener {
 
+    /**
+     * Check can move item outside inventory.
+     * Block despawnable, permanent and start items dropping and inventory change.
+     */
+    public static boolean shouldCancelMovement(ItemStack i, ShopCache sc) {
+        if (i == null) return false;
+        if (i.getType() == Material.AIR) return false;
+        if (sc == null) return false;
+
+        if (BedWars.nms.isCustomBedWarsItem(i)) {
+            if (BedWars.nms.getCustomData(i).equalsIgnoreCase("DEFAULT_ITEM")) {
+                return true;
+            }
+        }
+
+        String identifier = BedWars.nms.getShopUpgradeIdentifier(i);
+        if (identifier == null) return false;
+        if (identifier.equals("null")) return false;
+        ICachedItem cachedItem = sc.getCachedItem(identifier);
+        return cachedItem != null;
+        // the commented line below  was blocking movement only if tiers amount > 1
+        // return sc.getCachedItem(identifier).getCc().getContentTiers().size() > 1;
+    }
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         if (e.isCancelled()) return;
         if (!(e.getWhoClicked() instanceof Player player)) return;
 
-        Player p = (Player) e.getWhoClicked();
-
-        IArena a = Arena.getArenaByPlayer(p);
+        IArena a = Arena.getArenaByPlayer(player);
         if (a == null) return;
-        if (a.isSpectator(p)) return;
+        if (a.isSpectator(player)) return;
 
-        ShopCache shopCache = ShopCache.getInstance().getShopCache(p.getUniqueId());
-        IPlayerQuickBuyCache cache = PlayerQuickBuyCache.getInstance().getQuickBuyCache(p.getUniqueId());
+        ShopCache shopCache = ShopCache.getInstance().getShopCache(player.getUniqueId());
+        IPlayerQuickBuyCache cache = PlayerQuickBuyCache.getInstance().getQuickBuyCache(player.getUniqueId());
 
         if (cache == null) return;
         if (shopCache == null) return;
 
-        if (ShopIndex.getIndexViewers().contains(p.getUniqueId()) || ShopCategory.getInstance().getCategoryViewers().contains(p.getUniqueId())) {
+        if (ShopIndex.getIndexViewers().contains(player.getUniqueId()) || ShopCategory.getInstance().getCategoryViewers().contains(player.getUniqueId())) {
             if (e.getClickedInventory() != null && e.getClickedInventory().getType().equals(InventoryType.PLAYER)) {
                 e.setCancelled(true);
                 return;
             }
         }
 
-        if (ShopIndex.getIndexViewers().contains(p.getUniqueId())) {
+        if (ShopIndex.getIndexViewers().contains(player.getUniqueId())) {
             e.setCancelled(true);
 
             // Use the arena-linked shop and its pre-resolved categories to handle clicks
@@ -60,9 +82,9 @@ public class InventoryListener implements Listener {
                 IShopCategory clickedCategory = chosen.get(e.getSlot());
                 if (clickedCategory != null) {
                     if (clickedCategory instanceof ShopCategory) {
-                        ((ShopCategory) clickedCategory).open(p, shopCache);
+                        ((ShopCategory) clickedCategory).open(player, shopCache);
                     } else {
-                        clickedCategory.open(p, idx, shopCache);
+                        clickedCategory.open(player, idx, shopCache);
                     }
                     return;
                 }
@@ -71,7 +93,7 @@ public class InventoryListener implements Listener {
                 for (IShopCategory sc : idx.getCategoryList()) {
                     String n = sc.getName() == null ? "" : sc.getName().toLowerCase();
                     if (n.startsWith("default-") && e.getSlot() == sc.getSlot()) {
-                        sc.open(p, idx, shopCache);
+                        sc.open(player, idx, shopCache);
                         return;
                     }
                 }
@@ -84,18 +106,18 @@ public class InventoryListener implements Listener {
                         cache.setElement(element.getSlot(), (ICategoryContent) null);
                         cache.pushChangesToDB();
                         Bukkit.getScheduler().runTask(BedWars.plugin, () ->
-                                ShopManager.shop.open(p, cache, false)
+                                ShopManager.shop.open(player, cache, false)
                         );
                         return;
                     }
-                    if (element.getCategoryContent().execute(p, shopCache, element.getSlot())) {
+                    if (element.getCategoryContent().execute(player, shopCache, element.getSlot())) {
                         // Reload the shop page. Needed to recalculate item purchasable
-                        (a.getLinkedShop() != null ? a.getLinkedShop() : ShopManager.shop).open(p, cache, false);
+                        (a.getLinkedShop() != null ? a.getLinkedShop() : ShopManager.shop).open(player, cache, false);
                     }
                     return;
                 }
             }
-        } else if (ShopCategory.getInstance().getCategoryViewers().contains(p.getUniqueId())) {
+        } else if (ShopCategory.getInstance().getCategoryViewers().contains(player.getUniqueId())) {
             e.setCancelled(true);
 
             // Check if item is null or air (don't process clicks on air)
@@ -107,7 +129,7 @@ public class InventoryListener implements Listener {
 
             // Quick Buy button at top bar → back to index
             if (e.getSlot() == idx.getQuickBuyButton().getSlot()) {
-                idx.open(p, cache, false);
+                idx.open(player, cache, false);
                 return;
             }
 
@@ -117,9 +139,9 @@ public class InventoryListener implements Listener {
                 IShopCategory clickedCategory = chosen.get(e.getSlot());
                 if (clickedCategory != null) {
                     if (clickedCategory instanceof ShopCategory) {
-                        ((ShopCategory) clickedCategory).open(p, shopCache);
+                        ((ShopCategory) clickedCategory).open(player, shopCache);
                     } else {
-                        clickedCategory.open(p, idx, shopCache);
+                        clickedCategory.open(player, idx, shopCache);
                     }
                     return;
                 }
@@ -145,14 +167,15 @@ public class InventoryListener implements Listener {
                 for (ICategoryContent cc : selectedCategory.getCategoryContentList()) {
                     if (cc.getSlot() == e.getSlot()) {
                         if (e.isShiftClick()) {
-                            if (!cache.hasCategoryContent(cc)) new com.tomkeuper.bedwars.shop.quickbuy.QuickBuyAdd(p, cc);
+                            if (!cache.hasCategoryContent(cc))
+                                new com.tomkeuper.bedwars.shop.quickbuy.QuickBuyAdd(player, cc);
                             return;
                         }
-                        if (cc.execute(p, shopCache, cc.getSlot())) {
+                        if (cc.execute(player, shopCache, cc.getSlot())) {
                             if (selectedCategory instanceof ShopCategory) {
-                                ((ShopCategory) selectedCategory).open(p, shopCache); // reload page after purchase
+                                ((ShopCategory) selectedCategory).open(player, shopCache); // reload page after purchase
                             } else {
-                                selectedCategory.open(p, idx, shopCache);
+                                selectedCategory.open(player, idx, shopCache);
                             }
                         }
                         return;
@@ -266,29 +289,5 @@ public class InventoryListener implements Listener {
         ShopIndex.indexViewers.remove(e.getPlayer().getUniqueId());
         ShopCategory.categoryViewers.remove(e.getPlayer().getUniqueId());
         QuickBuyAdd.quickBuyAdds.remove(e.getPlayer().getUniqueId());
-    }
-
-    /**
-     * Check can move item outside inventory.
-     * Block despawnable, permanent and start items dropping and inventory change.
-     */
-    public static boolean shouldCancelMovement(ItemStack i, ShopCache sc) {
-        if (i == null) return false;
-        if (i.getType() == Material.AIR) return false;
-        if (sc == null) return false;
-
-        if (BedWars.nms.isCustomBedWarsItem(i)) {
-            if (BedWars.nms.getCustomData(i).equalsIgnoreCase("DEFAULT_ITEM")) {
-                return true;
-            }
-        }
-
-        String identifier = BedWars.nms.getShopUpgradeIdentifier(i);
-        if (identifier == null) return false;
-        if (identifier.equals("null")) return false;
-        ICachedItem cachedItem = sc.getCachedItem(identifier);
-        return cachedItem != null;
-        // the commented line below  was blocking movement only if tiers amount > 1
-        // return sc.getCachedItem(identifier).getCc().getContentTiers().size() > 1;
     }
 }

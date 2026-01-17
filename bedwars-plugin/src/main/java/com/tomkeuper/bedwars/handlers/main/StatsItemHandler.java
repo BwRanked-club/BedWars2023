@@ -4,8 +4,8 @@ import com.tomkeuper.bedwars.api.BedWars;
 import com.tomkeuper.bedwars.api.arena.IArena;
 import com.tomkeuper.bedwars.api.items.handlers.HandlerType;
 import com.tomkeuper.bedwars.api.items.handlers.IPermanentItem;
-import com.tomkeuper.bedwars.arena.Misc;
 import com.tomkeuper.bedwars.api.items.handlers.PermanentItemHandler;
+import com.tomkeuper.bedwars.arena.Misc;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 

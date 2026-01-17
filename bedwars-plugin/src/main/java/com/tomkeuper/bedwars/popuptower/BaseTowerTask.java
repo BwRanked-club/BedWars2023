@@ -21,12 +21,6 @@ abstract class BaseTowerTask {
 
     private BukkitTask task;
 
-    protected record RelativeStep(int dx, int dy, int dz, int ladderData) {
-        boolean isLadder () {
-            return ladderData >= 0;
-        }
-    }
-
     protected BaseTowerTask(Location soundLocation,
                             Block baseChestBlock,
                             TeamColor color,
@@ -65,18 +59,6 @@ abstract class BaseTowerTask {
         }, 0L, 1L);
     }
 
-    private void placeOne(Block base, TeamColor color, Player p, RelativeStep step) {
-        if (step.isLadder()) {
-            new NewPlaceBlock(base,
-                    toKey(step),
-                    color, p, true, step.ladderData());
-        } else {
-            new NewPlaceBlock(base,
-                    toKey(step),
-                    color, p, false, 0);
-        }
-    }
-
     private static String toKey(RelativeStep s) {
         return s.dx + ", " + s.dy + ", " + s.dz;
     }
@@ -112,6 +94,18 @@ abstract class BaseTowerTask {
         }
     }
 
+    private void placeOne(Block base, TeamColor color, Player p, RelativeStep step) {
+        if (step.isLadder()) {
+            new NewPlaceBlock(base,
+                    toKey(step),
+                    color, p, true, step.ladderData());
+        } else {
+            new NewPlaceBlock(base,
+                    toKey(step),
+                    color, p, false, 0);
+        }
+    }
+
     private void cancel() {
         if (task != null) {
             try {
@@ -119,6 +113,12 @@ abstract class BaseTowerTask {
             } catch (Exception ignored) {
             }
             task = null;
+        }
+    }
+
+    protected record RelativeStep(int dx, int dy, int dz, int ladderData) {
+        boolean isLadder() {
+            return ladderData >= 0;
         }
     }
 }

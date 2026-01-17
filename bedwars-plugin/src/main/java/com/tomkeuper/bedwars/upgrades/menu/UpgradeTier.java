@@ -4,7 +4,6 @@ import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.api.upgrades.UpgradeAction;
-import com.tomkeuper.bedwars.upgrades.UpgradesManager;
 import com.tomkeuper.bedwars.upgrades.upgradeaction.*;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -17,11 +16,11 @@ import java.util.List;
 
 public class UpgradeTier {
 
-    private ItemStack displayItem;
-    private String name;
-    private List<UpgradeAction> upgradeActions = new ArrayList<>();
-    private int cost;
-    private Material currency;
+    private final ItemStack displayItem;
+    private final String name;
+    private final List<UpgradeAction> upgradeActions = new ArrayList<>();
+    private final int cost;
+    private final Material currency;
 
     /**
      * @param parentName is the parent name.

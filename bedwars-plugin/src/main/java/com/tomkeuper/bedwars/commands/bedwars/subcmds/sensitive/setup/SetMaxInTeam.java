@@ -25,7 +25,7 @@ public class SetMaxInTeam extends SubCommand {
         if (s instanceof ConsoleCommandSender) return false;
         Player p = (Player) s;
         SetupSession ss = SetupSession.getSession(p.getUniqueId());
-        if (ss == null){
+        if (ss == null) {
             s.sendMessage("§c ▪ §7You're not in a setup session!");
             return true;
         }

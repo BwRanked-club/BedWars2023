@@ -1,5 +1,6 @@
 package com.tomkeuper.bedwars.arena;
 
+import com.google.gson.JsonObject;
 import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.arena.GameState;
 import com.tomkeuper.bedwars.api.arena.IArena;
@@ -9,7 +10,6 @@ import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.arena.tasks.ReJoinTask;
 import com.tomkeuper.bedwars.shop.ShopCache;
-import com.google.gson.JsonObject;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -25,13 +25,12 @@ import static com.tomkeuper.bedwars.api.language.Language.getMsg;
 
 public class ReJoin {
 
+    private static final List<ReJoin> reJoinList = new ArrayList<>();
+    private final ArrayList<ShopCache.CachedItem> permanentsAndNonDowngradables = new ArrayList<>();
     private UUID player;
     private IArena arena;
     private ITeam bwt;
     private ReJoinTask task = null;
-    private final ArrayList<ShopCache.CachedItem> permanentsAndNonDowngradables = new ArrayList<>();
-
-    private static final List<ReJoin> reJoinList = new ArrayList<>();
 
     /**
      * Make rejoin possible for a player
@@ -90,6 +89,10 @@ public class ReJoin {
         return null;
     }
 
+    public static List<ReJoin> getReJoinList() {
+        return Collections.unmodifiableList(reJoinList);
+    }
+
     /**
      * Check if can reJoin
      */
@@ -138,7 +141,7 @@ public class ReJoin {
     public void destroy(boolean destroyTeam) {
         BedWars.debug("ReJoin destroy for " + player.toString());
         reJoinList.remove(this);
-        if (BedWars.getRedisConnection() != null){
+        if (BedWars.getRedisConnection() != null) {
             JsonObject json = new JsonObject();
             json.addProperty("type", "RD");
             json.addProperty("uuid", player.toString());
@@ -196,15 +199,10 @@ public class ReJoin {
         return permanentsAndNonDowngradables;
     }
 
-    public static List<ReJoin> getReJoinList() {
-        return Collections.unmodifiableList(reJoinList);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null) return false;
-        if (!(o instanceof ReJoin)) return false;
-        ReJoin reJoin = (ReJoin) o;
+        if (!(o instanceof ReJoin reJoin)) return false;
         return reJoin.getPl().equals(getPl());
     }
 }

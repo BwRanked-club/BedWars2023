@@ -5,8 +5,6 @@ import com.tomkeuper.bedwars.api.items.handlers.IPermanentItem;
 import com.tomkeuper.bedwars.api.items.handlers.IPermanentItemHandler;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
-
 public class LobbyItem implements IPermanentItem {
 
     private IPermanentItemHandler handler;
@@ -15,10 +13,10 @@ public class LobbyItem implements IPermanentItem {
     private String identifier;
 
     public LobbyItem(IPermanentItemHandler handler, ItemStack item, int slot, String identifier) {
-            this.handler = handler;
-            this.item = BedWars.nms.setTag(item, "ACTION", identifier);
-            this.slot = slot;
-            this.identifier = identifier;
+        this.handler = handler;
+        this.item = BedWars.nms.setTag(item, "ACTION", identifier);
+        this.slot = slot;
+        this.identifier = identifier;
     }
 
     @Override
@@ -32,18 +30,13 @@ public class LobbyItem implements IPermanentItem {
     }
 
     @Override
-    public void setItem(ItemStack item) {
-        this.item = item;
-    }
-
-    @Override
     public ItemStack getItem() {
         return item;
     }
 
     @Override
-    public void setSlot(int slot) {
-        this.slot = slot;
+    public void setItem(ItemStack item) {
+        this.item = item;
     }
 
     @Override
@@ -52,12 +45,17 @@ public class LobbyItem implements IPermanentItem {
     }
 
     @Override
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setSlot(int slot) {
+        this.slot = slot;
     }
 
     @Override
     public String getIdentifier() {
         return identifier;
+    }
+
+    @Override
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 }

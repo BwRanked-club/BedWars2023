@@ -12,30 +12,29 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import static com.tomkeuper.bedwars.BedWars.config;
 
 public class GameAnnouncementTask implements Runnable, AnnouncementTask {
 
     BukkitTask task;
-
-    private Arena arena;
-
     LinkedHashMap<Player, List<String>> messages;
-
     int index = 0;
+    private final Arena arena;
 
     public GameAnnouncementTask(Arena arena) {
         this.arena = arena;
         messages = new LinkedHashMap<>();
-        for (Player player: arena.getPlayers()) {
+        for (Player player : arena.getPlayers()) {
             loadMessagesForPlayer(player, Messages.ARENA_IN_GAME_ANNOUNCEMENT);
         }
-        for (Player player: arena.getSpectators()) {
+        for (Player player : arena.getSpectators()) {
             loadMessagesForPlayer(player, Messages.ARENA_IN_GAME_ANNOUNCEMENT);
         }
-        task = Bukkit.getScheduler().runTaskTimerAsynchronously(BedWars.plugin, this, config.getInt(ConfigPath.GENERAL_CONFIGURATION_IN_GAME_ANNOUNCEMENT_COOLDOW) * 20L, config.getInt(ConfigPath.GENERAL_CONFIGURATION_IN_GAME_ANNOUNCEMENT_COOLDOW) *20L);
+        task = Bukkit.getScheduler().runTaskTimerAsynchronously(BedWars.plugin, this, config.getInt(ConfigPath.GENERAL_CONFIGURATION_IN_GAME_ANNOUNCEMENT_COOLDOW) * 20L, config.getInt(ConfigPath.GENERAL_CONFIGURATION_IN_GAME_ANNOUNCEMENT_COOLDOW) * 20L);
     }
 
     @Override
@@ -45,16 +44,17 @@ public class GameAnnouncementTask implements Runnable, AnnouncementTask {
     }
 
     @Override
-    public void addMessageForPlayer(Player p, String message){
-        if (this.messages.containsKey(p))  this.messages.get(p).add(message);
+    public void addMessageForPlayer(Player p, String message) {
+        if (this.messages.containsKey(p)) this.messages.get(p).add(message);
         this.messages.put(p, Collections.singletonList(message));
     }
 
     @Override
-    public void addMessagesForPlayer(Player p, List<String> messages){
-        if (this.messages.containsKey(p))  this.messages.get(p).addAll(messages);
+    public void addMessagesForPlayer(Player p, List<String> messages) {
+        if (this.messages.containsKey(p)) this.messages.get(p).addAll(messages);
         this.messages.put(p, messages);
     }
+
     public void run() {
         if (arena == null) {
             cancel();
@@ -63,7 +63,7 @@ public class GameAnnouncementTask implements Runnable, AnnouncementTask {
             if (arena.getStatus() == GameState.playing) {
                 try {
                     player.sendMessage(messages.get(player).get(index % messages.get(player).size()));
-                } catch (NullPointerException e){
+                } catch (NullPointerException e) {
                     // Player might lose data when rejoining after getting disconnected
                     loadMessagesForPlayer(player, Messages.ARENA_IN_GAME_ANNOUNCEMENT);
                 }

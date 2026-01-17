@@ -115,6 +115,10 @@ public class PumpkinContent extends CategoryContent {
         }
 
         @Override
+        public void setPrice(int price) {
+        }
+
+        @Override
         public Material getCurrency() {
             return Material.IRON_INGOT;
         }
@@ -124,20 +128,12 @@ public class PumpkinContent extends CategoryContent {
         }
 
         @Override
-        public void setPrice(int price) {
+        public ItemStack getItemStack() {
+            return new ItemStack(Material.PUMPKIN, 12);
         }
 
         @Override
         public void setItemStack(ItemStack itemStack) {
-        }
-
-        @Override
-        public void setBuyItemsList(List<IBuyItem> buyItemsList) {
-        }
-
-        @Override
-        public ItemStack getItemStack() {
-            return new ItemStack(Material.PUMPKIN, 12);
         }
 
         @Override
@@ -148,6 +144,10 @@ public class PumpkinContent extends CategoryContent {
         @Override
         public List<IBuyItem> getBuyItemsList() {
             return Collections.singletonList(new FinalItem());
+        }
+
+        @Override
+        public void setBuyItemsList(List<IBuyItem> buyItemsList) {
         }
     }
 

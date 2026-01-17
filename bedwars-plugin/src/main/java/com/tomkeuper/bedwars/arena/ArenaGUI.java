@@ -31,18 +31,17 @@ public class ArenaGUI {
     private static final HashMap<UUID, Long> antiCalledTwice = new HashMap<>();
 
     public static void refreshInv(Player player, IArena arena, int players) {
-        if (player == null || player.getOpenInventory() == null || !(player.getOpenInventory().getTopInventory().getHolder() instanceof ArenaSelectorHolder)) {
+        if (player == null || player.getOpenInventory() == null || !(player.getOpenInventory().getTopInventory().getHolder() instanceof ArenaSelectorHolder arenaSelectorHolder)) {
             return;
         }
-        ArenaSelectorHolder arenaSelectorHolder = ((ArenaSelectorHolder) player.getOpenInventory().getTopInventory().getHolder());
 
         List<IArena> arenas;
-        if (arenaSelectorHolder.getGroup().equalsIgnoreCase("default")) {
+        if (arenaSelectorHolder.group().equalsIgnoreCase("default")) {
             arenas = new ArrayList<>(Arena.getArenas());
         } else {
             arenas = new ArrayList<>();
             for (IArena a : Arena.getArenas()) {
-                if (a.getGroup().equalsIgnoreCase(arenaSelectorHolder.getGroup())) arenas.add(a);
+                if (a.getGroup().equalsIgnoreCase(arenaSelectorHolder.group())) arenas.add(a);
             }
         }
 
@@ -142,25 +141,6 @@ public class ArenaGUI {
         Sounds.playSound("arena-selector-open", player);
     }
 
-    public static class ArenaSelectorHolder implements InventoryHolder {
-
-        private final String group;
-
-        public ArenaSelectorHolder(String group){
-            this.group = group;
-        }
-
-        public String getGroup() {
-            return group;
-        }
-
-        @Override
-        public Inventory getInventory() {
-            return null;
-        }
-
-    }
-
     @NotNull
     private static List<Integer> getUsedSlots() {
         List<Integer> ls = new ArrayList<>();
@@ -185,4 +165,13 @@ public class ArenaGUI {
             antiCalledTwice.put(player.getUniqueId(), System.currentTimeMillis() + 2000);
         }
     }
+
+    public record ArenaSelectorHolder(String group) implements InventoryHolder {
+
+        @Override
+            public Inventory getInventory() {
+                return null;
+            }
+
+        }
 }

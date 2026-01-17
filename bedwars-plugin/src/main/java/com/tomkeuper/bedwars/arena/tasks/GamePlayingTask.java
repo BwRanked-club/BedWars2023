@@ -3,7 +3,6 @@ package com.tomkeuper.bedwars.arena.tasks;
 import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.arena.GameState;
 import com.tomkeuper.bedwars.api.arena.IArena;
-import com.tomkeuper.bedwars.api.arena.generator.IGenerator;
 import com.tomkeuper.bedwars.api.arena.team.ITeam;
 import com.tomkeuper.bedwars.api.configuration.ConfigPath;
 import com.tomkeuper.bedwars.api.events.player.PlayerInvisibilityPotionEvent;
@@ -12,8 +11,6 @@ import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.api.tasks.PlayingTask;
 import com.tomkeuper.bedwars.arena.Arena;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -26,9 +23,9 @@ import static com.tomkeuper.bedwars.api.language.Language.getMsg;
 
 public class GamePlayingTask implements Runnable, PlayingTask {
 
-    private Arena arena;
-    private BukkitTask task;
-    private OreGenTask oreGenTask;
+    private final Arena arena;
+    private final BukkitTask task;
+    private final OreGenTask oreGenTask;
     private int beds_destroy_countdown, dragon_spawn_countdown, game_end_countdown;
 
     public GamePlayingTask(Arena arena) {
@@ -60,12 +57,27 @@ public class GamePlayingTask implements Runnable, PlayingTask {
         return beds_destroy_countdown;
     }
 
+    @Override
+    public void setBedsDestroyCountdown(int seconds) {
+        this.beds_destroy_countdown = Math.max(0, seconds);
+    }
+
     public int getDragonSpawnCountdown() {
         return dragon_spawn_countdown;
     }
 
+    @Override
+    public void setDragonSpawnCountdown(int seconds) {
+        this.dragon_spawn_countdown = Math.max(0, seconds);
+    }
+
     public int getGameEndCountdown() {
         return game_end_countdown;
+    }
+
+    @Override
+    public void setGameEndCountdown(int seconds) {
+        this.game_end_countdown = Math.max(0, seconds);
     }
 
     @Override
@@ -129,12 +141,12 @@ public class GamePlayingTask implements Runnable, PlayingTask {
                         if (t.getMembers().isEmpty()) continue;
                         for (int x = 0; x < t.getDragonAmount(); x++) {
                             EnderDragon dragon = BedWars.nms.spawnDragon(getArena().getConfig().getArenaLoc("waiting.Loc").add(0, 10, 0), t);
-                            if (dragon != null){
+                            if (dragon != null) {
                                 t.addDragon(dragon);
-                                if (BedWars.nms.getVersion() == 0){
+                                if (BedWars.nms.getVersion() == 0) {
                                     arena.set1_8BossBarName(t, dragon);
-                                } else{
-                                    arena.createTABTeamDragonBossBar(t,x);
+                                } else {
+                                    arena.createTABTeamDragonBossBar(t, x);
                                 }
                             }
                         }
@@ -227,6 +239,13 @@ public class GamePlayingTask implements Runnable, PlayingTask {
                 }
             }
         }
+    }
+
+    public void setCountdownForEvent(Object nextEventEnum, int seconds) {
+        String name = String.valueOf(nextEventEnum);
+        if ("BEDS_DESTROY".equals(name)) setBedsDestroyCountdown(seconds);
+        if ("ENDER_DRAGON".equals(name)) setDragonSpawnCountdown(seconds);
+        if ("GAME_END".equals(name)) setGameEndCountdown(seconds);
     }
 
     public void cancel() {

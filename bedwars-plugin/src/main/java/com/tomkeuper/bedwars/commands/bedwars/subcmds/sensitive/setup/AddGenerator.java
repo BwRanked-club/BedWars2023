@@ -31,6 +31,30 @@ public class AddGenerator extends SubCommand {
         setPermission(Permissions.PERMISSION_SETUP_ARENA);
     }
 
+    /**
+     * Save team generator.
+     *
+     * @param l    location.
+     * @param t    team.
+     * @param ss   setup session.
+     * @param type Iron/ Gold.
+     */
+    private static void saveTeamGen(Location l, String t, @NotNull SetupSession ss, String type) {
+        Object o = ss.getConfig().getYml().get("Team." + t + "." + type);
+        List<String> locs;
+        if (o == null) {
+            locs = new ArrayList<>();
+        } else if (o instanceof String) {
+            locs = new ArrayList<>();
+            locs.add((String) o);
+        } else {
+            locs = ss.getConfig().getList("Team." + t + "." + type);
+        }
+
+        locs.add(ss.getConfig().stringLocationArenaFormat(l));
+        ss.getConfig().set("Team." + t + "." + type, locs);
+    }
+
     @Override
     public boolean execute(String[] args, CommandSender s) {
         if (s instanceof ConsoleCommandSender) return false;
@@ -187,29 +211,5 @@ public class AddGenerator extends SubCommand {
         if (!SetupSession.isInSetupSession(p.getUniqueId())) return false;
 
         return hasPermission(s);
-    }
-
-    /**
-     * Save team generator.
-     *
-     * @param l    location.
-     * @param t    team.
-     * @param ss   setup session.
-     * @param type Iron/ Gold.
-     */
-    private static void saveTeamGen(Location l, String t, @NotNull SetupSession ss, String type) {
-        Object o = ss.getConfig().getYml().get("Team." + t + "." + type);
-        List<String> locs;
-        if (o == null) {
-            locs = new ArrayList<>();
-        } else if (o instanceof String) {
-            locs = new ArrayList<>();
-            locs.add((String) o);
-        } else {
-            locs = ss.getConfig().getList("Team." + t + "." + type);
-        }
-
-        locs.add(ss.getConfig().stringLocationArenaFormat(l));
-        ss.getConfig().set("Team." + t + "." + type, locs);
     }
 }

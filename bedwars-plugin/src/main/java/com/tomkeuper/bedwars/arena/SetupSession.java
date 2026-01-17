@@ -32,32 +32,28 @@ import static com.tomkeuper.bedwars.BedWars.plugin;
 
 public class SetupSession implements ISetupSession {
 
-    private static List<SetupSession> setupSessions = new ArrayList<>();
+    private static final List<SetupSession> setupSessions = new ArrayList<>();
 
-    private Player player;
-    private String worldName;
+    private final Player player;
+    private final String worldName;
     private SetupType setupType;
     private ArenaConfig cm;
     private boolean started = false;
     private boolean autoCreatedEmerald = false;
     private boolean autoCreatedDiamond = false;
-    private List<Location> skipAutoCreateGen = new ArrayList<>();
-    private Map<String, IHologram> shopHologramsPerTeam = new HashMap<>();
-    private Map<String, IHologram> upgradeHologramsPerTeam = new HashMap<>();
-    private Map<String, IHologram> bedHologramsPerTeam = new HashMap<>();
-    private Map<String, IHologram> spawnHologramsPerTeam = new HashMap<>();
-    private Map<Location, IHologram> generatorHologramsPerTeam = new HashMap<>();
-    private Map<String, IHologram> killDropsHologramsPerTeam = new HashMap<>();
+    private final List<Location> skipAutoCreateGen = new ArrayList<>();
+    private final Map<String, IHologram> shopHologramsPerTeam = new HashMap<>();
+    private final Map<String, IHologram> upgradeHologramsPerTeam = new HashMap<>();
+    private final Map<String, IHologram> bedHologramsPerTeam = new HashMap<>();
+    private final Map<String, IHologram> spawnHologramsPerTeam = new HashMap<>();
+    private final Map<Location, IHologram> generatorHologramsPerTeam = new HashMap<>();
+    private final Map<String, IHologram> killDropsHologramsPerTeam = new HashMap<>();
 
     public SetupSession(Player player, String worldName) {
         this.player = player;
         this.worldName = worldName;
         getSetupSessions().add(this);
         openGUI(player);
-    }
-
-    public void setSetupType(SetupType setupType) {
-        this.setupType = setupType;
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -86,35 +82,6 @@ public class SetupSession implements ISetupSession {
         return 3;
     }
 
-    public SetupType getSetupType() {
-        return setupType;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public String getWorldName() {
-        return worldName;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public boolean isStarted() {
-        return started;
-    }
-
-    /**
-     * Start setup session, loadStructure world etc
-     *
-     * @return return is broken. do not use it.
-     */
-    public boolean startSetup() {
-        getPlayer().sendMessage("§6 ▪ §7Loading " + getWorldName());
-        cm = new ArenaConfig(BedWars.plugin, getWorldName(), plugin.getDataFolder().getPath() + "/Arenas");
-        BedWars.getAPI().getRestoreAdapter().onSetupSessionStart(this);
-        return true;
-    }
-
     private static void openGUI(Player player) {
         Inventory inv = Bukkit.createInventory(null, 9, getInvName());
         ItemStack assisted = new ItemStack(Material.GLOWSTONE_DUST);
@@ -132,6 +99,63 @@ public class SetupSession implements ISetupSession {
         inv.setItem(getAdvancedSlot(), advanced);
 
         player.openInventory(inv);
+    }
+
+    /**
+     * Check if a player is in setup session
+     */
+    public static boolean isInSetupSession(UUID player) {
+        for (SetupSession ss : getSetupSessions()) {
+            if (ss.getPlayer().getUniqueId().equals(player)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get a player session
+     */
+    public static SetupSession getSession(UUID p) {
+        for (SetupSession ss : getSetupSessions()) {
+            if (ss.getPlayer().getUniqueId().equals(p)) return ss;
+        }
+        return null;
+    }
+
+    public SetupType getSetupType() {
+        return setupType;
+    }
+
+    public void setSetupType(SetupType setupType) {
+        this.setupType = setupType;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public String getWorldName() {
+        return worldName;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public boolean isStarted() {
+        return started;
+    }
+
+    public void setStarted(boolean started) {
+        this.started = started;
+    }
+
+    /**
+     * Start setup session, loadStructure world etc
+     *
+     * @return return is broken. do not use it.
+     */
+    public boolean startSetup() {
+        getPlayer().sendMessage("§6 ▪ §7Loading " + getWorldName());
+        cm = new ArenaConfig(BedWars.plugin, getWorldName(), plugin.getDataFolder().getPath() + "/Arenas");
+        BedWars.getAPI().getRestoreAdapter().onSetupSessionStart(this);
+        return true;
     }
 
     /**
@@ -164,30 +188,6 @@ public class SetupSession implements ISetupSession {
     }
 
     /**
-     * Check if a player is in setup session
-     */
-    public static boolean isInSetupSession(UUID player) {
-        for (SetupSession ss : getSetupSessions()) {
-            if (ss.getPlayer().getUniqueId().equals(player)) return true;
-        }
-        return false;
-    }
-
-    /**
-     * Get a player session
-     */
-    public static SetupSession getSession(UUID p) {
-        for (SetupSession ss : getSetupSessions()) {
-            if (ss.getPlayer().getUniqueId().equals(p)) return ss;
-        }
-        return null;
-    }
-
-    public void setStarted(boolean started) {
-        this.started = started;
-    }
-
-    /**
      * Get arena configuration
      */
     public ArenaConfig getConfig() {
@@ -216,7 +216,7 @@ public class SetupSession implements ISetupSession {
             player.sendMessage(ChatColor.WHITE + "Please set the waiting spawn.");
             player.sendMessage(ChatColor.WHITE + "It is the place where players will wait the game to start.");
             player.spigot().sendMessage(Misc.msgHoverClick(ChatColor.BLUE + "     ▪     " + ChatColor.GOLD + "CLICK HERE TO SET THE WAITING LOBBY    " + ChatColor.BLUE + " ▪", ChatColor.LIGHT_PURPLE + "Click to set the waiting spawn.", "/" + BedWars.mainCmd + " setWaitingSpawn", ClickEvent.Action.RUN_COMMAND));
-            player.spigot().sendMessage(MainCommand.createTC(ChatColor.YELLOW + "Or type: " + ChatColor.GRAY + "/" + BedWars.mainCmd + " to see the command list.", "/" + BedWars.mainCmd + "", ChatColor.WHITE + "Show commands list."));
+            player.spigot().sendMessage(MainCommand.createTC(ChatColor.YELLOW + "Or type: " + ChatColor.GRAY + "/" + BedWars.mainCmd + " to see the command list.", "/" + BedWars.mainCmd, ChatColor.WHITE + "Show commands list."));
         } else {
             Bukkit.dispatchCommand(player, BedWars.mainCmd + " cmds");
         }
@@ -279,20 +279,20 @@ public class SetupSession implements ISetupSession {
         skipAutoCreateGen.add(location);
     }
 
-    public void setAutoCreatedEmerald(boolean autoCreatedEmerald) {
-        this.autoCreatedEmerald = autoCreatedEmerald;
-    }
-
     public boolean isAutoCreatedEmerald() {
         return autoCreatedEmerald;
     }
 
-    public void setAutoCreatedDiamond(boolean autoCreatedDiamond) {
-        this.autoCreatedDiamond = autoCreatedDiamond;
+    public void setAutoCreatedEmerald(boolean autoCreatedEmerald) {
+        this.autoCreatedEmerald = autoCreatedEmerald;
     }
 
     public boolean isAutoCreatedDiamond() {
         return autoCreatedDiamond;
+    }
+
+    public void setAutoCreatedDiamond(boolean autoCreatedDiamond) {
+        this.autoCreatedDiamond = autoCreatedDiamond;
     }
 
     public String getPrefix() {

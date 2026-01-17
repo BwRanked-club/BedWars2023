@@ -43,6 +43,17 @@ public class CmdList extends SubCommand {
         );
     }
 
+    private static TextComponent msgWithHoverAndClick(String text, String hover, String command, ClickEvent.Action action) {
+        return Misc.msgHoverClick(text, hover, command, action);
+    }
+
+    private static String resolveWaitingPosMessage(boolean hasPos1, boolean hasPos2) {
+        if (hasPos1 && !hasPos2) return ChatColor.RED + "(POS 2 NÃO DEFINIDA)";
+        if (!hasPos1 && hasPos2) return ChatColor.RED + "(POS 1 NÃO DEFINIDA)";
+        if (hasPos1) return ChatColor.GREEN + "(DEFINIDO)";
+        return ChatColor.GRAY + "(NÃO DEFINIDO) " + ChatColor.ITALIC + "OPCIONAL";
+    }
+
     @Override
     public boolean execute(String[] args, CommandSender sender) {
         if (sender instanceof ConsoleCommandSender) return false;
@@ -405,16 +416,5 @@ public class CmdList extends SubCommand {
             if (SetupSession.isInSetupSession(p.getUniqueId())) return false;
         }
         return hasPermission(sender);
-    }
-
-    private static TextComponent msgWithHoverAndClick(String text, String hover, String command, ClickEvent.Action action) {
-        return Misc.msgHoverClick(text, hover, command, action);
-    }
-
-    private static String resolveWaitingPosMessage(boolean hasPos1, boolean hasPos2) {
-        if (hasPos1 && !hasPos2) return ChatColor.RED + "(POS 2 NÃO DEFINIDA)";
-        if (!hasPos1 && hasPos2) return ChatColor.RED + "(POS 1 NÃO DEFINIDA)";
-        if (hasPos1) return ChatColor.GREEN + "(DEFINIDO)";
-        return ChatColor.GRAY + "(NÃO DEFINIDO) " + ChatColor.ITALIC + "OPCIONAL";
     }
 }

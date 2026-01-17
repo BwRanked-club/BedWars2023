@@ -4,7 +4,6 @@ import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.arena.SetupSession;
 import com.tomkeuper.bedwars.support.paper.PaperSupport;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

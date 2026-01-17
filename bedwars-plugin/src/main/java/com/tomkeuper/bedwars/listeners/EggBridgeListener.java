@@ -64,13 +64,11 @@ public class EggBridgeListener implements Listener {
                 return;
             }
         }
-        if (event.getEntity() instanceof Egg) {
-            Egg projectile = (Egg) event.getEntity();
-            if (!(projectile.getShooter() instanceof Player)) {
+        if (event.getEntity() instanceof Egg projectile) {
+            if (!(projectile.getShooter() instanceof Player shooter)) {
                 return;
             }
 
-            Player shooter = (Player) projectile.getShooter();
             IArena arena = Arena.getArenaByPlayer(shooter);
             if (arena == null) {
                 return;

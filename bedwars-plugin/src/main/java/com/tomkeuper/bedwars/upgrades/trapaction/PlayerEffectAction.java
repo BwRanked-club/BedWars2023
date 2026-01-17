@@ -11,8 +11,8 @@ public class PlayerEffectAction implements TrapAction {
 
     private final PotionEffectType potionEffectType;
     private final int amplifier;
-    private int duration;
     private final ApplyType type;
+    private int duration;
 
     public PlayerEffectAction(PotionEffectType potionEffectType, int amplifier, int duration, ApplyType type) {
         this.potionEffectType = potionEffectType;

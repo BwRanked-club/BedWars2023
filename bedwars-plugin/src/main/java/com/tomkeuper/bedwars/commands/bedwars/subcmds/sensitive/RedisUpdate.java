@@ -26,7 +26,7 @@ public class RedisUpdate extends SubCommand {
         }
 
         String key = args[0];
-        if (key.equals("default_rankup_cost")){
+        if (key.equals("default_rankup_cost")) {
             BedWars.getRedisConnection().storeSettings(key, String.valueOf(LevelsConfig.getNextCost(1)));
             s.sendMessage("§aUpdated default rankup cost to " + LevelsConfig.getNextCost(1));
         } else {

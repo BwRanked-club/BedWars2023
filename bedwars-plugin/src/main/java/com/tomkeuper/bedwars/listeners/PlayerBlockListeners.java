@@ -55,10 +55,27 @@ import static com.tomkeuper.bedwars.api.language.Language.getMsg;
 public class PlayerBlockListeners implements Listener {
 
     private static final List<Player> buildSession = new ArrayList<>();
+    private static final BlockFace[] FACES = {
+            BlockFace.NORTH, BlockFace.SOUTH,
+            BlockFace.EAST, BlockFace.WEST,
+            BlockFace.UP, BlockFace.DOWN
+    };
     private final boolean allowFireBreak;
 
     public PlayerBlockListeners() {
         allowFireBreak = config.getBoolean(ConfigPath.GENERAL_CONFIGURATION_ALLOW_FIRE_EXTINGUISH);
+    }
+
+    public static boolean isBuildSession(Player p) {
+        return buildSession.contains(p);
+    }
+
+    public static void addBuildSession(Player p) {
+        buildSession.add(p);
+    }
+
+    public static void removeBuildSession(Player p) {
+        buildSession.remove(p);
     }
 
     @EventHandler
@@ -470,7 +487,6 @@ public class PlayerBlockListeners implements Listener {
         }
     }
 
-
     @EventHandler
     public void onBlow(@NotNull EntityExplodeEvent e) {
         if (e.isCancelled()) return;
@@ -554,12 +570,6 @@ public class PlayerBlockListeners implements Listener {
         return adjacent.getType().isSolid() && nms.getBlastResistance(adjacent) > 20;
     }
 
-    private static final BlockFace[] FACES = {
-            BlockFace.NORTH, BlockFace.SOUTH,
-            BlockFace.EAST, BlockFace.WEST,
-            BlockFace.UP, BlockFace.DOWN
-    };
-
     private BlockFace getClosestFace(Vector direction) {
         BlockFace closest = BlockFace.NORTH;
         double highestDot = -Double.MAX_VALUE;
@@ -625,18 +635,6 @@ public class PlayerBlockListeners implements Listener {
                     e.setCancelled(true);
             }
         }
-    }
-
-    public static boolean isBuildSession(Player p) {
-        return buildSession.contains(p);
-    }
-
-    public static void addBuildSession(Player p) {
-        buildSession.add(p);
-    }
-
-    public static void removeBuildSession(Player p) {
-        buildSession.remove(p);
     }
 
     private boolean isSoftBreak(Material m) {

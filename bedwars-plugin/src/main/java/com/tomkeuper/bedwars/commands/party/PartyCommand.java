@@ -2,7 +2,6 @@ package com.tomkeuper.bedwars.commands.party;
 
 import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.language.Messages;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -19,13 +18,12 @@ import static com.tomkeuper.bedwars.api.language.Language.getMsg;
 
 public class PartyCommand extends BukkitCommand {
 
+    public static HashMap<UUID, Boolean> chatToggle = new HashMap<>();
+    //owner, target
+    private static final HashMap<UUID, UUID> partySessionRequest = new HashMap<>();
     public PartyCommand(String name) {
         super(name);
     }
-
-    //owner, target
-    private static HashMap<UUID, UUID> partySessionRequest = new HashMap<>();
-    public static HashMap<UUID, Boolean> chatToggle = new HashMap<>();
 
     @Override
     public boolean execute(CommandSender s, String c, String[] args) {
@@ -55,9 +53,9 @@ public class PartyCommand extends BukkitCommand {
                     tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/party accept " + p.getName()));
                     Bukkit.getPlayer(args[1]).spigot().sendMessage(tc);
                     if (partySessionRequest.containsKey(Bukkit.getPlayer(args[1]).getUniqueId())) {
-                        partySessionRequest.replace( Bukkit.getPlayer(args[1]).getUniqueId(), p.getUniqueId());
+                        partySessionRequest.replace(Bukkit.getPlayer(args[1]).getUniqueId(), p.getUniqueId());
                     } else {
-                        partySessionRequest.put( Bukkit.getPlayer(args[1]).getUniqueId(), p.getUniqueId());
+                        partySessionRequest.put(Bukkit.getPlayer(args[1]).getUniqueId(), p.getUniqueId());
                     }
                 } else {
                     p.sendMessage(getMsg(p, Messages.COMMAND_PARTY_INVITE_DENIED_PLAYER_OFFLINE).replace("%bw_player%", args[1]));
@@ -118,7 +116,7 @@ public class PartyCommand extends BukkitCommand {
                     p.sendMessage(getMsg(p, Messages.COMMAND_PARTY_INSUFFICIENT_PERMISSIONS));
                     return true;
                 }
-                for(Player players : BedWars.getPartyManager().getMembers(p)){
+                for (Player players : BedWars.getPartyManager().getMembers(p)) {
                     chatToggle.put(players.getUniqueId(), true);
                 }
                 chatToggle.put(p.getUniqueId(), true);
@@ -153,7 +151,7 @@ public class PartyCommand extends BukkitCommand {
                     p.sendMessage(getMsg(p, Messages.COMMAND_PARTY_INSUFFICIENT_PERMISSIONS));
                     return true;
                 }
-                if (args.length == 1){
+                if (args.length == 1) {
                     this.sendPartyCmds(p);
                     return true;
                 }
@@ -173,7 +171,7 @@ public class PartyCommand extends BukkitCommand {
                     }
                 }
                 break;
-            case "info" :
+            case "info":
             case "list":
                 if (!BedWars.getPartyManager().hasParty(p)) {
                     p.sendMessage(getMsg(p, Messages.COMMAND_PARTY_GENERAL_DENIED_NOT_IN_PARTY));

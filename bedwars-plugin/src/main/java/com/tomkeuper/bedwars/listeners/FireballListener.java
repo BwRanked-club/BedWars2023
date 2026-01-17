@@ -102,9 +102,8 @@ public class FireballListener implements Listener {
 
         Location location = e.getEntity().getLocation();
         ProjectileSource projectileSource = e.getEntity().getShooter();
-        if (!(projectileSource instanceof Player)) return;
+        if (!(projectileSource instanceof Player source)) return;
 
-        Player source = (Player) projectileSource;
         IArena arena = Arena.getArenaByPlayer(source);
 
         if (arena == null || arena.getStatus() != GameState.playing) return;
@@ -116,8 +115,7 @@ public class FireballListener implements Listener {
         Collection<Entity> nearbyEntities = world.getNearbyEntities(location, fireballExplosionSize, fireballExplosionSize, fireballExplosionSize);
 
         for (Entity entity : nearbyEntities) {
-            if (!(entity instanceof Player)) continue;
-            Player player = (Player) entity;
+            if (!(entity instanceof Player player)) continue;
 
             if (!Arena.isInArena(player) || arena.isSpectator(player) || arena.isReSpawning(player)) continue;
 
@@ -197,9 +195,8 @@ public class FireballListener implements Listener {
         if (!(event.getEntity() instanceof Fireball)) return;
 
         ProjectileSource projectileSource = ((Fireball) event.getEntity()).getShooter();
-        if (!(projectileSource instanceof Player)) return;
+        if (!(projectileSource instanceof Player source)) return;
 
-        Player source = (Player) projectileSource;
         IArena arena = Arena.getArenaByPlayer(source);
 
         if (arena == null || arena.getStatus() != GameState.playing) return;
@@ -226,18 +223,16 @@ public class FireballListener implements Listener {
 
     @EventHandler
     public void fireballDirectHit(EntityDamageByEntityEvent e) {
-        if (!(e.getDamager() instanceof Fireball) || !(e.getEntity() instanceof Player)) return;
+        if (!(e.getDamager() instanceof Fireball) || !(e.getEntity() instanceof Player player)) return;
 
-        Player player = (Player) e.getEntity();
         if (!Arena.isInArena(player)) return;
         e.setCancelled(true);
     }
 
     @EventHandler
     public void fireballPrime(ExplosionPrimeEvent e) {
-        if (!(e.getEntity() instanceof Fireball)) return;
+        if (!(e.getEntity() instanceof Fireball fireball)) return;
 
-        Fireball fireball = (Fireball) e.getEntity();
         ProjectileSource shooter = fireball.getShooter();
 
         if (!(shooter instanceof Player) || !Arena.isInArena((Player) shooter)) return;

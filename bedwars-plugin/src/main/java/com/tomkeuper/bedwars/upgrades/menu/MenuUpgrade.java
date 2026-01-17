@@ -1,5 +1,6 @@
 package com.tomkeuper.bedwars.upgrades.menu;
 
+import com.google.common.collect.ImmutableMap;
 import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.arena.team.ITeam;
 import com.tomkeuper.bedwars.api.configuration.ConfigPath;
@@ -11,7 +12,6 @@ import com.tomkeuper.bedwars.api.upgrades.TeamUpgrade;
 import com.tomkeuper.bedwars.api.upgrades.UpgradeAction;
 import com.tomkeuper.bedwars.arena.Arena;
 import com.tomkeuper.bedwars.configuration.Sounds;
-import com.google.common.collect.ImmutableMap;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -27,8 +27,8 @@ import java.util.*;
 
 public class MenuUpgrade implements MenuContent, TeamUpgrade {
 
-    private String name;
-    private List<UpgradeTier> tiers = new LinkedList<>();
+    private final String name;
+    private final List<UpgradeTier> tiers = new LinkedList<>();
 
     /**
      * Create a new upgrade element.
@@ -57,8 +57,8 @@ public class MenuUpgrade implements MenuContent, TeamUpgrade {
         ItemMeta im = i.getItemMeta();
         if (im == null) return i;
         String color;
-        if (!highest){
-            if (afford){
+        if (!highest) {
+            if (afford) {
                 color = Language.getMsg(player, Messages.FORMAT_UPGRADE_COLOR_CAN_AFFORD);
             } else {
                 color = Language.getMsg(player, Messages.FORMAT_UPGRADE_COLOR_CANT_AFFORD);
@@ -71,18 +71,18 @@ public class MenuUpgrade implements MenuContent, TeamUpgrade {
 
         List<String> lore = new ArrayList<>();
         String currencyMsg = BedWars.getUpgradeManager().getCurrencyMsg(player, ut);
-        for (String s : Language.getList(player, Messages.UPGRADES_UPGRADE_TIER_ITEM_LORE.replace("%bw_name%", this.getName().replace("upgrade-", "")))){
-            if (s.contains("{tier_")){
+        for (String s : Language.getList(player, Messages.UPGRADES_UPGRADE_TIER_ITEM_LORE.replace("%bw_name%", this.getName().replace("upgrade-", "")))) {
+            if (s.contains("{tier_")) {
                 // Get tier number from placeholder
                 String result = s.replaceAll(".*_([0-9]+)_.*", "$1");
 
                 String tierColor = Messages.FORMAT_UPGRADE_TIER_LOCKED;
-                if (Integer.valueOf(result)-1 <= team.getTeamUpgradeTiers().getOrDefault(getName(), -1)) {
+                if (Integer.valueOf(result) - 1 <= team.getTeamUpgradeTiers().getOrDefault(getName(), -1)) {
                     tierColor = Messages.FORMAT_UPGRADE_TIER_UNLOCKED;
                 }
 
                 //get current tier. Note: placeholder number doesnt match array index.
-                UpgradeTier upgradeTier = tiers.get(Integer.valueOf(result)-1);
+                UpgradeTier upgradeTier = tiers.get(Integer.valueOf(result) - 1);
 
                 lore.add(s.replace("{tier_" + result + "_cost}", String.valueOf(upgradeTier.getCost()))
                         .replace("{tier_" + result + "_currency}", currencyMsg)
@@ -92,9 +92,9 @@ public class MenuUpgrade implements MenuContent, TeamUpgrade {
                 lore.add(s.replace("%bw_color%", color));
             }
         }
-        if (highest){
+        if (highest) {
             lore.add(Language.getMsg(player, Messages.UPGRADES_LORE_REPLACEMENT_UNLOCKED).replace("%bw_color%", color));
-        } else if (afford){
+        } else if (afford) {
             lore.add(Language.getMsg(player, Messages.UPGRADES_LORE_REPLACEMENT_CLICK_TO_BUY).replace("%bw_color%", color));
         } else {
             lore.add(Language.getMsg(player, Messages.UPGRADES_LORE_REPLACEMENT_INSUFFICIENT_MONEY).replace("%bw_currency%", currencyMsg).replace("%bw_color%", color));
@@ -114,7 +114,7 @@ public class MenuUpgrade implements MenuContent, TeamUpgrade {
         }
         boolean highest = getTiers().size() == tier + 1 && team.getTeamUpgradeTiers().containsKey(getName());
         if (highest) {
-            if (announceAlreadyUnlocked){
+            if (announceAlreadyUnlocked) {
                 Sounds.playSound(ConfigPath.SOUNDS_INSUFF_MONEY, player);
                 player.sendMessage(Language.getMsg(player, Messages.UPGRADES_UPGRADE_ALREADY_CHAT));
             }
@@ -124,7 +124,7 @@ public class MenuUpgrade implements MenuContent, TeamUpgrade {
         if (getTiers().size() - 1 > tier) {
             ut = getTiers().get(tier + 1);
 
-            if (!forFree){
+            if (!forFree) {
                 int money = BedWars.getUpgradeManager().getMoney(player, ut.getCurrency());
                 if (money < ut.getCost()) {
                     Sounds.playSound(ConfigPath.SOUNDS_INSUFF_MONEY, player);
@@ -138,9 +138,9 @@ public class MenuUpgrade implements MenuContent, TeamUpgrade {
 
             final UpgradeBuyEvent event;
             Bukkit.getPluginManager().callEvent(event = new UpgradeBuyEvent(this, player, team));
-            if(event.isCancelled()) return false;
+            if (event.isCancelled()) return false;
 
-            if (!forFree){
+            if (!forFree) {
                 if (ut.getCurrency() == Material.AIR) {
                     BedWars.getEconomy().buyAction(player, ut.getCost());
                 } else {
@@ -158,7 +158,7 @@ public class MenuUpgrade implements MenuContent, TeamUpgrade {
                 a.onBuy(player, team);
             }
 
-            if (announcePurchase){
+            if (announcePurchase) {
                 for (Player p1 : team.getMembers()) {
                     p1.sendMessage(Language.getMsg(p1, Messages.UPGRADES_UPGRADE_BOUGHT_CHAT).replace("%bw_player%", player.getName()).replace("%bw_playername%", player.getDisplayName()).replace("%bw_upgrade_name%",
                             ChatColor.stripColor(Language.getMsg(p1, Messages.UPGRADES_UPGRADE_TIER_ITEM_NAME.replace("%bw_name%", getName()
@@ -166,7 +166,7 @@ public class MenuUpgrade implements MenuContent, TeamUpgrade {
                 }
             }
 
-            if (openInv){
+            if (openInv) {
                 ImmutableMap<Integer, MenuContent> menuContentBySlot = BedWars.getUpgradeManager().getMenuForArena(Arena.getArenaByPlayer(player)).getMenuContentBySlot();
                 Inventory inv = player.getOpenInventory().getTopInventory();
                 for (Map.Entry<Integer, MenuContent> entry : menuContentBySlot.entrySet()) {

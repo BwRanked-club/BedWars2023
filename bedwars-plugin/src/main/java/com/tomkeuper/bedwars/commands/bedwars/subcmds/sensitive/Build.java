@@ -23,8 +23,8 @@ public class Build extends SubCommand {
         setPriority(9);
         showInList(true);
         setPermission(Permissions.PERMISSION_BUILD);
-        setDisplayInfo(Misc.msgHoverClick("§6 ▪ §7/" + getParent().getName() + " "+getSubCommandName()+ "         §8 - §ebuild permission", "§fEnable or disable build session \n§fso you can break or place blocks.",
-                "/" + getParent().getName() + " "+getSubCommandName(), ClickEvent.Action.RUN_COMMAND));
+        setDisplayInfo(Misc.msgHoverClick("§6 ▪ §7/" + getParent().getName() + " " + getSubCommandName() + "         §8 - §ebuild permission", "§fEnable or disable build session \n§fso you can break or place blocks.",
+                "/" + getParent().getName() + " " + getSubCommandName(), ClickEvent.Action.RUN_COMMAND));
     }
 
     @Override

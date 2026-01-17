@@ -45,6 +45,41 @@ public class UpgradesManager {
         upgrades = new UpgradesConfig("upgrades", plugin.getDataFolder().getPath());
     }
 
+    private static boolean validKey(String name, String prefix) {
+        return name != null && name.startsWith(prefix);
+    }
+
+    private static String norm(String s) {
+        return s == null ? "" : s.toLowerCase(Locale.ROOT);
+    }
+
+    private static void debug(String msg) {
+        BedWars.debug(msg);
+    }
+
+    private static void warn(String msg) {
+        Bukkit.getLogger().log(Level.WARNING, msg);
+    }
+
+    private static Material parseMaterial(String name, Material def) {
+        if (name == null) return def;
+        try {
+            return Material.valueOf(name.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ex) {
+            warn(name + " is not a valid material. Falling back to " + def);
+            return def;
+        }
+    }
+
+    private static int safeInt(String s, int def) {
+        if (s == null) return def;
+        try {
+            return Integer.parseInt(s.trim());
+        } catch (NumberFormatException e) {
+            return def;
+        }
+    }
+
     public void init() {
         for (String rootKey : upgrades.getYml().getConfigurationSection("").getKeys(false)) {
             final String name = rootKey;
@@ -191,14 +226,6 @@ public class UpgradesManager {
         return true;
     }
 
-    private interface PosConsumer {
-        void add(MenuContent content, int slot);
-    }
-
-    private interface Loader {
-        boolean load(String name);
-    }
-
     private void parseAndAddComponent(String component, PosConsumer adder) {
         if (component == null || component.isEmpty()) return;
 
@@ -235,27 +262,11 @@ public class UpgradesManager {
         return null;
     }
 
-    private static boolean validKey(String name, String prefix) {
-        return name != null && name.startsWith(prefix);
-    }
-
     private boolean requireKeys(String base, String... keys) {
         for (String k : keys) {
             if (!upgrades.getYml().isSet(base + "." + k)) return false;
         }
         return true;
-    }
-
-    private static String norm(String s) {
-        return s == null ? "" : s.toLowerCase(Locale.ROOT);
-    }
-
-    private static void debug(String msg) {
-        BedWars.debug(msg);
-    }
-
-    private static void warn(String msg) {
-        Bukkit.getLogger().log(Level.WARNING, msg);
     }
 
     public int getMoney(Player player, Material currency) {
@@ -322,25 +333,6 @@ public class UpgradesManager {
         return stack;
     }
 
-    private static Material parseMaterial(String name, Material def) {
-        if (name == null) return def;
-        try {
-            return Material.valueOf(name.toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException ex) {
-            warn(name + " is not a valid material. Falling back to " + def);
-            return def;
-        }
-    }
-
-    private static int safeInt(String s, int def) {
-        if (s == null) return def;
-        try {
-            return Integer.parseInt(s.trim());
-        } catch (NumberFormatException e) {
-            return def;
-        }
-    }
-
     public String getCurrencyMsg(Player p, UpgradeTier ut) {
         String key = switch (ut.getCurrency()) {
             case IRON_INGOT -> ut.getCost() == 1 ? Messages.MEANING_IRON_SINGULAR : Messages.MEANING_IRON_PLURAL;
@@ -400,5 +392,13 @@ public class UpgradesManager {
 
     public Map<String, MenuContent> menuContentByName() {
         return menuContentByName;
+    }
+
+    private interface PosConsumer {
+        void add(MenuContent content, int slot);
+    }
+
+    private interface Loader {
+        boolean load(String name);
     }
 }

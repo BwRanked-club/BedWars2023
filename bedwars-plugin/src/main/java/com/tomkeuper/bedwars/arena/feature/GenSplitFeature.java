@@ -40,16 +40,17 @@ public class GenSplitFeature implements Listener {
             List<Entity> nearbyEntities = (List) pl.getWorld().getNearbyEntities(pl, splitRange, splitRange, 2.0);
 
             for (Entity entity : pl.getWorld().getEntities()) {
-                if (nearbyEntities.contains(entity) && entity instanceof Player) {
-                    Player pickupPlayer = (Player) entity;
+                if (nearbyEntities.contains(entity) && entity instanceof Player pickupPlayer) {
                     if (pickupPlayer.getUniqueId() != p.getUniqueId()) {
-                        if (Arena.getArenaByPlayer(pickupPlayer) == null) BedWars.debug("pickupPlayer: " + pickupPlayer.getName() + " is not in an arena. Event triggered by: " + p.getName());
+                        if (Arena.getArenaByPlayer(pickupPlayer) == null)
+                            BedWars.debug("pickupPlayer: " + pickupPlayer.getName() + " is not in an arena. Event triggered by: " + p.getName());
                         ITeam team = Arena.getArenaByPlayer(pickupPlayer).getTeam(p);
                         ITeam rt = Arena.getArenaByPlayer(pickupPlayer).getTeam(pickupPlayer);
 
                         if (team == rt) {
                             ItemStack item = new ItemStack(e.getItemStack().getType(), e.getAmount());
-                            if (!BedWars.getAPI().getAFKUtil().isPlayerAFK(pickupPlayer)) pickupPlayer.getInventory().addItem(item);
+                            if (!BedWars.getAPI().getAFKUtil().isPlayerAFK(pickupPlayer))
+                                pickupPlayer.getInventory().addItem(item);
                         }
                     }
                 }

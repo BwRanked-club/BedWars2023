@@ -7,8 +7,8 @@ import com.tomkeuper.bedwars.api.chat.IChat;
 import com.tomkeuper.bedwars.api.command.ParentCommand;
 import com.tomkeuper.bedwars.api.communication.IRedisClient;
 import com.tomkeuper.bedwars.api.configuration.ConfigManager;
-import com.tomkeuper.bedwars.api.economy.IEconomy;
 import com.tomkeuper.bedwars.api.database.IDatabase;
+import com.tomkeuper.bedwars.api.economy.IEconomy;
 import com.tomkeuper.bedwars.api.events.player.PlayerAfkEvent;
 import com.tomkeuper.bedwars.api.hologram.IHologramManager;
 import com.tomkeuper.bedwars.api.items.handlers.IPermanentItem;
@@ -50,6 +50,20 @@ import java.util.logging.Level;
 
 public class API implements com.tomkeuper.bedwars.api.BedWars {
 
+    private static final ScoreboardUtil scoreboardUtil = new ScoreboardUtil() {
+
+        @SuppressWarnings("unused")
+        @Override
+        public void removePlayerScoreboard(Player player) {
+            BoardManager.getInstance().remove(player);
+        }
+
+        @SuppressWarnings("unused")
+        @Override
+        public void givePlayerScoreboard(@NotNull Player player, boolean delay) {
+            BoardManager.getInstance().giveTabFeatures(player, Arena.getArenaByPlayer(player), delay);
+        }
+    };
     private static RestoreAdapter restoreAdapter;
     private final AFKUtil afkSystem = new AFKUtil() {
         private final HashMap<UUID, Integer> afkPlayers = new HashMap<>();
@@ -83,7 +97,6 @@ public class API implements com.tomkeuper.bedwars.api.BedWars {
             return afkPlayers.getOrDefault(player.getUniqueId(), 0);
         }
     };
-
     private final ArenaUtil arenaUtil = new ArenaUtil() {
         @SuppressWarnings("unused")
         @Override
@@ -123,14 +136,14 @@ public class API implements com.tomkeuper.bedwars.api.BedWars {
 
         @SuppressWarnings("unused")
         @Override
-        public void setGamesBeforeRestart(int games) {
-            Arena.setGamesBeforeRestart(games);
+        public int getGamesBeforeRestart() {
+            return Arena.getGamesBeforeRestart();
         }
 
         @SuppressWarnings("unused")
         @Override
-        public int getGamesBeforeRestart() {
-            return Arena.getGamesBeforeRestart();
+        public void setGamesBeforeRestart(int games) {
+            Arena.setGamesBeforeRestart(games);
         }
 
         @SuppressWarnings("unused")
@@ -217,7 +230,6 @@ public class API implements com.tomkeuper.bedwars.api.BedWars {
             Arena.sendLobbyCommandItems(p);
         }
     };
-
     private final Configs configs = new Configs() {
         @SuppressWarnings("unused")
         @Override
@@ -249,7 +261,6 @@ public class API implements com.tomkeuper.bedwars.api.BedWars {
             return BedWars.getUpgradeManager().getConfiguration();
         }
     };
-
     private final ShopUtil shopUtil = new ShopUtil() {
         @SuppressWarnings("unused")
         @Override
@@ -305,6 +316,113 @@ public class API implements com.tomkeuper.bedwars.api.BedWars {
             return BedWars.playerQuickBuyCache;
         }
     };
+    private final TeamUpgradesUtil teamUpgradesUtil = new TeamUpgradesUtil() {
+        @SuppressWarnings("unused")
+        @Override
+        public boolean isWatchingGUI(Player player) {
+            return BedWars.getUpgradeManager().isWatchingUpgrades(player.getUniqueId());
+        }
+
+        @SuppressWarnings("unused")
+        @Override
+        public void setWatchingGUI(Player player) {
+            BedWars.getUpgradeManager().setWatchingUpgrades(player.getUniqueId());
+        }
+
+        @SuppressWarnings("unused")
+        @Override
+        public void removeWatchingUpgrades(UUID uuid) {
+            BedWars.getUpgradeManager().removeWatchingUpgrades(uuid);
+        }
+
+        @SuppressWarnings("unused")
+        @Override
+        public int getTotalUpgradeTiers(IArena arena) {
+            return BedWars.getUpgradeManager().getMenuForArena(arena).countTiers();
+        }
+
+        @SuppressWarnings("unused")
+        @Override
+        public void setCustomMenuForArena(IArena arena, UpgradesIndex menu) {
+            BedWars.getUpgradeManager().setCustomMenuForArena(arena, menu);
+        }
+
+        @SuppressWarnings("unused")
+        @Override
+        public UpgradesIndex getMenuForArena(IArena arena) {
+            return BedWars.getUpgradeManager().getMenuForArena(arena);
+        }
+
+        @SuppressWarnings("unused")
+        @Override
+        public MenuContent getMenuContent(ItemStack item) {
+            return BedWars.getUpgradeManager().getMenuContent(item);
+        }
+
+        @SuppressWarnings("unused")
+        @Override
+        public MenuContent getMenuContent(String identifier) {
+            return BedWars.getUpgradeManager().getMenuContent(identifier);
+        }
+
+        @SuppressWarnings("unused")
+        @Override
+        public HashMap<String, MenuContent> getMenuContentByName() {
+            return (HashMap<String, MenuContent>) BedWars.getUpgradeManager().menuContentByName();
+        }
+    };
+    private final MapRatingUtil mapRatingUtil = new MapRatingUtil() {
+        @Override
+        public double getAverageRating(String arenaName) {
+            return MapRatingService.getAverageRating(arenaName);
+        }
+
+        @Override
+        public String getAverageRatingStars(String arenaName) {
+            double average = MapRatingService.getAverageRating(arenaName);
+            String star = getRatingStarChar();
+            int fullStars = (int) Math.floor(average);
+            if (fullStars < 0) fullStars = 0;
+            if (fullStars > 5) fullStars = 5;
+            StringBuilder out = new StringBuilder();
+            for (int i = 1; i <= 5; i++) {
+                out.append(i <= fullStars ? "§6" : "§7").append(star);
+            }
+            return out.toString();
+        }
+    };
+    private final ItemUtil itemUtil = new ItemUtil() {
+        @SuppressWarnings("unused")
+        @Override
+        public Collection<IPermanentItem> getLobbyItems() {
+            return BedWars.getLobbyItems();
+        }
+
+        @Override
+        public Collection<IPermanentItem> getSpectatorItems() {
+            return BedWars.getSpectatorItems();
+        }
+
+        @Override
+        public Collection<IPermanentItem> getPreGameItems() {
+            return BedWars.getPreGameItems();
+        }
+
+        @Override
+        public Map<String, IPermanentItemHandler> getItemHandlers() {
+            return BedWars.getItemHandlers();
+        }
+
+        @SuppressWarnings("unused")
+        @Override
+        public boolean registerItemHandler(IPermanentItemHandler handler) throws IllegalArgumentException {
+            if (handler.getId() == null) throw new IllegalArgumentException("Handler ID is not set!");
+            if (handler.getPlugin() == null) throw new IllegalArgumentException("Handler plugin is not set!");
+            if (handler.getType() == null) throw new IllegalArgumentException("Handler type is not set!");
+            return BedWars.registerItemHandler(handler);
+        }
+
+    };
 
     @SuppressWarnings("unused")
     @Override
@@ -353,62 +471,6 @@ public class API implements com.tomkeuper.bedwars.api.BedWars {
     public ShopUtil getShopUtil() {
         return shopUtil;
     }
-
-    private final TeamUpgradesUtil teamUpgradesUtil = new TeamUpgradesUtil() {
-        @SuppressWarnings("unused")
-        @Override
-        public boolean isWatchingGUI(Player player) {
-            return BedWars.getUpgradeManager().isWatchingUpgrades(player.getUniqueId());
-        }
-
-        @SuppressWarnings("unused")
-        @Override
-        public void setWatchingGUI(Player player) {
-            BedWars.getUpgradeManager().setWatchingUpgrades(player.getUniqueId());
-        }
-
-        @SuppressWarnings("unused")
-        @Override
-        public void removeWatchingUpgrades(UUID uuid) {
-            BedWars.getUpgradeManager().removeWatchingUpgrades(uuid);
-        }
-
-        @SuppressWarnings("unused")
-        @Override
-        public int getTotalUpgradeTiers(IArena arena) {
-            return BedWars.getUpgradeManager().getMenuForArena(arena).countTiers();
-        }
-
-        @SuppressWarnings("unused")
-        @Override
-        public void setCustomMenuForArena(IArena arena, UpgradesIndex menu) {
-            BedWars.getUpgradeManager().setCustomMenuForArena(arena, menu);
-        }
-
-        @SuppressWarnings("unused")
-        @Override
-        public UpgradesIndex getMenuForArena(IArena arena) {
-            return BedWars.getUpgradeManager().getMenuForArena(arena);
-        }
-
-        @SuppressWarnings("unused")
-        @Override
-        public MenuContent getMenuContent(ItemStack item) {
-            return BedWars.getUpgradeManager().getMenuContent(item);
-        }
-
-        @SuppressWarnings("unused")
-        @Override
-        public MenuContent getMenuContent(String identifier){
-            return BedWars.getUpgradeManager().getMenuContent(identifier);
-        }
-
-        @SuppressWarnings("unused")
-        @Override
-        public HashMap<String, MenuContent> getMenuContentByName() {
-            return (HashMap<String, MenuContent>) BedWars.getUpgradeManager().menuContentByName();
-        }
-    };
 
     @SuppressWarnings("unused")
     @Override
@@ -478,7 +540,7 @@ public class API implements com.tomkeuper.bedwars.api.BedWars {
         if (partyAdapter == null) return;
         if (partyAdapter.equals(BedWars.getPartyManager())) return;
         BedWars.setPartyManager(partyAdapter);
-        BedWars.plugin.getLogger().log(Level.WARNING,  "One of your plugins changed the Party adapter to: " + partyAdapter.getClass().getName());
+        BedWars.plugin.getLogger().log(Level.WARNING, "One of your plugins changed the Party adapter to: " + partyAdapter.getClass().getName());
     }
 
     @SuppressWarnings("unused")
@@ -547,48 +609,11 @@ public class API implements com.tomkeuper.bedwars.api.BedWars {
         return new File(BedWars.plugin.getDataFolder(), "Addons");
     }
 
-
-    private static final ScoreboardUtil scoreboardUtil = new ScoreboardUtil() {
-
-        @SuppressWarnings("unused")
-        @Override
-        public void removePlayerScoreboard(Player player) {
-            BoardManager.getInstance().remove(player);
-        }
-
-        @SuppressWarnings("unused")
-        @Override
-        public void givePlayerScoreboard(@NotNull Player player, boolean delay) {
-            BoardManager.getInstance().giveTabFeatures(player, Arena.getArenaByPlayer(player), delay);
-        }
-    };
-
     @SuppressWarnings("unused")
     @Override
     public ScoreboardUtil getScoreboardUtil() {
         return scoreboardUtil;
     }
-
-    private final MapRatingUtil mapRatingUtil = new MapRatingUtil() {
-        @Override
-        public double getAverageRating(String arenaName) {
-            return MapRatingService.getAverageRating(arenaName);
-        }
-
-        @Override
-        public String getAverageRatingStars(String arenaName) {
-            double average = MapRatingService.getAverageRating(arenaName);
-            String star = getRatingStarChar();
-            int fullStars = (int) Math.floor(average);
-            if (fullStars < 0) fullStars = 0;
-            if (fullStars > 5) fullStars = 5;
-            StringBuilder out = new StringBuilder();
-            for (int i = 1; i <= 5; i++) {
-                out.append(i <= fullStars ? "§6" : "§7").append(star);
-            }
-            return out.toString();
-        }
-    };
 
     @Override
     public MapRatingUtil getMapRatingUtil() {
@@ -621,13 +646,14 @@ public class API implements com.tomkeuper.bedwars.api.BedWars {
 
     @SuppressWarnings("unused")
     @Override
-    public void setRemoteDatabase(IDatabase database) {
-        BedWars.setRemoteDatabase(database);
-    }
-    @SuppressWarnings("unused")
-    @Override
     public IDatabase getRemoteDatabase() {
         return BedWars.getRemoteDatabase();
+    }
+
+    @SuppressWarnings("unused")
+    @Override
+    public void setRemoteDatabase(IDatabase database) {
+        BedWars.setRemoteDatabase(database);
     }
 
     @SuppressWarnings("unused")
@@ -654,38 +680,5 @@ public class API implements com.tomkeuper.bedwars.api.BedWars {
         }
         return star;
     }
-
-    private final ItemUtil itemUtil = new ItemUtil() {
-        @SuppressWarnings("unused")
-        @Override
-        public Collection<IPermanentItem> getLobbyItems() {
-            return BedWars.getLobbyItems();
-        }
-
-        @Override
-        public Collection<IPermanentItem> getSpectatorItems() {
-            return BedWars.getSpectatorItems();
-        }
-
-        @Override
-        public Collection<IPermanentItem> getPreGameItems() {
-            return BedWars.getPreGameItems();
-        }
-
-        @Override
-        public Map<String, IPermanentItemHandler> getItemHandlers() {
-            return BedWars.getItemHandlers();
-        }
-
-        @SuppressWarnings("unused")
-        @Override
-        public boolean registerItemHandler(IPermanentItemHandler handler) throws IllegalArgumentException {
-            if (handler.getId() == null) throw new IllegalArgumentException("Handler ID is not set!");
-            if (handler.getPlugin() == null) throw new IllegalArgumentException("Handler plugin is not set!");
-            if (handler.getType() == null)  throw new IllegalArgumentException("Handler type is not set!");
-            return BedWars.registerItemHandler(handler);
-        }
-
-    };
 
 }

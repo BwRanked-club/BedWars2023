@@ -28,8 +28,7 @@ public class CmdTpStaff extends SubCommand {
 
     @Override
     public boolean execute(String[] args, CommandSender s) {
-        if (!(s instanceof Player)) return true;
-        Player p2 = (Player) s;
+        if (!(s instanceof Player p2)) return true;
         if (args.length != 1) {
             s.sendMessage(Language.getMsg(p2, Messages.COMMAND_TP_USAGE));
             return true;

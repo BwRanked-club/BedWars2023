@@ -28,6 +28,15 @@ public class ReJoinTask implements Runnable {
         task = Bukkit.getScheduler().runTaskLater(BedWars.plugin, this, BedWars.config.getInt(ConfigPath.GENERAL_CONFIGURATION_REJOIN_TIME) * 20L);
     }
 
+    /**
+     * Get tasks list
+     */
+    @NotNull
+    @Contract(pure = true)
+    public static Collection<ReJoinTask> getReJoinTasks() {
+        return Collections.unmodifiableCollection(reJoinTasks);
+    }
+
     @Override
     public void run() {
         if (arena == null) {
@@ -38,7 +47,7 @@ public class ReJoinTask implements Runnable {
             destroy();
             return;
         }
-        if (bedWarsTeam.getMembers() == null){
+        if (bedWarsTeam.getMembers() == null) {
             destroy();
             return;
         }
@@ -61,15 +70,6 @@ public class ReJoinTask implements Runnable {
     public void destroy() {
         reJoinTasks.remove(this);
         task.cancel();
-    }
-
-    /**
-     * Get tasks list
-     */
-    @NotNull
-    @Contract(pure = true)
-    public static Collection<ReJoinTask> getReJoinTasks() {
-        return Collections.unmodifiableCollection(reJoinTasks);
     }
 
     public void cancel() {

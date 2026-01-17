@@ -55,4 +55,10 @@ public interface PlayingTask {
      * Cancel the playing task and associated tasks.
      */
     void cancel();
+
+    void setBedsDestroyCountdown(int seconds);
+
+    void setDragonSpawnCountdown(int seconds);
+
+    void setGameEndCountdown(int seconds);
 }

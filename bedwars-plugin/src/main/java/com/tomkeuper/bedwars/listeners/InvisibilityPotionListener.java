@@ -20,7 +20,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -30,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.tomkeuper.bedwars.BedWars.nms;
-import static com.tomkeuper.bedwars.BedWars.plugin;
 
 /**
  * This is used to hide and show player name tag above head when he drinks an invisibility
@@ -135,8 +133,7 @@ public class InvisibilityPotionListener implements Listener {
     public void onSplash(PotionSplashEvent event) {
         if (event.isCancelled()) return;
         for (LivingEntity entity : event.getAffectedEntities()) {
-            if (entity instanceof Player) {
-                Player player = (Player) entity;
+            if (entity instanceof Player player) {
 
                 IArena a = Arena.getArenaByPlayer(player);
                 if (a == null) return;
@@ -156,7 +153,7 @@ public class InvisibilityPotionListener implements Listener {
         }
     }
 
-    private void handleInvisibility(Player player, IArena arena, PotionEffect pe){
+    private void handleInvisibility(Player player, IArena arena, PotionEffect pe) {
         // if is already invisible
         if (arena.getShowTime().containsKey(player)) {
             ITeam t = arena.getTeam(player);

@@ -52,7 +52,7 @@ public class GeneratorEditAction implements UpgradeAction {
                 generator.add(gen);
             }
         }
-        for (IGenerator g : generator){
+        for (IGenerator g : generator) {
             g.setAmount(amount);
             g.setDelay(delay);
             g.setSpawnLimit(limit);

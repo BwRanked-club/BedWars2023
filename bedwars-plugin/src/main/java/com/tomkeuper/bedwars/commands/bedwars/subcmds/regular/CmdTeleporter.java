@@ -43,7 +43,7 @@ public class CmdTeleporter extends SubCommand {
         Player p = (Player) s;
 
         IArena a = Arena.getArenaByPlayer(p);
-        if (a == null){
+        if (a == null) {
             return false;
         } else {
             if (!a.isSpectator(p)) return false;

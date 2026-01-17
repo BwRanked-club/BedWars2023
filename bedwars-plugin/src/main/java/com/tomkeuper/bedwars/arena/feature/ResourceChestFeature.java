@@ -24,7 +24,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Locale;
@@ -36,19 +35,16 @@ import java.util.stream.Collectors;
 
 public class ResourceChestFeature implements Listener {
 
-    private static ResourceChestFeature instance;
-
-    private final Set<Material> blocked;
-
     private static final String ITEM_JSON_FILENAME = "item-names.json";
     private static final Map<String, String> ITEM_NAME_CACHE = new HashMap<>();
-    private static long ITEM_JSON_MTIME = -1L;
-    private static File ITEM_JSON_FILE;
-
     private static final String[] PT_BR_WOOL_COLORS = {
             "lã branca", "lã laranja", "lã magenta", "lã azul-clara", "lã amarela", "lã verde-limão", "lã rosa", "lã cinza",
             "lã cinza-clara", "lã ciano", "lã roxa", "lã azul", "lã marrom", "lã verde", "lã vermelha", "lã preta"
     };
+    private static ResourceChestFeature instance;
+    private static long ITEM_JSON_MTIME = -1L;
+    private static File ITEM_JSON_FILE;
+    private final Set<Material> blocked;
 
     private ResourceChestFeature() {
         this.blocked = BedWars.config.getYml()
@@ -71,97 +67,11 @@ public class ResourceChestFeature implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onLeftClickChest(PlayerInteractEvent e) {
-        IArena arena = Arena.getArenaByPlayer(e.getPlayer());
-        if (arena == null) return;
-        if (e.getAction() != Action.LEFT_CLICK_BLOCK) return;
-
-        Block block = e.getClickedBlock();
-        if (block == null) return;
-
-        boolean isChest = block.getType() == Material.CHEST;
-        boolean isEnderChest = block.getType() == Material.ENDER_CHEST;
-        if (!isChest && !isEnderChest) return;
-
-        ITeam team = arena.getTeam(e.getPlayer());
-        if (team == null) {
-            if (!isEnderChest) return;
-            if (arena.isSpectator(e.getPlayer()) || arena.getRespawnSessions().containsKey(e.getPlayer())) return;
-        }
-
-        Player player = e.getPlayer();
-        ItemStack hand = e.getItem();
-
-        if (hand == null || hand.getType() == Material.AIR) return;
-
-        if (blocked.contains(hand.getType())
-                || BedWars.nms.isTool(hand)
-                || BedWars.nms.getCustomData(hand).equalsIgnoreCase("DEFAULT_ITEM")) {
-            return;
-        }
-
-        Inventory inventory = isChest
-                ? ((Chest) block.getState()).getBlockInventory()
-                : getSharedEnderChest(team, player);
-
-        PlayerItemDepositEvent event = new PlayerItemDepositEvent(player, arena, hand, inventory, block.getType());
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) return;
-
-        player.playSound(player.getLocation(), Sound.CLICK, 1.0f, 1.0f);
-
-        int inserted = safeDeposit(event.getPlayer(), event.getItem(), event.getTargetInventory());
-        if (inserted > 0) {
-            sendDepositMessage(event.getPlayer(), event.getItem(), inserted);
-            ITeam team2 = arena.getTeam(event.getPlayer());
-            if (team2 != null && event.getItem().getType().name().contains("SWORD")) {
-                team2.defaultSword(player, true);
-            }
-        }
-    }
-
-    private int safeDeposit(Player player, ItemStack hand, Inventory inventory) {
-        ItemStack toStore = hand.clone();
-        Map<Integer, ItemStack> leftovers = inventory.addItem(toStore);
-
-        int attempted = toStore.getAmount();
-        int notInserted = leftovers.values().stream().mapToInt(ItemStack::getAmount).sum();
-        int inserted = attempted - notInserted;
-
-        if (inserted <= 0) {
-            player.sendMessage(Language.getMsg(player, Messages.INTERACT_FULL_CHEST));
-            return 0;
-        }
-
-        if (notInserted <= 0) {
-            player.getInventory().setItemInHand(new ItemStack(Material.AIR));
-        } else {
-            ItemStack newHand = hand.clone();
-            newHand.setAmount(notInserted);
-            player.getInventory().setItemInHand(newHand);
-        }
-
-        player.updateInventory();
-        return inserted;
-    }
-
     private static Inventory getSharedEnderChest(ITeam team, Player player) {
         if (team instanceof BedWarsTeam) {
             return ((BedWarsTeam) team).getSharedEnderChest();
         }
         return player.getEnderChest();
-    }
-
-    private void sendDepositMessage(Player player, ItemStack original, int inserted) {
-        ensureItemJsonLoaded();
-        String iso = getIso(player);
-        String formattedName = resolveItemName(original, iso);
-        String msg = Language.getMsg(player, Messages.ITEM_DEPOSITED_SUCCESSFULLY)
-                .replace("{AMOUNT}", String.valueOf(inserted))
-                .replace("{ITEM}", formattedName);
-        BedWars.plugin.getLogger().info("[ResourceChest] MSG -> " + msg + " (iso=" + iso + ")");
-        player.sendMessage(msg);
     }
 
     private static String getIso(Player p) {
@@ -282,5 +192,91 @@ public class ResourceChestFeature implements Listener {
             count++;
         }
         return map;
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onLeftClickChest(PlayerInteractEvent e) {
+        IArena arena = Arena.getArenaByPlayer(e.getPlayer());
+        if (arena == null) return;
+        if (e.getAction() != Action.LEFT_CLICK_BLOCK) return;
+
+        Block block = e.getClickedBlock();
+        if (block == null) return;
+
+        boolean isChest = block.getType() == Material.CHEST;
+        boolean isEnderChest = block.getType() == Material.ENDER_CHEST;
+        if (!isChest && !isEnderChest) return;
+
+        ITeam team = arena.getTeam(e.getPlayer());
+        if (team == null) {
+            if (!isEnderChest) return;
+            if (arena.isSpectator(e.getPlayer()) || arena.getRespawnSessions().containsKey(e.getPlayer())) return;
+        }
+
+        Player player = e.getPlayer();
+        ItemStack hand = e.getItem();
+
+        if (hand == null || hand.getType() == Material.AIR) return;
+
+        if (blocked.contains(hand.getType())
+                || BedWars.nms.isTool(hand)
+                || BedWars.nms.getCustomData(hand).equalsIgnoreCase("DEFAULT_ITEM")) {
+            return;
+        }
+
+        Inventory inventory = isChest
+                ? ((Chest) block.getState()).getBlockInventory()
+                : getSharedEnderChest(team, player);
+
+        PlayerItemDepositEvent event = new PlayerItemDepositEvent(player, arena, hand, inventory, block.getType());
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) return;
+
+        player.playSound(player.getLocation(), Sound.CLICK, 1.0f, 1.0f);
+
+        int inserted = safeDeposit(event.getPlayer(), event.getItem(), event.getTargetInventory());
+        if (inserted > 0) {
+            sendDepositMessage(event.getPlayer(), event.getItem(), inserted);
+            ITeam team2 = arena.getTeam(event.getPlayer());
+            if (team2 != null && event.getItem().getType().name().contains("SWORD")) {
+                team2.defaultSword(player, true);
+            }
+        }
+    }
+
+    private int safeDeposit(Player player, ItemStack hand, Inventory inventory) {
+        ItemStack toStore = hand.clone();
+        Map<Integer, ItemStack> leftovers = inventory.addItem(toStore);
+
+        int attempted = toStore.getAmount();
+        int notInserted = leftovers.values().stream().mapToInt(ItemStack::getAmount).sum();
+        int inserted = attempted - notInserted;
+
+        if (inserted <= 0) {
+            player.sendMessage(Language.getMsg(player, Messages.INTERACT_FULL_CHEST));
+            return 0;
+        }
+
+        if (notInserted <= 0) {
+            player.getInventory().setItemInHand(new ItemStack(Material.AIR));
+        } else {
+            ItemStack newHand = hand.clone();
+            newHand.setAmount(notInserted);
+            player.getInventory().setItemInHand(newHand);
+        }
+
+        player.updateInventory();
+        return inserted;
+    }
+
+    private void sendDepositMessage(Player player, ItemStack original, int inserted) {
+        ensureItemJsonLoaded();
+        String iso = getIso(player);
+        String formattedName = resolveItemName(original, iso);
+        String msg = Language.getMsg(player, Messages.ITEM_DEPOSITED_SUCCESSFULLY)
+                .replace("{AMOUNT}", String.valueOf(inserted))
+                .replace("{ITEM}", formattedName);
+        BedWars.plugin.getLogger().info("[ResourceChest] MSG -> " + msg + " (iso=" + iso + ")");
+        player.sendMessage(msg);
     }
 }

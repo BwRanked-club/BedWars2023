@@ -12,7 +12,10 @@ import com.tomkeuper.bedwars.arena.Arena;
 import com.tomkeuper.bedwars.arena.VoidChunkGenerator;
 import com.tomkeuper.bedwars.maprestore.internal.files.WorldZipper;
 import org.apache.commons.io.FileUtils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
@@ -28,6 +31,7 @@ import static com.tomkeuper.bedwars.BedWars.plugin;
 public class InternalAdapter extends RestoreAdapter {
 
     public static File backupFolder = new File(BedWars.plugin.getDataFolder() + "/Cache");
+
     public InternalAdapter(Plugin plugin) {
         super(plugin);
     }
@@ -65,7 +69,7 @@ public class InternalAdapter extends RestoreAdapter {
                     wc.generateStructures(false);
                     wc.generator(new VoidChunkGenerator());
                     World w = Bukkit.createWorld(wc);
-                    if (w == null){
+                    if (w == null) {
                         throw new IllegalStateException("World should be null");
                     }
                     w.setKeepSpawnInMemory(true);
@@ -105,7 +109,7 @@ public class InternalAdapter extends RestoreAdapter {
 
     @Override
     public void onDisable(IArena a) {
-        if(BedWars.isShuttingDown()) {
+        if (BedWars.isShuttingDown()) {
             Bukkit.unloadWorld(a.getWorldName(), false);
             return;
         }
@@ -141,7 +145,7 @@ public class InternalAdapter extends RestoreAdapter {
                             World w = Bukkit.createWorld(wc);
                             w.setKeepSpawnInMemory(true);
                             Bukkit.getScheduler().runTaskLater(plugin, s::teleportPlayer, 20L);
-                        } catch (Exception ex){
+                        } catch (Exception ex) {
                             ex.printStackTrace();
                             s.close();
                         }

@@ -57,7 +57,7 @@ public class Level extends SubCommand {
 
             BedWars.getAPI().getLevelsUtil().setLevel(pl, level);
 
-            int nextLevelCost =  LevelsConfig.levels.getYml().get("levels." + level + ".rankup-cost") == null ?
+            int nextLevelCost = LevelsConfig.levels.getYml().get("levels." + level + ".rankup-cost") == null ?
                     LevelsConfig.levels.getInt("levels.others.rankup-cost") : LevelsConfig.levels.getInt("levels." + level + ".rankup-cost");
 
             String levelName = LevelsConfig.levels.getYml().get("levels." + level + ".name") == null ?
@@ -93,7 +93,7 @@ public class Level extends SubCommand {
 
             BedWars.plugin.getServer().getScheduler().runTaskAsynchronously(BedWars.plugin, () -> {
                 Object[] data = BedWars.getRemoteDatabase().getLevelData(pl.getUniqueId());
-                BedWars.getRemoteDatabase().setLevelData(pl.getUniqueId(), (Integer) data[0], ((Integer)data[1]) + amount, (String) data[2], (Integer)data[3]);
+                BedWars.getRemoteDatabase().setLevelData(pl.getUniqueId(), (Integer) data[0], ((Integer) data[1]) + amount, (String) data[2], (Integer) data[3]);
                 s.sendMessage(ChatColor.GOLD + " ▪ " + ChatColor.GRAY + args[2] + " xp was given to: " + pl.getName());
                 s.sendMessage(ChatColor.GOLD + " ▪ " + ChatColor.GRAY + "The player may need to rejoin to see it updated.");
             });
@@ -104,8 +104,7 @@ public class Level extends SubCommand {
     }
 
     private void sendSubCommands(CommandSender s, com.tomkeuper.bedwars.api.BedWars api) {
-        if (s instanceof Player) {
-            Player p = (Player) s;
+        if (s instanceof Player p) {
             p.spigot().sendMessage(Misc.msgHoverClick("§6 ▪ §7/" + getParent().getName() + " " + getSubCommandName() + " setLevel §o<player> <level>",
                     "Set a player level.", "/" + getParent().getName() + " " + getSubCommandName() + " setLevel",
                     ClickEvent.Action.SUGGEST_COMMAND));

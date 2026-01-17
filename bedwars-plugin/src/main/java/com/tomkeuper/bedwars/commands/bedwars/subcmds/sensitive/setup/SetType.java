@@ -19,13 +19,13 @@ import java.util.List;
 
 public class SetType extends SubCommand {
 
+    private static final List<String> available = Arrays.asList("Solo", "Doubles", "3v3v3v3", "4v4v4v4");
+
     public SetType(ParentCommand parent, String name) {
         super(parent, name);
         setArenaSetupCommand(true);
         setPermission(Permissions.PERMISSION_SETUP_ARENA);
     }
-
-    private static final List<String> available = Arrays.asList("Solo", "Doubles", "3v3v3v3", "4v4v4v4");
 
     @Override
     public boolean execute(String[] args, CommandSender s) {

@@ -9,6 +9,35 @@ import org.jetbrains.annotations.Nullable;
 
 public class DispatchCommand implements UpgradeAction {
 
+    private final CommandType commandType;
+    private final String command;
+
+    public DispatchCommand(CommandType commandType, String command) {
+        this.commandType = commandType;
+        this.command = command;
+    }
+
+    @Override
+    public void onBuy(@Nullable Player player, ITeam team) {
+        String buyerName = player == null ? "null" : player.getName();
+        String buyerUUID = player == null ? "null" : player.getUniqueId().toString();
+        String teamName = team.getName();
+        String teamDisplay = team.getDisplayName(Language.getDefaultLanguage());
+        String teamColor = team.getColor().chat().toString();
+        String arenaIdentifier = team.getArena().getArenaName();
+        String arenaWorld = team.getArena().getWorldName();
+        String arenaDisplay = team.getArena().getDisplayName();
+        String arenaGroup = team.getArena().getGroup();
+        commandType.dispatch(team, command
+                .replace("{buyer}", buyerName)
+                .replace("{buyer_uuid}", buyerUUID)
+                .replace("{team}", teamName).replace("{team_display}", teamDisplay)
+                .replace("{team_color}", teamColor).replace("{arena}", arenaIdentifier)
+                .replace("{arena_world}", arenaWorld).replace("{arena_display}", arenaDisplay)
+                .replace("{arena_group}", arenaGroup));
+    }
+
+
     public enum CommandType {
         ONCE_AS_CONSOLE, FOREACH_MEMBER_AS_CONSOLE, FOREACH_MEMBER_AS_PLAYER;
 
@@ -43,35 +72,5 @@ public class DispatchCommand implements UpgradeAction {
                     break;
             }
         }
-    }
-
-    private final CommandType commandType;
-
-    private final String command;
-
-    public DispatchCommand(CommandType commandType, String command) {
-        this.commandType = commandType;
-        this.command = command;
-    }
-
-
-    @Override
-    public void onBuy(@Nullable Player player, ITeam team) {
-        String buyerName = player == null ? "null" : player.getName();
-        String buyerUUID = player == null ? "null" : player.getUniqueId().toString();
-        String teamName = team.getName();
-        String teamDisplay = team.getDisplayName(Language.getDefaultLanguage());
-        String teamColor = team.getColor().chat().toString();
-        String arenaIdentifier = team.getArena().getArenaName();
-        String arenaWorld = team.getArena().getWorldName();
-        String arenaDisplay = team.getArena().getDisplayName();
-        String arenaGroup = team.getArena().getGroup();
-        commandType.dispatch(team, command
-                .replace("{buyer}", buyerName)
-                .replace("{buyer_uuid}", buyerUUID)
-                .replace("{team}", teamName).replace("{team_display}", teamDisplay)
-                .replace("{team_color}", teamColor).replace("{arena}", arenaIdentifier)
-                .replace("{arena_world}", arenaWorld).replace("{arena_display}", arenaDisplay)
-                .replace("{arena_group}", arenaGroup));
     }
 }

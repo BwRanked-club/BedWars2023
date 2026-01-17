@@ -25,14 +25,14 @@ import java.util.UUID;
 
 public class ShopCategory implements IShopCategory {
 
+    public static List<UUID> categoryViewers = new ArrayList<>();
+    public static ShopCategory instance;
+    public final List<ICategoryContent> categoryContentList = new ArrayList<>();
     public int slot;
     public ItemStack itemStack;
     public String itemNamePath, itemLorePath, invNamePath;
     public boolean loaded = false;
-    public final List<ICategoryContent> categoryContentList = new ArrayList<>();
-    public static List<UUID> categoryViewers = new ArrayList<>();
     public String name;
-    public static ShopCategory instance;
 
     ShopCategory() {
     }
@@ -113,6 +113,24 @@ public class ShopCategory implements IShopCategory {
             }
         }
         instance = this;
+    }
+
+    /**
+     * Static helper to resolve a category content by its identifier within a given shop index.
+     * Uses the same logic as the instance method but avoids relying on a singleton instance.
+     */
+    public static ICategoryContent resolveCategoryContent(String identifier, IShopIndex shopIndex) {
+        if (identifier == null || shopIndex == null) return null;
+        for (IShopCategory sc : shopIndex.getCategoryList()) {
+            for (ICategoryContent cc : sc.getCategoryContentList()) {
+                if (identifier.equals(cc.getIdentifier())) return cc;
+            }
+        }
+        return null;
+    }
+
+    public static ShopCategory getInstance() {
+        return instance;
     }
 
     /**
@@ -230,20 +248,6 @@ public class ShopCategory implements IShopCategory {
         return null;
     }
 
-    /**
-     * Static helper to resolve a category content by its identifier within a given shop index.
-     * Uses the same logic as the instance method but avoids relying on a singleton instance.
-     */
-    public static ICategoryContent resolveCategoryContent(String identifier, IShopIndex shopIndex) {
-        if (identifier == null || shopIndex == null) return null;
-        for (IShopCategory sc : shopIndex.getCategoryList()) {
-            for (ICategoryContent cc : sc.getCategoryContentList()) {
-                if (identifier.equals(cc.getIdentifier())) return cc;
-            }
-        }
-        return null;
-    }
-
     @Override
     public String getName() {
         return name;
@@ -251,9 +255,5 @@ public class ShopCategory implements IShopCategory {
 
     public List<UUID> getCategoryViewers() {
         return new ArrayList<>(categoryViewers);
-    }
-
-    public static ShopCategory getInstance() {
-        return instance;
     }
 }

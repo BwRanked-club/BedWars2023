@@ -77,7 +77,8 @@ public class LevelsConfig extends ConfigManager {
     }
 
     public static int getNextCost(int level) {
-        if (levels.getYml().get("levels." + level + ".rankup-cost") != null) return levels.getYml().getInt("levels." + level + ".rankup-cost");
+        if (levels.getYml().get("levels." + level + ".rankup-cost") != null)
+            return levels.getYml().getInt("levels." + level + ".rankup-cost");
         for (String key : levels.getYml().getConfigurationSection("levels").getKeys(false)) {
             if (key.contains("-")) {
                 String[] nrs = key.split("-");

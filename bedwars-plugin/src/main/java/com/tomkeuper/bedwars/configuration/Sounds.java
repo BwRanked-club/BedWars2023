@@ -64,7 +64,7 @@ public class Sounds {
         addDefSound("shop-auto-equip", BedWars.getForCurrentVersion("HORSE_ARMOR", "ITEM_ARMOR_EQUIP_GENERIC", "ITEM_ARMOR_EQUIP_GENERIC"));
         addDefSound("egg-bridge-block", BedWars.getForCurrentVersion("CHICKEN_EGG_POP", "ENTITY_CHICKEN_EGG", "ENTITY_CHICKEN_EGG"));
         addDefSound("ender-pearl-landed", BedWars.getForCurrentVersion("ENDERMAN_TELEPORT", "ENTITY_ENDERMEN_TELEPORT", "ENTITY_ENDERMAN_TELEPORT"));
-        addDefSound("pop-up-tower-build", BedWars.getForCurrentVersion("CHICKEN_EGG_POP", "ENTITY_CHICKEN_EGG","ENTITY_CHICKEN_EGG"));
+        addDefSound("pop-up-tower-build", BedWars.getForCurrentVersion("CHICKEN_EGG_POP", "ENTITY_CHICKEN_EGG", "ENTITY_CHICKEN_EGG"));
         yml.options().copyDefaults(true);
         sounds.save();
     }
@@ -78,7 +78,7 @@ public class Sounds {
     }
 
     public static void playSound(String path, List<Player> players) {
-        if(path.equalsIgnoreCase("none")) return;
+        if (path.equalsIgnoreCase("none")) return;
         final Sound sound = getSound(path);
         int volume = getSounds().getInt(path + ".volume");
         int pitch = getSounds().getInt(path + ".pitch");
@@ -119,7 +119,7 @@ public class Sounds {
         getSounds().getYml().addDefault(path + ".pitch", 1);
     }
 
-    public static  void playsoundArea(String path, Location location, float x, float y){
+    public static void playsoundArea(String path, Location location, float x, float y) {
         final Sound sound = getSound(path);
         if (sound != null) location.getWorld().playSound(location, sound, x, y);
     }

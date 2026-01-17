@@ -28,14 +28,22 @@ import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Openable;
 
-import static com.tomkeuper.bedwars.BedWars.*;
+import static com.tomkeuper.bedwars.BedWars.config;
+import static com.tomkeuper.bedwars.BedWars.nms;
 import static com.tomkeuper.bedwars.api.language.Language.getMsg;
 
 public class PlayerInteractListeners implements Listener {
+
+    private static Inventory getSharedEnderChest(ITeam team, Player player) {
+        if (team instanceof BedWarsTeam) {
+            return ((BedWarsTeam) team).getSharedEnderChest();
+        }
+        return player.getEnderChest();
+    }
 
     @EventHandler
     /* Handle custom items with commands on them */
@@ -80,7 +88,7 @@ public class PlayerInteractListeners implements Listener {
                         return;
                     }
                 }
-            };
+            }
 
             Bukkit.getLogger().warning("Could not find a handler for item: " + action);
         }
@@ -204,8 +212,6 @@ public class PlayerInteractListeners implements Listener {
         }
     }
 
-
-
     @EventHandler
     public void disableItemFrameRotation(PlayerInteractEntityEvent e) {
         if (e == null) return;
@@ -284,12 +290,5 @@ public class PlayerInteractListeners implements Listener {
                 e.getInventory().setResult(new ItemStack(Material.AIR));
             }
         }
-    }
-
-    private static Inventory getSharedEnderChest(ITeam team, Player player) {
-        if (team instanceof BedWarsTeam) {
-            return ((BedWarsTeam) team).getSharedEnderChest();
-        }
-        return player.getEnderChest();
     }
 }

@@ -19,7 +19,7 @@ public class CmdGUI extends SubCommand {
         super(parent, name);
         setPriority(17);
         showInList(false);
-        setDisplayInfo(MainCommand.createTC("§6 ▪ §7/"+ MainCommand.getInstance().getName()+" "+getSubCommandName(), "/"+getParent().getName()+" "+getSubCommandName(), "§fOpens the arena GUI."));
+        setDisplayInfo(MainCommand.createTC("§6 ▪ §7/" + MainCommand.getInstance().getName() + " " + getSubCommandName(), "/" + getParent().getName() + " " + getSubCommandName(), "§fOpens the arena GUI."));
     }
 
     @Override
@@ -29,7 +29,7 @@ public class CmdGUI extends SubCommand {
         if (Arena.getArenaByPlayer(p) != null) return false;
 
         String group = "default";
-        if (args.length == 1){
+        if (args.length == 1) {
             group = args[0];
         }
 

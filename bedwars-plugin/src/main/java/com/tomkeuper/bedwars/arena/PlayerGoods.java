@@ -17,24 +17,21 @@ import static com.tomkeuper.bedwars.BedWars.plugin;
 class PlayerGoods {
 
     private static final Map<UUID, PlayerGoods> PLAYER_GOODS = new HashMap<>();
-
-    private UUID uuid;
     private final int level;
     private final int foodLevel;
     private final double health;
     private final double healthScale;
     private final float exp;
-
-    private ItemStack[] inventoryContents;
-    private ItemStack[] armorContents;
-    private ItemStack[] enderChestContents;
-    private List<PotionEffect> potionEffects;
-
     private final GameMode gameMode;
     private final boolean allowFlight;
     private final boolean flying;
     private final String displayName;
     private final String playerListName;
+    private UUID uuid;
+    private ItemStack[] inventoryContents;
+    private ItemStack[] armorContents;
+    private ItemStack[] enderChestContents;
+    private List<PotionEffect> potionEffects;
 
     PlayerGoods(Player player, boolean prepare) {
         this(player, prepare, false);
@@ -133,6 +130,21 @@ class PlayerGoods {
         return PLAYER_GOODS.get(player.getUniqueId());
     }
 
+    private static void clearAllActivePotions(Player player) {
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            player.removePotionEffect(effect.getType());
+        }
+    }
+
+    private static ItemStack[] cloneArray(ItemStack[] source) {
+        if (source == null) return null;
+        ItemStack[] copy = new ItemStack[source.length];
+        for (int i = 0; i < source.length; i++) {
+            copy[i] = source[i] == null ? null : source[i].clone();
+        }
+        return copy;
+    }
+
     void restore() {
         BedWars.debug("Restoring PlayerGoods for player " + uuid.toString());
 
@@ -183,20 +195,5 @@ class PlayerGoods {
         this.armorContents = null;
         this.enderChestContents = null;
         this.potionEffects = null;
-    }
-
-    private static void clearAllActivePotions(Player player) {
-        for (PotionEffect effect : player.getActivePotionEffects()) {
-            player.removePotionEffect(effect.getType());
-        }
-    }
-
-    private static ItemStack[] cloneArray(ItemStack[] source) {
-        if (source == null) return null;
-        ItemStack[] copy = new ItemStack[source.length];
-        for (int i = 0; i < source.length; i++) {
-            copy[i] = source[i] == null ? null : source[i].clone();
-        }
-        return copy;
     }
 }

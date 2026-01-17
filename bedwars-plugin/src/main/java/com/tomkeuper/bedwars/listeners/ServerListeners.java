@@ -36,26 +36,26 @@ public class ServerListeners implements Listener {
 
     @EventHandler
     public void onFoodChange(FoodLevelChangeEvent e) {
-        if(e.isCancelled()) return;
+        if (e.isCancelled()) return;
         Player player = (Player) e.getEntity();
         IArena arena = Arena.getArenaByPlayer(player);
 
         // Dont cancel hunger for shared mode outside of arena
-        if(arena == null && getServerType() == ServerType.SHARED) return;
+        if (arena == null && getServerType() == ServerType.SHARED) return;
 
         // Cancel hunger in MULTIARENA lobby
-        if(arena == null) {
+        if (arena == null) {
             e.setCancelled(true);
             return;
         }
 
         // Cancel hunger for spectators
-        if(arena.isSpectator(player)) {
+        if (arena.isSpectator(player)) {
             e.setCancelled(true);
             return;
         }
 
-        switch(arena.getStatus()) {
+        switch (arena.getStatus()) {
             case waiting:
             case starting:
             case restarting:

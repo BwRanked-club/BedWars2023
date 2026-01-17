@@ -6,7 +6,6 @@ import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.api.upgrades.EnemyBaseEnterTrap;
 import com.tomkeuper.bedwars.api.upgrades.MenuContent;
-import com.tomkeuper.bedwars.upgrades.UpgradesManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
@@ -19,8 +18,8 @@ import java.util.List;
 
 public class MenuTrapSlot implements MenuContent {
 
-    private ItemStack displayItem;
-    private String name;
+    private final ItemStack displayItem;
+    private final String name;
     private int trap;
 
     /**
@@ -46,10 +45,10 @@ public class MenuTrapSlot implements MenuContent {
                 ebe = team.getActiveTraps().get(trap);
             }
         }
-        if (ebe != null){
+        if (ebe != null) {
             i = ebe.getItemStack().clone();
         }
-        i.setAmount(trap+1);
+        i.setAmount(trap + 1);
         ItemMeta im = i.getItemMeta();
         if (im == null) return i;
         im.setDisplayName(Language.getMsg(player, Messages.UPGRADES_TRAP_SLOT_ITEM_NAME_PATH + name.replace("trap-slot-", ""))

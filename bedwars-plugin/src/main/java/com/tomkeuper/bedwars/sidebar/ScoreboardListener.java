@@ -23,12 +23,12 @@ public class ScoreboardListener implements Listener {
     public void onPlayerDamage(EntityDamageEvent e) {
         if (e == null) return;
         if (e.isCancelled()) return;
-        if (!(e.getEntity() instanceof Player)) return;
-        final Player player = (Player) e.getEntity();
+        if (!(e.getEntity() instanceof Player player)) return;
         final IArena arena = Arena.getArenaByPlayer(player);
 
         int health = (int) Math.ceil((player.getHealth() - e.getFinalDamage()));
-        if (arena == null) return;
+        if (arena == null) {
+        }
 
 //        SidebarService.getInstance().refreshHealth(arena, player, health);
     }
@@ -37,8 +37,7 @@ public class ScoreboardListener implements Listener {
     public void onRegain(EntityRegainHealthEvent e) {
         if (e == null) return;
         if (e.isCancelled()) return;
-        if (!(e.getEntity() instanceof Player)) return;
-        final Player player = (Player) e.getEntity();
+        if (!(e.getEntity() instanceof Player player)) return;
         final IArena arena = Arena.getArenaByPlayer(player);
         if (arena == null) return;
 

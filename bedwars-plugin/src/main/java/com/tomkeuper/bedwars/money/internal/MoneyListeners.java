@@ -19,6 +19,21 @@ import java.util.UUID;
 
 public class MoneyListeners implements Listener {
 
+    private static void grant(Player player, int amount, PlayerMoneyGainEvent.MoneySource source, String messageKey) {
+        if (amount <= 0) return;
+
+        var event = new PlayerMoneyGainEvent(player, amount, source);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) return;
+
+        if (BedWars.getEconomy() != null) {
+            BedWars.getEconomy().giveMoney(player, event.getAmount());
+        }
+
+        String msg = Language.getMsg(player, messageKey).replace("%bw_money%", String.valueOf(event.getAmount()));
+        player.sendMessage(msg);
+    }
+
     @EventHandler
     public void onGameEnd(GameEndEvent e) {
         final IArena arena = e.getArena();
@@ -89,20 +104,5 @@ public class MoneyListeners implements Listener {
                 grant(killer, regularKill, PlayerMoneyGainEvent.MoneySource.REGULAR_KILL, Messages.MONEY_REWARD_REGULAR_KILL);
             }
         }
-    }
-
-    private static void grant(Player player, int amount, PlayerMoneyGainEvent.MoneySource source, String messageKey) {
-        if (amount <= 0) return;
-
-        var event = new PlayerMoneyGainEvent(player, amount, source);
-        Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) return;
-
-        if (BedWars.getEconomy() != null) {
-            BedWars.getEconomy().giveMoney(player, event.getAmount());
-        }
-
-        String msg = Language.getMsg(player, messageKey).replace("%bw_money%", String.valueOf(event.getAmount()));
-        player.sendMessage(msg);
     }
 }

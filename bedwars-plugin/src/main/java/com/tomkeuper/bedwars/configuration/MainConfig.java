@@ -13,7 +13,10 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 public class MainConfig extends ConfigManager {
 
@@ -122,7 +125,7 @@ public class MainConfig extends ConfigManager {
         yml.addDefault(ConfigPath.GENERAL_FIREBALL_DAMAGE_SELF, 2.0);
         yml.addDefault(ConfigPath.GENERAL_FIREBALL_DAMAGE_ENEMY, 2.0);
         yml.addDefault(ConfigPath.GENERAL_FIREBALL_DAMAGE_TEAMMATES, 0.0);
-        yml.addDefault(ConfigPath.GENERAL_FIREBALL_EXPLOSION_PROOF_BLOCKS, Arrays.asList("END_STONE"));
+        yml.addDefault(ConfigPath.GENERAL_FIREBALL_EXPLOSION_PROOF_BLOCKS, List.of("END_STONE"));
 
         // eggbridge category
         yml.addDefault(ConfigPath.GENERAL_EGGBRIDGE_MIN_DISTANCE_FROM_PLAYER, 4.0);
@@ -289,7 +292,8 @@ public class MainConfig extends ConfigManager {
     @SuppressWarnings("WeakerAccess")
     public void saveLobbyCommandItem(String name, String cmd, boolean enchanted, String material, int data, int slot) {
         if (isFirstTime()) {
-            if (cmd != null) getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_LOBBY_ITEMS_COMMAND.replace("%path%", name), cmd);
+            if (cmd != null)
+                getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_LOBBY_ITEMS_COMMAND.replace("%path%", name), cmd);
             getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_LOBBY_ITEMS_MATERIAL.replace("%path%", name), material);
             getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_LOBBY_ITEMS_DATA.replace("%path%", name), data);
             getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_LOBBY_ITEMS_ENCHANTED.replace("%path%", name), enchanted);
@@ -307,8 +311,10 @@ public class MainConfig extends ConfigManager {
     @SuppressWarnings("WeakerAccess")
     public void savePreGameCommandItem(String name, String cmd, boolean enchanted, String material, int data, int slot) {
         if (isFirstTime()) {
-            if (cmd != null) getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_PRE_GAME_ITEMS_COMMAND.replace("%path%", name), cmd);
-            if (name.equalsIgnoreCase("leave")) getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_PRE_GAME_ITEMS_LEAVE_DELAY.replace("%path%", name), 3);
+            if (cmd != null)
+                getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_PRE_GAME_ITEMS_COMMAND.replace("%path%", name), cmd);
+            if (name.equalsIgnoreCase("leave"))
+                getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_PRE_GAME_ITEMS_LEAVE_DELAY.replace("%path%", name), 3);
             getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_PRE_GAME_ITEMS_MATERIAL.replace("%path%", name), material);
             getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_PRE_GAME_ITEMS_DATA.replace("%path%", name), data);
             getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_PRE_GAME_ITEMS_ENCHANTED.replace("%path%", name), enchanted);
@@ -325,8 +331,10 @@ public class MainConfig extends ConfigManager {
     @SuppressWarnings("WeakerAccess")
     public void saveSpectatorCommandItem(String name, String cmd, boolean enchanted, String material, int data, int slot) {
         if (isFirstTime()) {
-            if (cmd != null) getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_SPECTATOR_ITEMS_COMMAND.replace("%path%", name), cmd);
-            if (name.equalsIgnoreCase("leave")) getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_SPECTATOR_ITEMS_LEAVE_DELAY.replace("%path%", name), 3);
+            if (cmd != null)
+                getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_SPECTATOR_ITEMS_COMMAND.replace("%path%", name), cmd);
+            if (name.equalsIgnoreCase("leave"))
+                getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_SPECTATOR_ITEMS_LEAVE_DELAY.replace("%path%", name), 3);
             getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_SPECTATOR_ITEMS_MATERIAL.replace("%path%", name), material);
             getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_SPECTATOR_ITEMS_DATA.replace("%path%", name), data);
             getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_SPECTATOR_ITEMS_ENCHANTED.replace("%path%", name), enchanted);

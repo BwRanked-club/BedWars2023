@@ -5,18 +5,14 @@ import com.tomkeuper.bedwars.api.arena.GameState;
 import com.tomkeuper.bedwars.api.configuration.ConfigPath;
 import com.tomkeuper.bedwars.arena.Arena;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class AntiDropFeature implements Listener {
     private static AntiDropFeature instance;
+
     public AntiDropFeature() {
         Bukkit.getPluginManager().registerEvents(this, BedWars.plugin);
     }

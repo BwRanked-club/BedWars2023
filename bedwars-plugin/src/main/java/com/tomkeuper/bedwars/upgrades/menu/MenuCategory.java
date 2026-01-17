@@ -21,10 +21,10 @@ import java.util.Map;
 
 public class MenuCategory implements MenuContent {
 
-    private ItemStack displayItem;
-    private String name;
+    private final ItemStack displayItem;
+    private final String name;
 
-    private HashMap<Integer, MenuContent> menuContentBySlot = new HashMap<>();
+    private final HashMap<Integer, MenuContent> menuContentBySlot = new HashMap<>();
 
     public MenuCategory(String name, ItemStack displayItem) {
         this.name = name;
@@ -78,13 +78,13 @@ public class MenuCategory implements MenuContent {
 
     @Override
     public boolean onClick(Player player, ClickType clickType, ITeam team, boolean forFree, boolean announcePurchase, boolean announceAlreadyUnlocked, boolean openInv) {
-        if (name.equalsIgnoreCase("category-traps")){
-            int queueLimit = BedWars.getUpgradeManager().getConfiguration().getInt(team.getArena().getGroup().toLowerCase()+"-upgrades-settings.trap-queue-limit");
-            if (queueLimit == 0){
+        if (name.equalsIgnoreCase("category-traps")) {
+            int queueLimit = BedWars.getUpgradeManager().getConfiguration().getInt(team.getArena().getGroup().toLowerCase() + "-upgrades-settings.trap-queue-limit");
+            if (queueLimit == 0) {
                 queueLimit = BedWars.getUpgradeManager().getConfiguration().getInt("default-upgrades-settings.trap-queue-limit");
             }
-            if (queueLimit <= team.getActiveTraps().size()){
-                if (announceAlreadyUnlocked){
+            if (queueLimit <= team.getActiveTraps().size()) {
+                if (announceAlreadyUnlocked) {
                     Sounds.playSound(ConfigPath.SOUNDS_INSUFF_MONEY, player);
                     player.sendMessage(Language.getMsg(player, Messages.UPGRADES_TRAP_QUEUE_LIMIT));
                 }

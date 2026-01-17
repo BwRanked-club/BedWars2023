@@ -22,8 +22,8 @@ public class EnableArena extends SubCommand {
 
     public EnableArena(ParentCommand parent, String name) {
         super(parent, name);
-        setDisplayInfo(Misc.msgHoverClick("§6 ▪ §7/" + getParent().getName() + " "+getSubCommandName()+" §6<worldName>","§fEnable an arena.",
-                "/" + getParent().getName() + " "+getSubCommandName()+ " ", ClickEvent.Action.SUGGEST_COMMAND));
+        setDisplayInfo(Misc.msgHoverClick("§6 ▪ §7/" + getParent().getName() + " " + getSubCommandName() + " §6<worldName>", "§fEnable an arena.",
+                "/" + getParent().getName() + " " + getSubCommandName() + " ", ClickEvent.Action.SUGGEST_COMMAND));
         showInList(true);
         setPriority(5);
         setPermission(Permissions.PERMISSION_ARENA_ENABLE);
@@ -44,8 +44,8 @@ public class EnableArena extends SubCommand {
             return true;
         }
 
-        for (IArena mm : Arena.getEnableQueue()){
-            if (mm.getArenaName().equalsIgnoreCase(args[0])){
+        for (IArena mm : Arena.getEnableQueue()) {
+            if (mm.getArenaName().equalsIgnoreCase(args[0])) {
                 s.sendMessage("§c▪ §7This arena is already in the enable queue!");
                 return true;
             }
@@ -80,8 +80,7 @@ public class EnableArena extends SubCommand {
 
     @Override
     public boolean canSee(CommandSender s, com.tomkeuper.bedwars.api.BedWars api) {
-        if (s instanceof Player) {
-            Player p = (Player) s;
+        if (s instanceof Player p) {
             if (Arena.isInArena(p)) return false;
             if (SetupSession.isInSetupSession(p.getUniqueId())) return false;
         }

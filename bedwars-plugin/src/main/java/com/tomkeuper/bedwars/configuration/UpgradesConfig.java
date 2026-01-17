@@ -3,9 +3,11 @@ package com.tomkeuper.bedwars.configuration;
 import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.configuration.ConfigManager;
 import org.bukkit.configuration.file.YamlConfiguration;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import static com.tomkeuper.bedwars.BedWars.getForCurrentVersion;
 import static com.tomkeuper.bedwars.BedWars.plugin;
 

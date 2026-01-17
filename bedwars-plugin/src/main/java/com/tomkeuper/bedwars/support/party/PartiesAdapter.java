@@ -15,9 +15,9 @@ import java.util.Objects;
 
 public class PartiesAdapter implements Party {
 
+    private static final int requiredRankToSelect = BedWars.config.getInt(ConfigPath.GENERAL_ALESSIODP_PARTIES_RANK);
     //Support for Parties by AlessioDP
     private final PartiesAPI api = com.alessiodp.parties.api.Parties.getApi();
-    private static final int requiredRankToSelect = BedWars.config.getInt(ConfigPath.GENERAL_ALESSIODP_PARTIES_RANK);
 
     @Override
     public boolean hasParty(Player p) {
@@ -72,14 +72,14 @@ public class PartiesAdapter implements Party {
         //party creation handled on bungee side
         if (!api.isBungeeCordEnabled()) {
             PartyPlayer partyOwner = api.getPartyPlayer(owner.getUniqueId());
-            if (null != partyOwner  && !partyOwner.isInParty()) {
+            if (null != partyOwner && !partyOwner.isInParty()) {
                 boolean created = api.createParty(null, partyOwner);
                 if (created && null != partyOwner.getPartyId()) {
                     com.alessiodp.parties.api.interfaces.Party party = api.getParty(partyOwner.getPartyId());
                     if (null != party) {
                         for (Player player1 : members) {
                             PartyPlayer partyPlayer = api.getPartyPlayer(player1.getUniqueId());
-                            if (null != partyPlayer  && !partyPlayer.isInParty()) {
+                            if (null != partyPlayer && !partyPlayer.isInParty()) {
                                 party.addMember(partyPlayer);
                             }
                         }

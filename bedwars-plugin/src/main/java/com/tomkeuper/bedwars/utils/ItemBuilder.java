@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class ItemBuilder {
 
-    private ItemStack item;
+    private final ItemStack item;
     private ItemMeta itemMeta;
 
     public ItemBuilder(Material material) {
@@ -85,8 +85,7 @@ public class ItemBuilder {
     }
 
     public ItemBuilder setLeatherColor(Color color) {
-        if (itemMeta instanceof LeatherArmorMeta) {
-            LeatherArmorMeta leatherMeta = (LeatherArmorMeta) itemMeta;
+        if (itemMeta instanceof LeatherArmorMeta leatherMeta) {
             leatherMeta.setColor(color);
         }
         return this;
@@ -94,9 +93,8 @@ public class ItemBuilder {
 
     public ItemBuilder setSkull(String owner) {
         ensureSkull();
-        if (!(itemMeta instanceof SkullMeta)) return this;
+        if (!(itemMeta instanceof SkullMeta meta)) return this;
 
-        SkullMeta meta = (SkullMeta) itemMeta;
         OfflinePlayer player = Bukkit.getOfflinePlayer(owner);
         meta.setOwner(player.getName());
         return this;

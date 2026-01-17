@@ -22,26 +22,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class OfflineGraceService {
 
-    private OfflineGraceService() {
-    }
-
     private static final int GRACE_SECONDS = 60;
-
     private static final Map<UUID, Entry> entries = new ConcurrentHashMap<>();
 
-    private static final class Entry {
-        final IArena arena;
-        final ITeam team;
-        final Player snapshot;
-        final long expiresAt;
-        BukkitTask task;
-
-        Entry(IArena arena, ITeam team, Player snapshot, long expiresAt) {
-            this.arena = arena;
-            this.team = team;
-            this.snapshot = snapshot;
-            this.expiresAt = expiresAt;
-        }
+    private OfflineGraceService() {
     }
 
     public static void startGrace(IArena arena, ITeam team, Player player) {
@@ -166,6 +150,21 @@ public final class OfflineGraceService {
         e.arena.addPlayerDeath(e.snapshot);
 
         e.arena.checkWinner();
+    }
+
+    private static final class Entry {
+        final IArena arena;
+        final ITeam team;
+        final Player snapshot;
+        final long expiresAt;
+        BukkitTask task;
+
+        Entry(IArena arena, ITeam team, Player snapshot, long expiresAt) {
+            this.arena = arena;
+            this.team = team;
+            this.snapshot = snapshot;
+            this.expiresAt = expiresAt;
+        }
     }
 
 }

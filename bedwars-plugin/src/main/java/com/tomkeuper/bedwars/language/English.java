@@ -561,7 +561,7 @@ public class English extends Language {
     }
 
     @Override
-    public void generateNPCMessages(YamlConfiguration yml, String group){
+    public void generateNPCMessages(YamlConfiguration yml, String group) {
         yml.addDefault(Messages.NPC_NAME_TEAM_UPGRADES.replace("%group%", group), Arrays.asList("&bTEAM UPGRADES", "&e&lRIGHT CLICK"));
         yml.addDefault(Messages.NPC_NAME_SOLO_UPGRADES.replace("%group%", group), Arrays.asList("&bSOLO UPGRADES", "&e&lRIGHT CLICK"));
         yml.addDefault(Messages.NPC_NAME_TEAM_SHOP.replace("%group%", group), Arrays.asList("&bTEAM SHOP", "&e&lRIGHT CLICK"));

@@ -15,18 +15,16 @@ import org.bukkit.inventory.ItemStack;
 import java.util.*;
 
 public class ShopCache implements IShopCache {
-    public ShopCache() {
-        instance = this;
-    }
-
+    private static final List<ShopCache> shopCaches = new ArrayList<>();
+    private static ShopCache instance;
     @Getter
     private UUID player;
     private List<CachedItem> cachedItems = new LinkedList<>();
     private int selectedCategory;
     private HashMap<IShopCategory, Byte> categoryWeight = new HashMap<>();
-
-    private static final List<ShopCache> shopCaches = new ArrayList<>();
-    private static ShopCache instance;
+    public ShopCache() {
+        instance = this;
+    }
 
     public ShopCache(UUID player) {
         this.player = player;
@@ -34,14 +32,18 @@ public class ShopCache implements IShopCache {
         shopCaches.add(this);
     }
 
-    @Override
-    public void setSelectedCategory(int slot) {
-        this.selectedCategory = slot;
+    public static ShopCache getInstance() {
+        return instance;
     }
 
     @Override
     public int getSelectedCategory() {
         return selectedCategory;
+    }
+
+    @Override
+    public void setSelectedCategory(int slot) {
+        this.selectedCategory = slot;
     }
 
     @Override
@@ -73,65 +75,8 @@ public class ShopCache implements IShopCache {
      */
     public void managePermanentsAndDowngradables(Arena arena) {
         BedWars.debug("Restore permanents on death for: " + player);
-        for (CachedItem ci : cachedItems){
+        for (CachedItem ci : cachedItems) {
             ci.manageDeath(arena);
-        }
-    }
-
-    /**
-     * Keep trace of shop items and player's tiers
-     */
-    @SuppressWarnings("WeakerAccess")
-    public class CachedItem implements ICachedItem {
-        @Getter
-        private final ICategoryContent cc;
-        private int tier = 1;
-
-        public CachedItem(ICategoryContent cc) {
-            this.cc = cc;
-            cachedItems.add(this);
-            BedWars.debug("New Cached item " + cc.getIdentifier() + " for player " + player);
-        }
-
-        @Override
-        public int getTier() {
-            return tier;
-        }
-
-        /**
-         * Give permanents on death
-         * and downgrade if necessary
-         */
-        public void manageDeath(Arena arena) {
-            if (!cc.isPermanent()) return;
-            if (cc.isDowngradable() && tier > 1) tier--;
-            BedWars.debug("ShopCache Item Restore: " + cc.getIdentifier() + " for " + player);
-            //noinspection ConstantConditions
-            cc.giveItems(Bukkit.getPlayer(player), getShopCache(player), arena);
-        }
-
-        @Override
-        public void upgrade(int slot) {
-            tier++;
-            Player p = Bukkit.getPlayer(player);
-            for (ItemStack i : p.getInventory().getContents()) {
-                if (i == null) continue;
-                if (i.getType() == Material.AIR) continue;
-                if (BedWars.nms.getShopUpgradeIdentifier(i).equals(cc.getIdentifier())) {
-                    p.getInventory().remove(i);
-                }
-            }
-            updateItem(slot, p);
-            p.updateInventory();
-        }
-
-        @Override
-        public void updateItem(int slot, Player p) {
-            if (p.getOpenInventory() != null) {
-                if (p.getOpenInventory().getTopInventory() != null) {
-                    p.getOpenInventory().getTopInventory().setItem(slot, cc.getItemStack(Bukkit.getPlayer(player), getShopCache(player)));
-                }
-            }
         }
     }
 
@@ -205,8 +150,8 @@ public class ShopCache implements IShopCache {
      */
     public List<CachedItem> getCachedPermanents() {
         List<CachedItem> ci = new ArrayList<>();
-        for (CachedItem c : cachedItems){
-            if (c.getCc().isPermanent()){
+        for (CachedItem c : cachedItems) {
+            if (c.getCc().isPermanent()) {
                 ci.add(c);
             }
         }
@@ -217,7 +162,60 @@ public class ShopCache implements IShopCache {
         return cachedItems;
     }
 
-    public static ShopCache getInstance() {
-        return instance;
+    /**
+     * Keep trace of shop items and player's tiers
+     */
+    @SuppressWarnings("WeakerAccess")
+    public class CachedItem implements ICachedItem {
+        @Getter
+        private final ICategoryContent cc;
+        private int tier = 1;
+
+        public CachedItem(ICategoryContent cc) {
+            this.cc = cc;
+            cachedItems.add(this);
+            BedWars.debug("New Cached item " + cc.getIdentifier() + " for player " + player);
+        }
+
+        @Override
+        public int getTier() {
+            return tier;
+        }
+
+        /**
+         * Give permanents on death
+         * and downgrade if necessary
+         */
+        public void manageDeath(Arena arena) {
+            if (!cc.isPermanent()) return;
+            if (cc.isDowngradable() && tier > 1) tier--;
+            BedWars.debug("ShopCache Item Restore: " + cc.getIdentifier() + " for " + player);
+            //noinspection ConstantConditions
+            cc.giveItems(Bukkit.getPlayer(player), getShopCache(player), arena);
+        }
+
+        @Override
+        public void upgrade(int slot) {
+            tier++;
+            Player p = Bukkit.getPlayer(player);
+            for (ItemStack i : p.getInventory().getContents()) {
+                if (i == null) continue;
+                if (i.getType() == Material.AIR) continue;
+                if (BedWars.nms.getShopUpgradeIdentifier(i).equals(cc.getIdentifier())) {
+                    p.getInventory().remove(i);
+                }
+            }
+            updateItem(slot, p);
+            p.updateInventory();
+        }
+
+        @Override
+        public void updateItem(int slot, Player p) {
+            if (p.getOpenInventory() != null) {
+                if (p.getOpenInventory().getTopInventory() != null) {
+                    p.getOpenInventory().getTopInventory().setItem(slot, cc.getItemStack(Bukkit.getPlayer(player), getShopCache(player)));
+                }
+            }
+        }
     }
 }

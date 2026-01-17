@@ -11,7 +11,7 @@ public class EnchantItemAction implements UpgradeAction {
     private final int amplifier;
     private final ApplyType type;
 
-    public EnchantItemAction(Enchantment enchantment, int amplifier, ApplyType type){
+    public EnchantItemAction(Enchantment enchantment, int amplifier, ApplyType type) {
         this.enchantment = enchantment;
         this.amplifier = amplifier;
         this.type = type;
@@ -19,11 +19,11 @@ public class EnchantItemAction implements UpgradeAction {
 
     @Override
     public void onBuy(Player player, ITeam bwt) {
-        if (type == ApplyType.ARMOR){
+        if (type == ApplyType.ARMOR) {
             bwt.addArmorEnchantment(enchantment, amplifier);
-        } else if (type == ApplyType.SWORD){
+        } else if (type == ApplyType.SWORD) {
             bwt.addSwordEnchantment(enchantment, amplifier);
-        } else if (type == ApplyType.BOW){
+        } else if (type == ApplyType.BOW) {
             bwt.addBowEnchantment(enchantment, amplifier);
         }
     }

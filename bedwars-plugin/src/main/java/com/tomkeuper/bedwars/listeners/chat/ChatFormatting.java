@@ -35,6 +35,78 @@ public class ChatFormatting implements Listener {
 
     private static final List<Player> recipients = new ArrayList<>();
 
+    private static Component parsePHolders(String format, String msg, Player eventTriggerPlayer, Player recipientPlayer, @Nullable ITeam team) {
+        format = format
+                .replace("%bw_v_prefix%", BedWars.getChatSupport().getPrefix(eventTriggerPlayer))
+                .replace("%bw_v_suffix%", BedWars.getChatSupport().getSuffix(eventTriggerPlayer))
+                .replace("%bw_playername%", eventTriggerPlayer.getName())
+                .replace("%bw_level%", BedWars.getLevelSupport().getLevel(eventTriggerPlayer))
+                .replace("%bw_player%", eventTriggerPlayer.getDisplayName());
+        if (team != null) {
+            String teamFormat = getMsg(recipientPlayer, Messages.FORMAT_PAPI_PLAYER_TEAM_TEAM)
+                    .replace("%bw_team_color%", String.valueOf(team.getColor().chat()))
+                    .replace("%bw_team_name%", team.getDisplayName(Language.getPlayerLanguage(recipientPlayer)).toUpperCase());
+            format = format.replace("%bw_team_format%", teamFormat);
+        }
+        format = SupportPAPI.getSupportPAPI().replace(eventTriggerPlayer, format);
+        if (Permissions.hasPermission(eventTriggerPlayer, Permissions.PERMISSION_CHAT_COLOR, Permissions.PERMISSION_VIP, Permissions.PERMISSION_ALL))
+            return parseLegacyMini(format.replace("%bw_message%", msg));
+        else return parseLegacyMini(format).replaceText(builder ->
+                builder.match("%bw_message%").replacement(msg)
+        );
+    }
+
+    private static boolean isShouting(String msg, Language lang) {
+        if (msg == null || msg.isEmpty()) return false;
+        String trimmed = msg.trim();
+        String lower = trimmed.toLowerCase();
+        if (trimmed.startsWith("!")) return true;
+        if (lower.startsWith("shout")) return true;
+        if (lower.startsWith(lang.m(Messages.MEANING_SHOUT).toLowerCase())) return true;
+        if (lower.startsWith("/g")) return true;
+        return lower.startsWith("g ");
+    }
+
+    private static String clearShout(String msg, Language lang) {
+        if (msg == null) return "";
+        String trimmed = msg.trim();
+
+        if (trimmed.startsWith("!")) trimmed = trimmed.substring(1);
+        String lower = trimmed.toLowerCase();
+
+        if (lower.startsWith("shout")) trimmed = trimmed.substring(5);
+        else if (lower.startsWith(lang.m(Messages.MEANING_SHOUT).toLowerCase()))
+            trimmed = trimmed.substring(lang.m(Messages.MEANING_SHOUT).length());
+        else if (lower.startsWith("/g")) {
+            trimmed = trimmed.substring(2);
+        } else if (lower.startsWith("g ")) {
+            trimmed = trimmed.substring(1);
+        }
+
+        return trimmed.trim();
+    }
+
+    @SafeVarargs
+    public static void setRecipients(AsyncPlayerChatEvent event, List<Player>... target) {
+        if (!BedWars.config.getBoolean(ConfigPath.GENERAL_CHAT_GLOBAL)) {
+            recipients.clear();
+            for (List<Player> list : target) {
+                recipients.addAll(list);
+            }
+        } else {
+            recipients.clear();
+            recipients.addAll(event.getRecipients());
+        }
+        event.getRecipients().clear();
+    }
+
+    private static Component parseLegacyMini(String s) {
+        s = s.replaceAll("§", "&");
+        Component deserializedLegacy = LegacyComponentSerializer.legacyAmpersand().deserialize(s);
+        String miniSerializedLegacy = MiniMessage.miniMessage().serialize(deserializedLegacy).replace("\\<", "<");
+        return MiniMessage.miniMessage().deserialize(miniSerializedLegacy);
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncPlayerChatEvent e) {
         if (e == null) return;
@@ -118,79 +190,6 @@ public class ChatFormatting implements Listener {
         }
 
         sendMessage(e, language.m(Messages.FORMATTING_CHAT_LOBBY), e.getMessage(), p, null);
-    }
-
-    private static Component parsePHolders(String format, String msg, Player eventTriggerPlayer, Player recipientPlayer, @Nullable ITeam team) {
-        format = format
-                .replace("%bw_v_prefix%", BedWars.getChatSupport().getPrefix(eventTriggerPlayer))
-                .replace("%bw_v_suffix%", BedWars.getChatSupport().getSuffix(eventTriggerPlayer))
-                .replace("%bw_playername%", eventTriggerPlayer.getName())
-                .replace("%bw_level%", BedWars.getLevelSupport().getLevel(eventTriggerPlayer))
-                .replace("%bw_player%", eventTriggerPlayer.getDisplayName());
-        if (team != null) {
-            String teamFormat = getMsg(recipientPlayer, Messages.FORMAT_PAPI_PLAYER_TEAM_TEAM)
-                    .replace("%bw_team_color%", String.valueOf(team.getColor().chat()))
-                    .replace("%bw_team_name%", team.getDisplayName(Language.getPlayerLanguage(recipientPlayer)).toUpperCase());
-            format = format.replace("%bw_team_format%", teamFormat);
-        }
-        format = SupportPAPI.getSupportPAPI().replace(eventTriggerPlayer, format);
-        if (Permissions.hasPermission(eventTriggerPlayer, Permissions.PERMISSION_CHAT_COLOR, Permissions.PERMISSION_VIP, Permissions.PERMISSION_ALL))
-            return parseLegacyMini(format.replace("%bw_message%", msg));
-        else return parseLegacyMini(format).replaceText(builder ->
-                builder.match("%bw_message%").replacement(msg)
-        );
-    }
-
-    private static boolean isShouting(String msg, Language lang) {
-        if (msg == null || msg.isEmpty()) return false;
-        String trimmed = msg.trim();
-        String lower = trimmed.toLowerCase();
-        if (trimmed.startsWith("!")) return true;
-        if (lower.startsWith("shout")) return true;
-        if (lower.startsWith(lang.m(Messages.MEANING_SHOUT).toLowerCase())) return true;
-        if (lower.startsWith("/g")) return true;
-        if (lower.startsWith("g ")) return true;
-        return false;
-    }
-
-    private static String clearShout(String msg, Language lang) {
-        if (msg == null) return "";
-        String trimmed = msg.trim();
-
-        if (trimmed.startsWith("!")) trimmed = trimmed.substring(1);
-        String lower = trimmed.toLowerCase();
-
-        if (lower.startsWith("shout")) trimmed = trimmed.substring(5);
-        else if (lower.startsWith(lang.m(Messages.MEANING_SHOUT).toLowerCase()))
-            trimmed = trimmed.substring(lang.m(Messages.MEANING_SHOUT).length());
-        else if (lower.startsWith("/g")) {
-            trimmed = trimmed.substring(2);
-        } else if (lower.startsWith("g ")) {
-            trimmed = trimmed.substring(1);
-        }
-
-        return trimmed.trim();
-    }
-
-    @SafeVarargs
-    public static void setRecipients(AsyncPlayerChatEvent event, List<Player>... target) {
-        if (!BedWars.config.getBoolean(ConfigPath.GENERAL_CHAT_GLOBAL)) {
-            recipients.clear();
-            for (List<Player> list : target) {
-                recipients.addAll(list);
-            }
-        } else {
-            recipients.clear();
-            recipients.addAll(event.getRecipients());
-        }
-        event.getRecipients().clear();
-    }
-
-    private static Component parseLegacyMini(String s) {
-        s = s.replaceAll("§", "&");
-        Component deserializedLegacy = LegacyComponentSerializer.legacyAmpersand().deserialize(s);
-        String miniSerializedLegacy = MiniMessage.miniMessage().serialize(deserializedLegacy).replace("\\<", "<");
-        return MiniMessage.miniMessage().deserialize(miniSerializedLegacy);
     }
 
     @SuppressWarnings("resource")

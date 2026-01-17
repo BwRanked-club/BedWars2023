@@ -13,18 +13,6 @@ import org.bukkit.event.Listener;
 
 public class BlockStatusListener implements Listener {
 
-    @EventHandler
-    public void onArenaEnable(ArenaEnableEvent e) {
-        if (e == null) return;
-        updateBlock((Arena) e.getArena());
-    }
-
-    @EventHandler
-    public void onStatusChange(GameStateChangeEvent e) {
-        if (e == null) return;
-        updateBlock((Arena) e.getArena());
-    }
-
     /**
      * Update sign block
      */
@@ -55,5 +43,17 @@ public class BlockStatusListener implements Listener {
             BedWars.nms.setJoinSignBackground(s.getState(), Material.valueOf(BedWars.signs.getString(path)));
             BedWars.nms.setJoinSignBackgroundBlockData(s.getState(), (byte) BedWars.signs.getInt(data));
         }
+    }
+
+    @EventHandler
+    public void onArenaEnable(ArenaEnableEvent e) {
+        if (e == null) return;
+        updateBlock((Arena) e.getArena());
+    }
+
+    @EventHandler
+    public void onStatusChange(GameStateChangeEvent e) {
+        if (e == null) return;
+        updateBlock((Arena) e.getArena());
     }
 }

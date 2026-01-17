@@ -16,38 +16,38 @@ import java.util.UUID;
 @SuppressWarnings("WeakerAccess")
 public class QuickBuyTask extends BukkitRunnable {
 
-    private UUID uuid;
+    private final UUID uuid;
 
 
-    public QuickBuyTask(UUID uuid){
+    public QuickBuyTask(UUID uuid) {
         this.uuid = uuid;
-        this.runTaskLaterAsynchronously(BedWars.plugin, 20*7);
+        this.runTaskLaterAsynchronously(BedWars.plugin, 20 * 7);
     }
 
     @Override
     public void run() {
-        if (Bukkit.getPlayer(uuid) == null){
+        if (Bukkit.getPlayer(uuid) == null) {
             cancel();
             return;
         }
-        if (Bukkit.getPlayer(uuid).isOnline()){
+        if (Bukkit.getPlayer(uuid).isOnline()) {
             IPlayerQuickBuyCache cache = PlayerQuickBuyCache.getInstance().getQuickBuyCache(uuid);
-            if (cache == null){
+            if (cache == null) {
                 cancel();
                 return;
             }
 
-            if (!BedWars.getRemoteDatabase().hasQuickBuy(uuid)){
-                if (BedWars.shop.getYml().get(ConfigPath.SHOP_QUICK_DEFAULTS_PATH) != null){
+            if (!BedWars.getRemoteDatabase().hasQuickBuy(uuid)) {
+                if (BedWars.shop.getYml().get(ConfigPath.SHOP_QUICK_DEFAULTS_PATH) != null) {
                     for (String s : BedWars.shop.getYml().getConfigurationSection(ConfigPath.SHOP_QUICK_DEFAULTS_PATH).getKeys(false)) {
                         if (BedWars.shop.getYml().get(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + "." + s + ".path") != null) {
-                            if (BedWars.shop.getYml().get(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + "." + s + ".slot") == null){
+                            if (BedWars.shop.getYml().get(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + "." + s + ".slot") == null) {
                                 continue;
                             }
 
                             try {
                                 Integer.valueOf(BedWars.shop.getYml().getString(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + "." + s + ".slot"));
-                            } catch (Exception ex){
+                            } catch (Exception ex) {
                                 BedWars.debug(BedWars.shop.getYml().getString(ConfigPath.SHOP_QUICK_DEFAULTS_PATH + "." + s + ".slot") + " must be an integer!");
                                 continue;
                             }

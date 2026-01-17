@@ -80,7 +80,7 @@ public class StatsListener implements Listener {
         Player victim = event.getVictim();
         Player killer = event.getKiller();
 
-        if (killer != null && sameParty(killer, victim)) return;
+        if (sameParty(killer, victim)) return;
 
         IPlayerStats victimStats = BedWars.getStatsManager().get(victim.getUniqueId());
         IPlayerStats killerStats = (killer != null && !victim.equals(killer))

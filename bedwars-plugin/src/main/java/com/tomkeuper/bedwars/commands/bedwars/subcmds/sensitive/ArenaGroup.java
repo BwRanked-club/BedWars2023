@@ -29,7 +29,7 @@ public class ArenaGroup extends SubCommand {
         setPriority(8);
         showInList(true);
         setPermission(Permissions.PERMISSION_ARENA_GROUP);
-        setDisplayInfo(Misc.msgHoverClick("§6 ▪ §7/" + getParent().getName() + " " + getSubCommandName()+" §8- §eclick for details", "§fManage arena groups.",
+        setDisplayInfo(Misc.msgHoverClick("§6 ▪ §7/" + getParent().getName() + " " + getSubCommandName() + " §8- §eclick for details", "§fManage arena groups.",
                 "/" + getParent().getName() + " " + getSubCommandName(), ClickEvent.Action.RUN_COMMAND));
     }
 

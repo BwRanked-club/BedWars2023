@@ -39,7 +39,7 @@ public class SetIslandRadius extends SubCommand {
         Player p = (Player) s;
         SetupSession ss = SetupSession.getSession(p.getUniqueId());
 
-        if (ss == null){
+        if (ss == null) {
             s.sendMessage("§c ▪ §7You're not in a setup session!");
             return true;
         }

@@ -60,6 +60,55 @@ public class HealPoolTask extends BukkitRunnable {
         TASKS.add(this);
     }
 
+    public static boolean exists(IArena arena, ITeam team) {
+        if (TASKS.isEmpty()) return false;
+        for (HealPoolTask task : TASKS) {
+            if (task != null && task.getArena() == arena && task.getTeam() == team) return true;
+        }
+        return false;
+    }
+
+    // --- Static helpers (API-compatible) ---
+
+    public static void removeForArena(IArena arena) {
+        if (arena == null || TASKS.isEmpty()) return;
+        for (Iterator<HealPoolTask> it = TASKS.iterator(); it.hasNext(); ) {
+            HealPoolTask task = it.next();
+            if (task == null) continue;
+            IArena a = task.getArena();
+            if (a != null && a.equals(arena)) {
+                task.cancel();
+                it.remove();
+            }
+        }
+    }
+
+    public static void removeForArena(String worldName) {
+        if (worldName == null || TASKS.isEmpty()) return;
+        for (Iterator<HealPoolTask> it = TASKS.iterator(); it.hasNext(); ) {
+            HealPoolTask task = it.next();
+            if (task == null) continue;
+            IArena a = task.getArena();
+            if (a != null && worldName.equals(a.getWorldName())) {
+                task.cancel();
+                it.remove();
+            }
+        }
+    }
+
+    public static void removeForTeam(ITeam team) {
+        if (team == null || TASKS.isEmpty()) return;
+        for (Iterator<HealPoolTask> it = TASKS.iterator(); it.hasNext(); ) {
+            HealPoolTask task = it.next();
+            if (task == null) continue;
+            ITeam t = task.getTeam();
+            if (t != null && t.equals(team)) {
+                task.cancel();
+                it.remove();
+            }
+        }
+    }
+
     @Override
     public void run() {
         // Basic null/validity guards
@@ -120,55 +169,6 @@ public class HealPoolTask extends BukkitRunnable {
                 }
             }
         });
-    }
-
-    // --- Static helpers (API-compatible) ---
-
-    public static boolean exists(IArena arena, ITeam team) {
-        if (TASKS.isEmpty()) return false;
-        for (HealPoolTask task : TASKS) {
-            if (task != null && task.getArena() == arena && task.getTeam() == team) return true;
-        }
-        return false;
-    }
-
-    public static void removeForArena(IArena arena) {
-        if (arena == null || TASKS.isEmpty()) return;
-        for (Iterator<HealPoolTask> it = TASKS.iterator(); it.hasNext(); ) {
-            HealPoolTask task = it.next();
-            if (task == null) continue;
-            IArena a = task.getArena();
-            if (a != null && a.equals(arena)) {
-                task.cancel();
-                it.remove();
-            }
-        }
-    }
-
-    public static void removeForArena(String worldName) {
-        if (worldName == null || TASKS.isEmpty()) return;
-        for (Iterator<HealPoolTask> it = TASKS.iterator(); it.hasNext(); ) {
-            HealPoolTask task = it.next();
-            if (task == null) continue;
-            IArena a = task.getArena();
-            if (a != null && worldName.equals(a.getWorldName())) {
-                task.cancel();
-                it.remove();
-            }
-        }
-    }
-
-    public static void removeForTeam(ITeam team) {
-        if (team == null || TASKS.isEmpty()) return;
-        for (Iterator<HealPoolTask> it = TASKS.iterator(); it.hasNext(); ) {
-            HealPoolTask task = it.next();
-            if (task == null) continue;
-            ITeam t = task.getTeam();
-            if (t != null && t.equals(team)) {
-                task.cancel();
-                it.remove();
-            }
-        }
     }
 
     // --- Accessors with clearer names ---

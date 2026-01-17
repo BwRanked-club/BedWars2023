@@ -16,36 +16,10 @@ import java.util.UUID;
 
 public class ShoutCommand extends BukkitCommand {
 
-    private static HashMap<UUID, Long> shoutCooldown = new HashMap<>();
+    private static final HashMap<UUID, Long> shoutCooldown = new HashMap<>();
 
     public ShoutCommand(String name) {
         super(name);
-    }
-
-    @Override
-    public boolean execute(CommandSender s, String st, String[] args) {
-        if (s instanceof ConsoleCommandSender) return true;
-        Player p = (Player) s;
-        IArena a = Arena.getArenaByPlayer(p);
-
-        if (a == null || a.isSpectator(p)) {
-            p.sendMessage(Language.getMsg(p, Messages.COMMAND_NOT_FOUND_OR_INSUFF_PERMS));
-            return true;
-        }
-
-        // Prevent player from shouting if it is a solo mode
-        if(BedWars.config.getBoolean(ConfigPath.GENERAL_DISABLE_SHOUT_SOLO) && a.getMaxInTeam() == 1){
-            p.sendMessage(Language.getMsg(p, Messages.COMMAND_SHOUT_DISABLE_SOLO));
-            return true;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (String ar : args) {
-            sb.append(ar).append(" ");
-        }
-
-        p.chat("!" + sb);
-        return false;
     }
 
     public static void updateShout(Player player) {
@@ -69,5 +43,31 @@ public class ShoutCommand extends BukkitCommand {
     public static boolean isShout(Player p) {
         if (!shoutCooldown.containsKey(p.getUniqueId())) return false;
         return shoutCooldown.get(p.getUniqueId()) + 1000 > System.currentTimeMillis();
+    }
+
+    @Override
+    public boolean execute(CommandSender s, String st, String[] args) {
+        if (s instanceof ConsoleCommandSender) return true;
+        Player p = (Player) s;
+        IArena a = Arena.getArenaByPlayer(p);
+
+        if (a == null || a.isSpectator(p)) {
+            p.sendMessage(Language.getMsg(p, Messages.COMMAND_NOT_FOUND_OR_INSUFF_PERMS));
+            return true;
+        }
+
+        // Prevent player from shouting if it is a solo mode
+        if (BedWars.config.getBoolean(ConfigPath.GENERAL_DISABLE_SHOUT_SOLO) && a.getMaxInTeam() == 1) {
+            p.sendMessage(Language.getMsg(p, Messages.COMMAND_SHOUT_DISABLE_SOLO));
+            return true;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (String ar : args) {
+            sb.append(ar).append(" ");
+        }
+
+        p.chat("!" + sb);
+        return false;
     }
 }

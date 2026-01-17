@@ -30,13 +30,13 @@ import static com.tomkeuper.bedwars.api.language.Language.getMsg;
 
 public class MainCommand extends BukkitCommand implements ParentCommand {
 
-    /* SubCommands ArenaList */
-    private static List<SubCommand> subCommandList = new ArrayList<>();
-    /* MainCommand instance*/
-    private static MainCommand instance;
     /* Dot char */
     @SuppressWarnings("WeakerAccess")
     public static char dot = 254;
+    /* SubCommands ArenaList */
+    private static final List<SubCommand> subCommandList = new ArrayList<>();
+    /* MainCommand instance*/
+    private static MainCommand instance;
 
     public MainCommand(String name) {
         super(name);
@@ -104,6 +104,43 @@ public class MainCommand extends BukkitCommand implements ParentCommand {
         new SetKillDropsLoc(this, "setKillDrops");
     }
 
+    public static boolean isArenaGroup(String var) {
+        if (config.getYml().get("arenaGroups") != null) {
+            return config.getYml().getStringList("arenaGroups").contains(var);
+        }
+        return var.equalsIgnoreCase("default");
+    }
+
+    public static TextComponent createTC(String text, String suggest, String shot_text) {
+        TextComponent tx = new TextComponent(text);
+        tx.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggest));
+        tx.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(shot_text).create()));
+        return tx;
+    }
+
+    /**
+     * Get instance
+     */
+    public static MainCommand getInstance() {
+        return instance;
+    }
+
+    /**
+     * Check if lobby location is set
+     */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public static boolean isLobbySet() {
+        if (BedWars.getServerType() == ServerType.BUNGEE) return true;
+        return !config.getLobbyWorldName().isEmpty();
+    }
+
+    /**
+     * Get a dot symbol
+     */
+    public static char getDot() {
+        return dot;
+    }
+
     @Override
     public boolean execute(CommandSender s, String st, String[] args) {
 
@@ -151,20 +188,6 @@ public class MainCommand extends BukkitCommand implements ParentCommand {
         return true;
     }
 
-    public static boolean isArenaGroup(String var) {
-        if (config.getYml().get("arenaGroups") != null) {
-            return config.getYml().getStringList("arenaGroups").contains(var);
-        }
-        return var.equalsIgnoreCase("default");
-    }
-
-    public static TextComponent createTC(String text, String suggest, String shot_text) {
-        TextComponent tx = new TextComponent(text);
-        tx.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggest));
-        tx.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(shot_text).create()));
-        return tx;
-    }
-
     @Override
     public void addSubCommand(SubCommand subCommand) {
         subCommandList.add(subCommand);
@@ -207,26 +230,9 @@ public class MainCommand extends BukkitCommand implements ParentCommand {
         return null;
     }
 
-
     @Override
     public List<SubCommand> getSubCommands() {
         return subCommandList;
-    }
-
-    /**
-     * Get instance
-     */
-    public static MainCommand getInstance() {
-        return instance;
-    }
-
-    /**
-     * Check if lobby location is set
-     */
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public static boolean isLobbySet() {
-        if (BedWars.getServerType() == ServerType.BUNGEE) return true;
-        return !config.getLobbyWorldName().isEmpty();
     }
 
     @Override
@@ -250,12 +256,5 @@ public class MainCommand extends BukkitCommand implements ParentCommand {
             }
         }
         return null;
-    }
-
-    /**
-     * Get a dot symbol
-     */
-    public static char getDot() {
-        return dot;
     }
 }

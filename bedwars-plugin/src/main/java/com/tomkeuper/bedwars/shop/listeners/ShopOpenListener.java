@@ -4,7 +4,6 @@ import com.tomkeuper.bedwars.api.arena.GameState;
 import com.tomkeuper.bedwars.api.arena.IArena;
 import com.tomkeuper.bedwars.api.arena.team.ITeam;
 import com.tomkeuper.bedwars.arena.Arena;
-import com.tomkeuper.bedwars.shop.ShopManager;
 import com.tomkeuper.bedwars.shop.quickbuy.PlayerQuickBuyCache;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -14,10 +13,10 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 public class ShopOpenListener implements Listener {
 
     @EventHandler
-    public void onShopOpen(PlayerInteractEntityEvent e){
+    public void onShopOpen(PlayerInteractEntityEvent e) {
         IArena a = Arena.getArenaByPlayer(e.getPlayer());
         if (a == null) return;
-        if(!a.getStatus().equals(GameState.playing)) return;
+        if (!a.getStatus().equals(GameState.playing)) return;
         Location l = e.getRightClicked().getLocation();
         for (ITeam t : a.getTeams()) {
             Location l2 = t.getShop();

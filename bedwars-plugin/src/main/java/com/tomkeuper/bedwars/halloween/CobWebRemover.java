@@ -25,6 +25,15 @@ public class CobWebRemover {
         taskId = Bukkit.getScheduler().runTaskTimer(BedWars.plugin, new RemovalTask(), 20L, 20L).getTaskId();
     }
 
+    public static CobWebRemover getByArena(IArena arena) {
+        return taskByArena.get(arena);
+    }
+
+    public static CobWebRemover getByArenaWorld(String world) {
+        Optional<Map.Entry<IArena, CobWebRemover>> entry = taskByArena.entrySet().stream().filter(arena -> arena.getKey().getWorldName().equals(world)).findFirst();
+        return entry.map(Map.Entry::getValue).orElse(null);
+    }
+
     public void addCobWeb(Block block) {
         cobWebs.put(block, System.currentTimeMillis() + 7500L);
     }
@@ -35,15 +44,6 @@ public class CobWebRemover {
 
     public IArena getArena() {
         return arena;
-    }
-
-    public static CobWebRemover getByArena(IArena arena) {
-        return taskByArena.get(arena);
-    }
-
-    public static CobWebRemover getByArenaWorld(String world) {
-        Optional<Map.Entry<IArena, CobWebRemover>> entry = taskByArena.entrySet().stream().filter(arena -> arena.getKey().getWorldName().equals(world)).findFirst();
-        return entry.map(Map.Entry::getValue).orElse(null);
     }
 
     public void destroy() {

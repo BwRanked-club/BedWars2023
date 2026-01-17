@@ -45,6 +45,18 @@ public class BoardManager implements IScoreboardService {
     private final HashMap<TabPlayer, Integer> headPlayersSuffix = new HashMap<>();
     private final HashMap<TabPlayer, Integer> tabPlayersTitle = new HashMap<>();
 
+    private BoardManager() {
+        scoreboardManager = TabAPI.getInstance().getScoreboardManager();
+        tabListFormatManager = TabAPI.getInstance().getTabListFormatManager();
+        placeholderManager = TabAPI.getInstance().getPlaceholderManager();
+        nameTagManager = TabAPI.getInstance().getNameTagManager();
+        BossBarManager bossBarManager = TabAPI.getInstance().getBossBarManager();
+        if (bossBarManager == null)
+            BedWars.plugin.getLogger().warning("BossBar is disabled in TAB config! Please enable it there.\n Make sure to remove the ServerInfo default config if you want to use dragon boss-bars");
+        if (tabListFormatManager == null)
+            BedWars.plugin.getLogger().warning("TabList Format Manager is null! You dont have the tablist-name-formatting enabled in TAB config.\nWithout this feature the plugin will NOT work properly");
+    }
+
     public static boolean init() {
         if (TabAPI.getInstance().getScoreboardManager() == null) return false;
         if (instance == null) {
@@ -79,6 +91,10 @@ public class BoardManager implements IScoreboardService {
         } catch (Throwable t) {
             BedWars.plugin.getLogger().severe("[BoardManager] Failed to refresh TAB managers: " + t.getMessage());
         }
+    }
+
+    public static BoardManager getInstance() {
+        return instance;
     }
 
     public void registerLoadEvent() {
@@ -146,18 +162,6 @@ public class BoardManager implements IScoreboardService {
         SimpleDateFormat nextEventDateFormat = new SimpleDateFormat(getMsg(player, Messages.FORMATTING_SCOREBOARD_NEXEVENT_TIMER));
         nextEventDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         return nextEventDateFormat;
-    }
-
-    private BoardManager() {
-        scoreboardManager = TabAPI.getInstance().getScoreboardManager();
-        tabListFormatManager = TabAPI.getInstance().getTabListFormatManager();
-        placeholderManager = TabAPI.getInstance().getPlaceholderManager();
-        nameTagManager = TabAPI.getInstance().getNameTagManager();
-        BossBarManager bossBarManager = TabAPI.getInstance().getBossBarManager();
-        if (bossBarManager == null)
-            BedWars.plugin.getLogger().warning("BossBar is disabled in TAB config! Please enable it there.\n Make sure to remove the ServerInfo default config if you want to use dragon boss-bars");
-        if (tabListFormatManager == null)
-            BedWars.plugin.getLogger().warning("TabList Format Manager is null! You dont have the tablist-name-formatting enabled in TAB config.\nWithout this feature the plugin will NOT work properly");
     }
 
     private void registerPlaceholders() {
@@ -332,10 +336,6 @@ public class BoardManager implements IScoreboardService {
             int finalI = i;
             pm.registerPlayerPlaceholder("%bw_team_" + i + "%", 50, player -> getTeamPlaceholder((Player) player.getPlayer(), finalI));
         }
-    }
-
-    public static BoardManager getInstance() {
-        return instance;
     }
 
     @Override
