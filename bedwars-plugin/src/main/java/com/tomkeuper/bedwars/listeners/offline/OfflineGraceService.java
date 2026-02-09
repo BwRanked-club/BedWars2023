@@ -8,6 +8,7 @@ import com.tomkeuper.bedwars.api.configuration.ConfigPath;
 import com.tomkeuper.bedwars.api.events.player.PlayerKillEvent;
 import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.language.Messages;
+import com.tomkeuper.bedwars.arena.Misc;
 import com.tomkeuper.bedwars.listeners.dropshandler.PlayerDrops;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -91,10 +92,10 @@ public final class OfflineGraceService {
                 on.sendMessage(event.getMessage().apply(on)
                         .replace("%bw_team_name%", e.team.getDisplayName(lang))
                         .replace("%bw_player_color%", e.team.getColor().chat().toString())
-                        .replace("%bw_player%", victim.getDisplayName())
+                        .replace("%bw_player%", Misc.getPlayerName(victim))
                         .replace("%bw_playername%", victim.getName())
                         .replace("%bw_killer_color%", killerTeam == null ? "" : killerTeam.getColor().chat().toString())
-                        .replace("%bw_killer_name%", realKiller == null ? "" : realKiller.getDisplayName())
+                        .replace("%bw_killer_name%", realKiller == null ? "" : Misc.getPlayerName(realKiller))
                         .replace("%bw_killer_team_name%", killerTeam == null ? "" : killerTeam.getDisplayName(lang)));
             }
             for (Player on : e.arena.getSpectators()) {
@@ -102,10 +103,10 @@ public final class OfflineGraceService {
                 on.sendMessage(event.getMessage().apply(on)
                         .replace("%bw_team_name%", e.team.getDisplayName(lang))
                         .replace("%bw_player_color%", e.team.getColor().chat().toString())
-                        .replace("%bw_player%", victim.getDisplayName())
+                        .replace("%bw_player%", Misc.getPlayerName(victim))
                         .replace("%bw_playername%", victim.getName())
                         .replace("%bw_killer_color%", killerTeam == null ? "" : killerTeam.getColor().chat().toString())
-                        .replace("%bw_killer_name%", realKiller == null ? "" : realKiller.getDisplayName())
+                        .replace("%bw_killer_name%", realKiller == null ? "" : Misc.getPlayerName(realKiller))
                         .replace("%bw_killer_team_name%", killerTeam == null ? "" : killerTeam.getDisplayName(lang)));
             }
 

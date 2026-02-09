@@ -11,6 +11,7 @@ import com.tomkeuper.bedwars.api.upgrades.MenuContent;
 import com.tomkeuper.bedwars.api.upgrades.TeamUpgrade;
 import com.tomkeuper.bedwars.api.upgrades.UpgradeAction;
 import com.tomkeuper.bedwars.arena.Arena;
+import com.tomkeuper.bedwars.arena.Misc;
 import com.tomkeuper.bedwars.configuration.Sounds;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -160,7 +161,7 @@ public class MenuUpgrade implements MenuContent, TeamUpgrade {
 
             if (announcePurchase) {
                 for (Player p1 : team.getMembers()) {
-                    p1.sendMessage(Language.getMsg(p1, Messages.UPGRADES_UPGRADE_BOUGHT_CHAT).replace("%bw_player%", player.getName()).replace("%bw_playername%", player.getDisplayName()).replace("%bw_upgrade_name%",
+                    p1.sendMessage(Language.getMsg(p1, Messages.UPGRADES_UPGRADE_BOUGHT_CHAT).replace("%bw_player%", Misc.getPlayerName(player)).replace("%bw_playername%", player.getDisplayName()).replace("%bw_upgrade_name%",
                             ChatColor.stripColor(Language.getMsg(p1, Messages.UPGRADES_UPGRADE_TIER_ITEM_NAME.replace("%bw_name%", getName()
                                     .replace("upgrade-", "")).replace("%bw_tier%", ut.getName())))).replace("%bw_color%", ""));
                 }

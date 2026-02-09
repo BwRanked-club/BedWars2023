@@ -25,7 +25,11 @@ public class GameEndListener implements Listener {
 
         // clear inventories
         for (UUID p : event.getAliveWinners()) {
-            Bukkit.getPlayer(p).getInventory().clear();
+            Player winner = Bukkit.getPlayer(p);
+            if (winner != null) {
+                winner.getInventory().clear();
+                winner.getInventory().setArmorContents(null);
+            }
         }
 
         // clear Ender Chests for everyone currently in the arena (players and spectators)

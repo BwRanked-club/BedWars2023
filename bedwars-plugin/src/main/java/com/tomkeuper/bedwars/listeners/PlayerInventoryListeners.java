@@ -11,8 +11,13 @@ import com.tomkeuper.bedwars.api.server.ServerType;
 import com.tomkeuper.bedwars.api.server.SetupType;
 import com.tomkeuper.bedwars.arena.Arena;
 import com.tomkeuper.bedwars.arena.Misc;
+import com.tomkeuper.bedwars.arena.Misc;
 import com.tomkeuper.bedwars.arena.SetupSession;
 import com.tomkeuper.bedwars.commands.bedwars.subcmds.regular.CmdLeave;
+import com.tomkeuper.bedwars.history.HistoryEventMenu;
+import com.tomkeuper.bedwars.history.HistoryEventMenuHolder;
+import com.tomkeuper.bedwars.history.HistoryMenu;
+import com.tomkeuper.bedwars.history.HistoryMenuHolder;
 import com.tomkeuper.bedwars.shop.main.ShopCategory;
 import com.tomkeuper.bedwars.shop.main.ShopIndex;
 import com.tomkeuper.bedwars.support.version.common.VersionCommon;
@@ -177,6 +182,39 @@ public class PlayerInventoryListeners implements Listener {
         Player p = (Player) e.getWhoClicked();
         ItemStack i = e.getCurrentItem();
 
+        if (e.getView().getTopInventory().getHolder() instanceof HistoryEventMenuHolder holder) {
+            e.setCancelled(true);
+            if (!BedWars.nms.isCustomBedWarsItem(i)) return;
+            String data = BedWars.nms.getCustomData(i);
+            if (HistoryEventMenu.NBT_HISTORY_EVENT_NEXT.equalsIgnoreCase(data)) {
+                HistoryEventMenu.open(p, holder.getTargetId(), holder.getMatchId(), holder.getPage() + 1, holder.getHistoryPage());
+            } else if (HistoryEventMenu.NBT_HISTORY_EVENT_PREV.equalsIgnoreCase(data)) {
+                HistoryEventMenu.open(p, holder.getTargetId(), holder.getMatchId(), holder.getPage() - 1, holder.getHistoryPage());
+            } else if (HistoryEventMenu.NBT_HISTORY_EVENT_BACK.equalsIgnoreCase(data)) {
+                HistoryMenu.open(p, holder.getTargetId(), holder.getHistoryPage());
+            }
+            return;
+        }
+
+        if (e.getView().getTopInventory().getHolder() instanceof HistoryMenuHolder holder) {
+            e.setCancelled(true);
+            if (!BedWars.nms.isCustomBedWarsItem(i)) return;
+            String data = BedWars.nms.getCustomData(i);
+            if (HistoryMenu.NBT_HISTORY_NEXT.equalsIgnoreCase(data)) {
+                HistoryMenu.open(p, holder.getTargetId(), holder.getPage() + 1);
+            } else if (HistoryMenu.NBT_HISTORY_PREV.equalsIgnoreCase(data)) {
+                HistoryMenu.open(p, holder.getTargetId(), holder.getPage() - 1);
+            } else if (data != null && data.startsWith(HistoryMenu.NBT_HISTORY_ENTRY_PREFIX)) {
+                String raw = data.substring(HistoryMenu.NBT_HISTORY_ENTRY_PREFIX.length());
+                try {
+                    java.util.UUID matchId = java.util.UUID.fromString(raw);
+                    HistoryEventMenu.open(p, holder.getTargetId(), matchId, 1, holder.getPage());
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+            return;
+        }
+
         IArena a = Arena.getArenaByPlayer(p);
         if (a != null) {
             /* Make it so they can't toggle their armor */
@@ -189,7 +227,7 @@ public class PlayerInventoryListeners implements Listener {
         // Prevent players from moving items in stats GUI
         if (nms.getInventoryName(e).equals(Language.getMsg(p, Messages.PLAYER_STATS_GUI_INV_NAME)
                 .replace("%bw_playername%", p.getName())
-                .replace("%bw_player%", p.getDisplayName()))) {
+                .replace("%bw_player%", Misc.getPlayerName(p)))) {
             e.setCancelled(true);
             return;
         }

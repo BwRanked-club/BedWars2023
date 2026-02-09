@@ -35,11 +35,12 @@ public class HologramTask implements Runnable {
                 String iso = Language.getPlayerLanguage(p).getIso();
                 Location pLoc = p.getLocation();
                 List<ShopHolo> shopHolos = a.getShopHolograms(iso);
+                if (shopHolos == null || shopHolos.isEmpty()) continue;
                 for (ShopHolo shopHolo : shopHolos) {
                     IHologram hologram = shopHolo.getHologram();
                     Location holoLoc = hologram.getLocation();
                     double distance = pLoc.distance(holoLoc);
-                    if (distance <= BedWars.hologramUpdateDistance) continue;
+                    if (distance > BedWars.hologramUpdateDistance) continue;
                     shopHolo.update(p);
                 }
             }
@@ -49,11 +50,12 @@ public class HologramTask implements Runnable {
                 for (Player p : world.getPlayers()) {
                     String iso = Language.getPlayerLanguage(p).getIso();
                     IBedHolo bedHolo = ((BedWarsTeam) team).getBedHologram(iso);
+                    if (bedHolo == null || bedHolo.getHologram() == null) continue;
                     Location bedLoc = bedHolo.getHologram().getLocation();
 
                     Location pLoc = p.getLocation();
                     double distance = pLoc.distance(bedLoc);
-                    if (distance <= BedWars.hologramUpdateDistance) continue;
+                    if (distance > BedWars.hologramUpdateDistance) continue;
                     bedHolo.update(p);
                 }
             }
@@ -69,7 +71,7 @@ public class HologramTask implements Runnable {
                     GeneratorHolder holder = generator.getHologramHolder();
                     Location pLoc = p.getLocation();
                     double distance = pLoc.distance(genLoc);
-                    if (distance <= BedWars.hologramUpdateDistance) continue;
+                    if (distance > BedWars.hologramUpdateDistance) continue;
 
                     holo.update(p);
                     holder.update(p);

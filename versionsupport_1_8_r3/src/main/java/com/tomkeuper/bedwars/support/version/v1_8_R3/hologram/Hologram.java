@@ -57,13 +57,18 @@ public class Hologram implements IHologram {
 
     @Override
     public void addPlayer(Player player) {
+        if (player == null) return;
+        for (Player p : this.players) {
+            if (p != null && p.getUniqueId().equals(player.getUniqueId())) return;
+        }
         this.players.add(player);
-        update();
+        update(player);
     }
 
     @Override
     public void removePlayer(Player player) {
-        this.players.remove(player);
+        if (player == null) return;
+        this.players.removeIf(p -> p != null && p.getUniqueId().equals(player.getUniqueId()));
         for (IHoloLine line : this.lines) {
             line.remove(player);
         }

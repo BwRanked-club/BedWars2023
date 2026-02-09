@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 public enum HandlerType {
     LEAVE_ARENA("bw:leave_arena"),
     VIEW_STATS("bw:player_stats"),
+    VIEW_HISTORY("bw:match_history"),
     COMMAND("bw:command_item"),
     PLUGIN(null);
 

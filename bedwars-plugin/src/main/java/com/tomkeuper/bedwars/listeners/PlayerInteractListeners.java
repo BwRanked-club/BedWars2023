@@ -39,7 +39,7 @@ import static com.tomkeuper.bedwars.api.language.Language.getMsg;
 public class PlayerInteractListeners implements Listener {
 
     private static Inventory getSharedEnderChest(ITeam team, Player player) {
-        if (team instanceof BedWarsTeam) {
+        if (BedWars.config.getBoolean(ConfigPath.GENERAL_CONFIGURATION_ENDER_CHEST_TEAM_SHARED) && team instanceof BedWarsTeam) {
             return ((BedWarsTeam) team).getSharedEnderChest();
         }
         return player.getEnderChest();

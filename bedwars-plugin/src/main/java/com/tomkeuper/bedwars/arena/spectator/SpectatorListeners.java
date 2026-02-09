@@ -9,6 +9,7 @@ import com.tomkeuper.bedwars.api.events.spectator.SpectatorFirstPersonLeaveEvent
 import com.tomkeuper.bedwars.api.events.spectator.SpectatorTeleportToPlayerEvent;
 import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.arena.Arena;
+import com.tomkeuper.bedwars.arena.Misc;
 import com.tomkeuper.bedwars.configuration.Sounds;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -157,7 +158,7 @@ public class SpectatorListeners implements Listener {
             p.getInventory().setHeldItemSlot(5);
             p.setGameMode(GameMode.SPECTATOR);
             p.setSpectatorTarget(target);
-            nms.sendTitle(p, event.getTitle().apply(p).replace("%bw_playername%", p.getName()).replace("%bw_player%", target.getDisplayName()), event.getSubTitle().apply(p).replace("%bw_player%", target.getDisplayName()), event.getFadeIn(), event.getStay(), event.getFadeOut());
+            nms.sendTitle(p, event.getTitle().apply(p).replace("%bw_playername%", p.getName()).replace("%bw_player%", Misc.getPlayerName(target)), event.getSubTitle().apply(p).replace("%bw_player%", Misc.getPlayerName(target)), event.getFadeIn(), event.getStay(), event.getFadeOut());
         }
     }
 

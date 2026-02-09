@@ -155,5 +155,22 @@ public class QuitAndTeleportListener implements Listener {
                 }
             }
         }
+
+        final IArena targetArena = Arena.getArenaByIdentifier(player.getWorld().getName());
+        if (targetArena != null && Arena.getArenaByPlayer(player) == null) {
+            if (getPartyManager().hasParty(player)) {
+                final Player owner = getPartyManager().getOwner(player);
+                if (owner != null) {
+                    final IArena ownerArena = Arena.getArenaByPlayer(owner);
+                    if (ownerArena != null && ownerArena.equals(targetArena)) {
+                        if (ownerArena.isPlayer(owner)) {
+                            ownerArena.addPlayer(player, true);
+                        } else if (ownerArena.isSpectator(owner)) {
+                            ownerArena.addSpectator(player, false, null);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

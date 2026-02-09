@@ -11,7 +11,9 @@ import com.tomkeuper.bedwars.api.server.ServerType;
 import com.tomkeuper.bedwars.api.sidebar.IScoreboardService;
 import com.tomkeuper.bedwars.api.tasks.PlayingTask;
 import com.tomkeuper.bedwars.arena.Arena;
+import com.tomkeuper.bedwars.arena.Misc;
 import com.tomkeuper.bedwars.levels.internal.PlayerLevel;
+import com.tomkeuper.bedwars.support.papi.SupportPAPI;
 import me.neznamy.tab.api.TabAPI;
 import me.neznamy.tab.api.TabPlayer;
 import me.neznamy.tab.api.bossbar.BossBarManager;
@@ -23,6 +25,7 @@ import me.neznamy.tab.api.scoreboard.Scoreboard;
 import me.neznamy.tab.api.scoreboard.ScoreboardManager;
 import me.neznamy.tab.api.tablist.TabListFormatManager;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -30,10 +33,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static com.tomkeuper.bedwars.api.language.Language.getMsg;
 
 public class BoardManager implements IScoreboardService {
+    private static final String FALLBACK_PLAYER_NAME = "%bw_playername%";
+    private static final Pattern SINGLE_PLACEHOLDER_PATTERN = Pattern.compile("^%[a-zA-Z0-9_]+%$");
     private static ScoreboardManager scoreboardManager;
     private static TabListFormatManager tabListFormatManager;
     private static PlaceholderManager placeholderManager;
@@ -198,7 +204,7 @@ public class BoardManager implements IScoreboardService {
         placeholderManager.registerPlayerPlaceholder("%bw_v_prefix%", placeholderRefresh, player -> BedWars.getChatSupport().getPrefix((Player) player.getPlayer()));
         placeholderManager.registerPlayerPlaceholder("%bw_v_suffix%", placeholderRefresh, player -> BedWars.getChatSupport().getSuffix((Player) player.getPlayer()));
         placeholderManager.registerPlayerPlaceholder("%bw_playername%", placeholderRefresh, TabPlayer::getName);
-        placeholderManager.registerPlayerPlaceholder("%bw_player%", placeholderRefresh, player -> ((Player) player.getPlayer()).getDisplayName());
+        placeholderManager.registerPlayerPlaceholder("%bw_player%", placeholderRefresh, player -> Misc.getPlayerName((Player) player.getPlayer()));
         placeholderManager.registerPlayerPlaceholder("%bw_money%", placeholderRefresh, player -> String.valueOf(BedWars.getEconomy().getMoney((Player) player.getPlayer())));
         placeholderManager.registerServerPlaceholder("%bw_server_ip%", placeholderRefresh, () -> BedWars.config.getString(ConfigPath.GENERAL_CONFIG_PLACEHOLDERS_REPLACEMENTS_SERVER_IP));
         placeholderManager.registerServerPlaceholder("%bw_version%", placeholderRefresh, () -> BedWars.plugin.getDescription().getVersion());
@@ -397,7 +403,7 @@ public class BoardManager implements IScoreboardService {
             nameTagManager.setPrefix(tabPlayer, "%bw_prefix_head%");
             nameTagManager.setSuffix(tabPlayer, "%bw_suffix_head%");
 
-            tabListFormatManager.setName(tabPlayer, BedWars.config.getString(ConfigPath.SB_CONFIG_SIDEBAR_PLAYER_NAME));
+            tabListFormatManager.setName(tabPlayer, getTabPlayerNameFormat((Player) tabPlayer.getPlayer()));
 
         }, delay ? 5 : 0);
     }
@@ -729,6 +735,49 @@ public class BoardManager implements IScoreboardService {
         IArena arena = Arena.getArenaByPlayer(player);
         if (arena == null) return Bukkit.getOnlinePlayers().size();
         return arena.getPlayers().size();
+    }
+
+    private String getTabPlayerNameFormat(Player player) {
+        String configured = BedWars.config.getString(ConfigPath.SB_CONFIG_SIDEBAR_PLAYER_NAME);
+        if (configured == null) {
+            return FALLBACK_PLAYER_NAME;
+        }
+
+        String trimmed = configured.trim();
+        if (trimmed.isEmpty()) {
+            return FALLBACK_PLAYER_NAME;
+        }
+
+        String stripped = stripColors(trimmed);
+        if (!isSinglePlaceholder(stripped)) {
+            return trimmed;
+        }
+
+        if (placeholderManager != null && placeholderManager.getPlaceholder(stripped) != null) {
+            return trimmed;
+        }
+
+        String resolved = SupportPAPI.getSupportPAPI().replace(player, trimmed);
+        if (resolved == null || resolved.trim().isEmpty()) {
+            return FALLBACK_PLAYER_NAME;
+        }
+
+        String resolvedStripped = stripColors(resolved);
+        if (resolvedStripped.equalsIgnoreCase(stripped) || isSinglePlaceholder(resolvedStripped)) {
+            return FALLBACK_PLAYER_NAME;
+        }
+
+        return trimmed;
+    }
+
+    private boolean isSinglePlaceholder(String value) {
+        if (value == null) return false;
+        return SINGLE_PLACEHOLDER_PATTERN.matcher(value.trim()).matches();
+    }
+
+    private String stripColors(String value) {
+        if (value == null) return "";
+        return ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', value));
     }
 
     private void setHeaderFooter(TabPlayer player, IArena arena) {

@@ -36,8 +36,10 @@ public class MainConfig extends ConfigManager {
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_ENABLE_ANTI_DROP, true);
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HOLOGRAM_UPDATE_DISTANCE, 50);
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_ENABLE_TEAMMATE_TRACKING_ACTION_BAR, false);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_DESPAWNABLE_TIME_BAR_LENGTH, 9);
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_RESOURCE_CHEST_ENABLED, false);
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_RESOURCE_CHEST_BLOCKED, Arrays.asList(BedWars.getForCurrentVersion("WOOD_SWORD", "WOODEN_SWORD", "WOODEN_SWORD"), "SHEARS", "COMPASS"));
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_ENDER_CHEST_TEAM_SHARED, false);
         yml.addDefault(ConfigPath.GENERAL_CHAT_GLOBAL, yml.get("globalChat", false));
         yml.addDefault(ConfigPath.GENERAL_CHAT_FORMATTING, yml.get("formatChat", true));
         yml.addDefault("debug", false);
@@ -165,6 +167,7 @@ public class MainConfig extends ConfigManager {
 
         /* Multi-Arena Lobby Command Items */
         saveLobbyCommandItem("stats", null, false, BedWars.getForCurrentVersion("SKULL_ITEM", "SKULL_ITEM", "PLAYER_HEAD"), 3, 0);
+        saveLobbyCommandItem("history", null, false, "PAPER", 0, 1);
         saveLobbyCommandItem("arena-selector", "bw gui", true, "CHEST", 5, 4);
         saveLobbyCommandItem("leave", null, false, BedWars.getForCurrentVersion("BED", "BED", "RED_BED"), 0, 8);
 
@@ -195,6 +198,87 @@ public class MainConfig extends ConfigManager {
         /* default teleporter GUI settings */
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_TELEPORTER_GUI_SIZE, 36);
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_TELEPORTER_SLOTS, "10,11,12,13,14,15,16,19,20,21,22,23,24,25");
+
+        /* match history settings */
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_ENABLED, true);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_ALLOW_OTHERS, true);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_ALLOW_IN_GAME, false);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_COOLDOWN_MS, 3000);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_MAX_RECORDS, 0);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_PURGE_DAYS, 0);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_MODE_LABELS + ".1", "Solo");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_MODE_LABELS + ".2", "Duo");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_MODE_LABELS + ".3", "Trio");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_MODE_LABELS + ".4", "Squad");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_MODE_LABELS + ".default", "%bw_team_size%v%bw_team_size%");
+
+        /* match history events settings */
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_EVENTS_ENABLED, true);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_EVENTS_MAX_PER_MATCH, 0);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_EVENTS_LOG_RESOURCE_DROPS, false);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_EVENTS_LOG_RESOURCE_COLLECT, true);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_EVENTS_LOG_BUILD_EVENTS, true);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_EVENTS_LOG_PROGRESSION_EVENTS, true);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_EVENTS_LOG_STAT_EVENTS, true);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_MATCH_HISTORY_EVENTS_LOG_SHOP_OPEN, true);
+
+        /* default history GUI settings */
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_GUI_SIZE, 54);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_GUI_SLOTS, "10,11,12,13,14,15,16,19,20,21,22,23,24,25,28,29,30,31,32,33,34,37,38,39,40,41,42,43");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_ENTRY_MATERIAL, "PAPER");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_ENTRY_DATA, 0);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_ENTRY_ENCHANTED, false);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_NAV_PREV_MATERIAL, "ARROW");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_NAV_PREV_DATA, 0);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_NAV_PREV_SLOT, 45);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_NAV_PREV_ENCHANTED, false);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_NAV_NEXT_MATERIAL, "ARROW");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_NAV_NEXT_DATA, 0);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_NAV_NEXT_SLOT, 53);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_NAV_NEXT_ENCHANTED, false);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_NAV_PAGE_MATERIAL, "BOOK");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_NAV_PAGE_DATA, 0);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_NAV_PAGE_SLOT, 49);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_NAV_PAGE_ENCHANTED, false);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EMPTY_MATERIAL, "BARRIER");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EMPTY_DATA, 0);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EMPTY_SLOT, 22);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EMPTY_ENCHANTED, false);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_FILLER_ENABLED, true);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_FILLER_MATERIAL, BedWars.getForCurrentVersion("STAINED_GLASS_PANE", "STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE"));
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_FILLER_DATA, 15);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_FILLER_ENCHANTED, false);
+
+        /* default history events GUI settings */
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_GUI_SIZE, 54);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_GUI_SLOTS, "10,11,12,13,14,15,16,19,20,21,22,23,24,25,28,29,30,31,32,33,34,37,38,39,40,41,42,43");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_ENTRY_MATERIAL, "PAPER");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_ENTRY_DATA, 0);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_ENTRY_ENCHANTED, false);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_PREV_MATERIAL, "ARROW");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_PREV_DATA, 0);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_PREV_SLOT, 45);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_PREV_ENCHANTED, false);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_NEXT_MATERIAL, "ARROW");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_NEXT_DATA, 0);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_NEXT_SLOT, 53);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_NEXT_ENCHANTED, false);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_PAGE_MATERIAL, "BOOK");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_PAGE_DATA, 0);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_PAGE_SLOT, 49);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_PAGE_ENCHANTED, false);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_BACK_MATERIAL, "ARROW");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_BACK_DATA, 0);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_BACK_SLOT, 47);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_NAV_BACK_ENCHANTED, false);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_EMPTY_MATERIAL, "BARRIER");
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_EMPTY_DATA, 0);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_EMPTY_SLOT, 22);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_EMPTY_ENCHANTED, false);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_FILLER_ENABLED, true);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_FILLER_MATERIAL, BedWars.getForCurrentVersion("STAINED_GLASS_PANE", "STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE"));
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_FILLER_DATA, 15);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_FILLER_ENCHANTED, false);
 
         /* default stats GUI items */
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_GUI_SIZE, 27);

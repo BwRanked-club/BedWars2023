@@ -38,22 +38,76 @@ public class DisableArena extends SubCommand {
             s.sendMessage("§c▪ §7Usage: §o/" + getParent().getName() + " " + getSubCommandName() + " <mapName>");
             return true;
         }
-        if (!BedWars.getAPI().getRestoreAdapter().isWorld(args[0])) {
-            s.sendMessage("§c▪ §7" + args[0] + " is a world and not an arena!");
-            return true;
+
+        String rawName = args[0];
+        IArena byIdentifier = Arena.getArenaByIdentifier(rawName);
+        String template = byIdentifier != null ? byIdentifier.getArenaName() : rawName;
+        if (byIdentifier == null && rawName.startsWith("bw_temp_")) {
+            String derived = rawName.replaceAll("bw_temp_\\w+_", "");
+            if (!derived.equals(rawName)) {
+                template = derived;
+            }
         }
-        IArena a = Arena.getArenaByName(args[0]);
-        if (a == null) {
+
+        boolean rawIsWorld = BedWars.getAPI().getRestoreAdapter().isWorld(rawName);
+        boolean templateIsWorld = BedWars.getAPI().getRestoreAdapter().isWorld(template);
+
+        List<IArena> toDisable = new ArrayList<>();
+        for (IArena arena : Arena.getArenas()) {
+            if (matchesTemplate(arena, template, rawName)) {
+                toDisable.add(arena);
+            }
+        }
+
+        List<IArena> toDequeue = new ArrayList<>();
+        for (IArena arena : Arena.getEnableQueue()) {
+            if (matchesTemplate(arena, template, rawName)) {
+                toDequeue.add(arena);
+            }
+        }
+
+        if (toDisable.isEmpty() && toDequeue.isEmpty()) {
+            if (!rawIsWorld && !templateIsWorld) {
+                s.sendMessage("§c▪ §7" + rawName + " is a world and not an arena!");
+                return true;
+            }
             s.sendMessage("§c▪ §7This has already been disabled or doesnt exist!");
             return true;
         }
-        if (a.getStatus() == GameState.playing) {
-            s.sendMessage("§6 ▪ §7There is a game running on this Arena, please disable after the game!");
-            return true;
+
+        for (IArena arena : toDisable) {
+            if (arena.getStatus() == GameState.playing) {
+                s.sendMessage("§6 ▪ §7There is a game running on this Arena, please disable after the game!");
+                return true;
+            }
         }
+
         s.sendMessage("§6 ▪ §7Disabling arena...");
-        a.disable();
+        for (IArena arena : toDisable) {
+            arena.disable();
+        }
+        for (IArena arena : toDequeue) {
+            Arena.removeFromEnableQueue(arena);
+        }
         return true;
+    }
+
+    private boolean matchesTemplate(IArena arena, String template, String rawName) {
+        if (arena == null) return false;
+        String arenaName = arena.getArenaName();
+        String worldName = arena.getWorldName();
+
+        if (arenaName.equalsIgnoreCase(template) || arenaName.equalsIgnoreCase(rawName)) return true;
+        if (worldName != null && worldName.equalsIgnoreCase(rawName)) return true;
+
+        String templateLower = template.toLowerCase();
+        String arenaLower = arenaName.toLowerCase();
+        if (arenaLower.startsWith("bw_temp_") && arenaLower.endsWith(templateLower)) return true;
+        if (worldName != null) {
+            String worldLower = worldName.toLowerCase();
+            return worldLower.startsWith("bw_temp_") && worldLower.endsWith(templateLower);
+        }
+        return false;
     }
 
     @Override

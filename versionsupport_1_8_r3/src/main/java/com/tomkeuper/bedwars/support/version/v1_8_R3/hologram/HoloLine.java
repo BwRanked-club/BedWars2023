@@ -8,11 +8,16 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 public class HoloLine implements IHoloLine {
     private String text;
     private IHologram hologram;
     public final EntityArmorStand entity;
     private boolean destroyed = false;
+    private final Set<UUID> revealedTo = new HashSet<>();
 
     public HoloLine(String text, IHologram hologram) {
         this.text = text;
@@ -34,6 +39,7 @@ public class HoloLine implements IHoloLine {
             pc.sendPacket(packet);
             pc.sendPacket(metadataPacket);
             pc.sendPacket(teleportPacket);
+            revealedTo.add(player.getUniqueId());
         }
     }
 
@@ -80,6 +86,11 @@ public class HoloLine implements IHoloLine {
 
         for (Player player : hologram.getPlayers()) {
             PlayerConnection pc = ((CraftPlayer) player).getHandle().playerConnection;
+            if (!revealedTo.contains(player.getUniqueId())) {
+                PacketPlayOutSpawnEntityLiving spawn = new PacketPlayOutSpawnEntityLiving(entity);
+                pc.sendPacket(spawn);
+                revealedTo.add(player.getUniqueId());
+            }
             pc.sendPacket(packet);
             pc.sendPacket(metadataPacket);
         }
@@ -97,6 +108,11 @@ public class HoloLine implements IHoloLine {
         PacketPlayOutEntityMetadata metadataPacket = new PacketPlayOutEntityMetadata(entity.getId(), entity.getDataWatcher(), true);
 
         PlayerConnection pc = ((CraftPlayer) player).getHandle().playerConnection;
+        if (!revealedTo.contains(player.getUniqueId())) {
+            PacketPlayOutSpawnEntityLiving spawn = new PacketPlayOutSpawnEntityLiving(entity);
+            pc.sendPacket(spawn);
+            revealedTo.add(player.getUniqueId());
+        }
         pc.sendPacket(packet);
         pc.sendPacket(metadataPacket);
     }
@@ -104,10 +120,12 @@ public class HoloLine implements IHoloLine {
     @Override
     public void reveal() {
         destroyed = false;
-        PacketPlayOutSpawnEntityLiving packet = new PacketPlayOutSpawnEntityLiving(entity);
         for (Player player : hologram.getPlayers()) {
+            if (revealedTo.contains(player.getUniqueId())) continue;
+            PacketPlayOutSpawnEntityLiving packet = new PacketPlayOutSpawnEntityLiving(entity);
             PlayerConnection pc = ((CraftPlayer) player).getHandle().playerConnection;
             pc.sendPacket(packet);
+            revealedTo.add(player.getUniqueId());
         }
 
         if (!hologram.getLines().contains(this)) hologram.addLine(this);
@@ -117,9 +135,12 @@ public class HoloLine implements IHoloLine {
     @Override
     public void reveal(Player player) {
         destroyed = false;
-        PacketPlayOutSpawnEntityLiving packet = new PacketPlayOutSpawnEntityLiving(entity);
         PlayerConnection pc = ((CraftPlayer) player).getHandle().playerConnection;
-        pc.sendPacket(packet);
+        if (!revealedTo.contains(player.getUniqueId())) {
+            PacketPlayOutSpawnEntityLiving packet = new PacketPlayOutSpawnEntityLiving(entity);
+            pc.sendPacket(packet);
+            revealedTo.add(player.getUniqueId());
+        }
 
         if (!hologram.getLines().contains(this)) hologram.addLine(this);
         hologram.update(player);
@@ -132,6 +153,7 @@ public class HoloLine implements IHoloLine {
             PlayerConnection pc = ((CraftPlayer) player).getHandle().playerConnection;
             pc.sendPacket(packet);
         }
+        revealedTo.clear();
     }
 
     @Override
@@ -139,6 +161,7 @@ public class HoloLine implements IHoloLine {
         PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(entity.getId());
         PlayerConnection pc = ((CraftPlayer) player).getHandle().playerConnection;
         pc.sendPacket(packet);
+        revealedTo.remove(player.getUniqueId());
     }
 
     @Override

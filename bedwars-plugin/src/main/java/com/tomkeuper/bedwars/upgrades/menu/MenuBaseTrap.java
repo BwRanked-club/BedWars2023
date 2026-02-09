@@ -11,6 +11,7 @@ import com.tomkeuper.bedwars.api.upgrades.MenuContent;
 import com.tomkeuper.bedwars.api.upgrades.TeamUpgrade;
 import com.tomkeuper.bedwars.api.upgrades.TrapAction;
 import com.tomkeuper.bedwars.arena.Arena;
+import com.tomkeuper.bedwars.arena.Misc;
 import com.tomkeuper.bedwars.configuration.Sounds;
 import com.tomkeuper.bedwars.upgrades.trapaction.DisenchantAction;
 import com.tomkeuper.bedwars.upgrades.trapaction.PlayerEffectAction;
@@ -282,7 +283,7 @@ public class MenuBaseTrap implements MenuContent, EnemyBaseEnterTrap, TeamUpgrad
 
         if (announcePurchase) {
             for (Player p1 : team.getMembers()) {
-                p1.sendMessage(Language.getMsg(p1, Messages.UPGRADES_UPGRADE_BOUGHT_CHAT).replace("%bw_playername%", player.getName()).replace("%bw_player%", player.getDisplayName()).replace("%bw_upgrade_name%",
+                p1.sendMessage(Language.getMsg(p1, Messages.UPGRADES_UPGRADE_BOUGHT_CHAT).replace("%bw_playername%", player.getName()).replace("%bw_player%", Misc.getPlayerName(player)).replace("%bw_upgrade_name%",
                         ChatColor.stripColor(Language.getMsg(p1, Messages.UPGRADES_BASE_TRAP_ITEM_NAME_PATH + getName().replace("base-trap-", "")).replace("%bw_color%", ""))));
             }
         }
@@ -339,10 +340,10 @@ public class MenuBaseTrap implements MenuContent, EnemyBaseEnterTrap, TeamUpgrad
                 String trapName = ChatColor.stripColor(Language.getMsg(p, getNameMsgPath())).replace("%bw_color%", "");
                 String enemy = trapTeam.getArena().getTeam(player) == null ? "NULL" : trapTeam.getArena().getTeam(player).getDisplayName(Language.getPlayerLanguage(p));
                 p.sendMessage(Language.getMsg(p, Messages.UPGRADES_TRAP_CUSTOM_MSG + name2).replace("%bw_trap%", trapName)
-                        .replace("%bw_playername%", player.getName()).replace("%bw_player%", player.getDisplayName()).replace("%bw_team%", enemy).replace("%bw_color%", color));
+                        .replace("%bw_playername%", player.getName()).replace("%bw_player%", Misc.getPlayerName(player)).replace("%bw_team%", enemy).replace("%bw_color%", color));
                 BedWars.nms.sendTitle(p, Language.getMsg(p, Messages.UPGRADES_TRAP_CUSTOM_TITLE + name2)
                                 .replace("%bw_trap%", trapName).replace("%bw_playername%", player.getName()).replace("%bw_team%", enemy).replace("%bw_color%", color),
-                        Language.getMsg(p, Messages.UPGRADES_TRAP_CUSTOM_SUBTITLE + name2).replace("%bw_trap%", trapName).replace("%bw_playername%", player.getName()).replace("%bw_player%", player.getDisplayName())
+                        Language.getMsg(p, Messages.UPGRADES_TRAP_CUSTOM_SUBTITLE + name2).replace("%bw_trap%", trapName).replace("%bw_playername%", player.getName()).replace("%bw_player%", Misc.getPlayerName(player))
                                 .replace("%bw_team%", enemy).replace("%bw_color%", color), 15, 35, 10);
             }
         } else {

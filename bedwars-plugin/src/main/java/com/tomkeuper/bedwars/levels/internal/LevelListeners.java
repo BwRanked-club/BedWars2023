@@ -41,10 +41,10 @@ public class LevelListeners implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerQuit(PlayerQuitEvent e) {
         final UUID u = e.getPlayer().getUniqueId();
-        Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, () -> {
-            PlayerLevel pl = PlayerLevel.getLevelByPlayer(u);
+        PlayerLevel pl = PlayerLevel.getCachedLevelByPlayer(u);
+        if (pl != null) {
             pl.destroy();
-        });
+        }
     }
 
     @EventHandler
@@ -93,10 +93,8 @@ public class LevelListeners implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onArenaLeave(PlayerLeaveArenaEvent e) {
         final UUID u = e.getPlayer().getUniqueId();
-        Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, () -> {
-            PlayerLevel pl = PlayerLevel.getLevelByPlayer(u);
-            if (pl != null) pl.updateDatabase();
-        });
+        PlayerLevel pl = PlayerLevel.getCachedLevelByPlayer(u);
+        if (pl != null) pl.updateDatabase();
     }
 
     @EventHandler

@@ -34,7 +34,7 @@ public class Portuguese extends Language {
         yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_FOOTER_RESTARTING, "&c%bw_server_ip%");
         yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_FOOTER_SPECTATOR, "&9%bw_server_ip%");
 
-        yml.addDefault(Messages.COMMAND_MAIN, Arrays.asList("", "&2▪ &7/" + BedWars.mainCmd + " stats", "&2▪ &7/" + BedWars.mainCmd + " join &o<arena/grupo>", "&2▪ &7/" + BedWars.mainCmd + " leave", "&2▪ &7/" + BedWars.mainCmd + " lang", "&2▪ &7/" + BedWars.mainCmd + " gui", "&2▪ &7/" + BedWars.mainCmd + " start &3(vip)"));
+        yml.addDefault(Messages.COMMAND_MAIN, Arrays.asList("", "&2▪ &7/" + BedWars.mainCmd + " stats", "&2▪ &7/" + BedWars.mainCmd + " historico", "&2▪ &7/" + BedWars.mainCmd + " join &o<arena/grupo>", "&2▪ &7/" + BedWars.mainCmd + " leave", "&2▪ &7/" + BedWars.mainCmd + " lang", "&2▪ &7/" + BedWars.mainCmd + " gui", "&2▪ &7/" + BedWars.mainCmd + " start &3(vip)"));
         yml.addDefault(Messages.COMMAND_LANG_LIST_HEADER, "%bw_lang_prefix% &2Idiomas disponíveis:");
         yml.addDefault(Messages.COMMAND_LANG_LIST_FORMAT, "&a▪  &7%bw_lang_iso% - &f%bw_name%");
         yml.addDefault(Messages.COMMAND_LANG_USAGE, "%bw_lang_prefix%&7Use: /lang &f&o<linguagem>");
@@ -203,6 +203,10 @@ public class Portuguese extends Language {
         yml.addDefault(Messages.FORMATTING_GENERATOR_TIER2, "II");
         yml.addDefault(Messages.FORMATTING_GENERATOR_TIER3, "III");
         yml.addDefault(Messages.FORMATTING_DESPAWNABLE_UTILITY_NPC_HEALTH, "▮ ");
+        yml.addDefault(Messages.FORMATTING_DESPAWNABLE_UTILITY_NPC_TIME_BAR_PREFIX, "&8[");
+        yml.addDefault(Messages.FORMATTING_DESPAWNABLE_UTILITY_NPC_TIME_BAR_SUFFIX, "&8]");
+        yml.addDefault(Messages.FORMATTING_DESPAWNABLE_UTILITY_NPC_TIME_BAR_FILLED, "|");
+        yml.addDefault(Messages.FORMATTING_DESPAWNABLE_UTILITY_NPC_TIME_BAR_EMPTY, "&7|");
         yml.addDefault(Messages.FORMATTING_STATS_DATE_FORMAT, "dd/MM/yyyy HH:mm");
         yml.addDefault(Messages.FORMAT_PAPI_PLAYER_TEAM_TEAM, "%bw_team_color%[%bw_team_name%]");
         yml.addDefault(Messages.FORMAT_PAPI_PLAYER_TEAM_SHOUT, "&6[GLOBAL]");
@@ -333,8 +337,16 @@ public class Portuguese extends Language {
         yml.addDefault(Messages.MONEY_REWARD_REGULAR_KILL, "%bw_lang_prefix%&6+%bw_money% Moedas (Regular Kill).");
 
         yml.addDefault(Messages.HALLOWEEN_ITEM_NAME, "&6&lFeliz Halloween");
+        yml.addDefault(Messages.FORMATTING_HISTORY_DATE_FORMAT, "dd/MM HH:mm");
+        yml.addDefault(Messages.HISTORY_RESULT_WIN, "&aVenceu");
+        yml.addDefault(Messages.HISTORY_RESULT_LOSE, "&cPerdeu");
+        yml.addDefault(Messages.PLAYER_HISTORY_NO_DATA, "%bw_lang_prefix%&cNao ha historico ainda.");
+        yml.addDefault(Messages.PLAYER_HISTORY_PLAYER_NOT_FOUND, "%bw_lang_prefix%&cJogador nao encontrado.");
+        yml.addDefault(Messages.PLAYER_HISTORY_VIEW_OTHER_DENIED, "%bw_lang_prefix%&cVoce nao tem permissao para ver outros jogadores.");
 
         /* Lobby Command Items */
+        yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_NAME.replace("%path%", "history"), "&eHistorico de Partidas");
+        yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_LORE.replace("%path%", "history"), Collections.singletonList("&fBotao direito para ver o historico!"));
         yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_NAME.replace("%path%", "stats"), "&eEstatísticas");
         yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_LORE.replace("%path%", "stats"), Collections.singletonList("&fBotão direito para ver estatísticas! "));
         yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_NAME.replace("%path%", "arena-selector"), "&eSeletor de Arena");
@@ -364,6 +376,123 @@ public class Portuguese extends Language {
         addDefaultStatsMsg(yml, "last-play", "&6Última Partida", "&f%bw_play_last%");
         addDefaultStatsMsg(yml, "games-played", "&6Partidas", "&f%bw_games_played%");
 
+        /* history gui */
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_INV_NAME, "&8Historico: %bw_target%");
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_ENTRY_NAME, "&ePartida #%bw_history_index%");
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_ENTRY_LORE, Arrays.asList(
+                "&7Mapa: &f%bw_history_map%",
+                "&7Modo: &f%bw_history_mode%",
+                "&7Colocacao: &f%bw_history_placement%",
+                "&7Resultado: %bw_history_result%",
+                "&7Kills: &f%bw_history_kills%",
+                "&7Final Kills: &f%bw_history_final_kills%",
+                "&7Total Kills: &f%bw_history_total_kills%",
+                "&7Mortes: &f%bw_history_deaths%",
+                "&7Mortes Finais: &f%bw_history_final_deaths%",
+                "&7Camas: &f%bw_history_beds_destroyed%",
+                "&7Duracao: &f%bw_history_duration%",
+                "&7Data: &f%bw_history_datetime%",
+                "",
+                "&aClique para ver eventos."
+        ));
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_EMPTY_NAME, "&cSem partidas");
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_EMPTY_LORE, Collections.singletonList("&7Jogue uma partida para ver aqui."));
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_NEXT_NAME, "&aProxima pagina");
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_NEXT_LORE, Collections.singletonList("&7Pagina %bw_history_page%/%bw_history_pages%"));
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_PREV_NAME, "&cPagina anterior");
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_PREV_LORE, Collections.singletonList("&7Pagina %bw_history_page%/%bw_history_pages%"));
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_PAGE_NAME, "&ePagina %bw_history_page%/%bw_history_pages%");
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_PAGE_LORE, Collections.singletonList("&7Total de partidas: &f%bw_history_total%"));
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_FILLER_NAME, " ");
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_FILLER_LORE, Collections.emptyList());
+
+        /* history events gui */
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_NO_DATA, "%bw_lang_prefix%&cNenhum evento encontrado.");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_NO_PERMISSION, "%bw_lang_prefix%&cVoce nao tem permissao para ver os eventos avancados da partida.");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_INV_NAME, "&8Eventos da Partida");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_EMPTY_NAME, "&cSem eventos");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_EMPTY_LORE, Collections.singletonList("&7Nenhum evento registrado."));
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_NEXT_NAME, "&aProxima pagina");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_NEXT_LORE, Collections.singletonList("&7Pagina %bw_history_page%/%bw_history_pages%"));
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_PREV_NAME, "&cPagina anterior");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_PREV_LORE, Collections.singletonList("&7Pagina %bw_history_page%/%bw_history_pages%"));
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_PAGE_NAME, "&ePagina %bw_history_page%/%bw_history_pages%");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_PAGE_LORE, Collections.singletonList("&7Total de eventos: &f%bw_history_total%"));
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_BACK_NAME, "&aVoltar");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_BACK_LORE, Collections.singletonList("&7Voltar para a lista."));
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_FILLER_NAME, " ");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_FILLER_LORE, Collections.emptyList());
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_DEFAULT_NAME, "&eEvento #%bw_history_event_index%");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_DEFAULT_LORE, Arrays.asList(
+                "&7Tipo: &f%bw_event_type%",
+                "&7Hora: &f%bw_event_time%",
+                "&7Ator: &f%bw_event_actor%",
+                "&7Alvo: &f%bw_event_target%",
+                "&7Time: %bw_event_team_color%%bw_event_team%",
+                "&7Meta: &f%bw_event_meta%"
+        ));
+
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_NAME.replace("%type%", "player-kill"), "&cAbate");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_LORE.replace("%type%", "player-kill"), Arrays.asList(
+                "&7Hora: &f%bw_event_time%",
+                "&7Killer: &f%bw_event_actor%",
+                "&7Vitima: &f%bw_event_target%",
+                "&7Causa: &f%bw_event_meta_cause%",
+                "&7Final: &f%bw_event_meta_final_kill%"
+        ));
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_NAME.replace("%type%", "bed-break"), "&cCama destruida");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_LORE.replace("%type%", "bed-break"), Arrays.asList(
+                "&7Hora: &f%bw_event_time%",
+                "&7Jogador: &f%bw_event_actor%",
+                "&7Time alvo: &f%bw_event_meta_victim_team%"
+        ));
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_NAME.replace("%type%", "shop-buy"), "&aCompra");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_LORE.replace("%type%", "shop-buy"), Arrays.asList(
+                "&7Hora: &f%bw_event_time%",
+                "&7Jogador: &f%bw_event_actor%",
+                "&7Item: &f%bw_event_meta_item%",
+                "&7Categoria: &f%bw_event_meta_category%"
+        ));
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_NAME.replace("%type%", "upgrade-buy"), "&bUpgrade");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_LORE.replace("%type%", "upgrade-buy"), Arrays.asList(
+                "&7Hora: &f%bw_event_time%",
+                "&7Jogador: &f%bw_event_actor%",
+                "&7Upgrade: &f%bw_event_meta_upgrade%"
+        ));
+
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "game-start"), "Inicio");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "game-end"), "Fim");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "player-join"), "Entrada");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "player-leave"), "Saida");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "player-rejoin"), "Reconectar");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "player-respawn"), "Respawn");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "player-first-spawn"), "Primeiro Spawn");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "player-kill"), "Abate");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "bed-break"), "Cama destruida");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "team-eliminated"), "Time eliminado");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "team-assign"), "Time definido");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "upgrade-buy"), "Upgrade");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "shop-buy"), "Compra");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "shop-open"), "Abrir loja");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "generator-upgrade"), "Upgrade gerador");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "next-event"), "Proximo evento");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "dream-defender"), "Golem");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "bed-bug"), "Inseto");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "invisibility"), "Invisibilidade");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "egg-bridge-throw"), "Egg Bridge");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "egg-bridge-build"), "Egg Bridge build");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "popup-tower-place"), "Torre");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "popup-tower-build"), "Torre build");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "item-deposit"), "Deposito");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "base-enter"), "Base entrar");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "base-leave"), "Base sair");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "resource-collect"), "Coleta");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "resource-drop"), "Drop");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "stat-change"), "Status");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "xp-gain"), "XP");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "money-gain"), "Moedas");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "level-up"), "Level");
+
         yml.addDefault(Messages.SCOREBOARD_DEFAULT_WAITING, Arrays.asList("&f&lBED WARS", "&7%bw_date% &8%bw_server_id%", "", "&fMapa: &a%bw_map%", "", "&fJogadores: &a%bw_on%/%bw_max%", "", "&fEsperando...", "", "§fModo: &a%bw_group%", "&fVersão: &7%bw_version%", "", "&e%bw_server_ip%"));
         yml.addDefault(Messages.SCOREBOARD_DEFAULT_STARTING, Arrays.asList("&f&lBED WARS", "&7%bw_date% &8%bw_server_id%", "", "&fMapa: &a%bw_map%", "", "&fJogadores: &a%bw_on%/%bw_max%", "", "&fInicio em &a%bw_time%s", "", "§fModo: &a%bw_group%", "&fVersão: &7%bw_version%", "", "&e%bw_server_ip%"));
         yml.addDefault(Messages.SCOREBOARD_DEFAULT_PLAYING, Arrays.asList("&e&lBED WARS", "&7%bw_date%", "", "&f%bw_next_event% em &a%bw_time%", "",
@@ -387,7 +516,7 @@ public class Portuguese extends Language {
         yml.addDefault(Messages.SHOP_NEW_PURCHASE, "%bw_lang_prefix%&aVocê comprou &6%bw_item%");
         yml.addDefault(Messages.SHOP_ALREADY_BOUGHT, "%bw_lang_prefix%&cVocê já comprou isso!");
         yml.addDefault(Messages.SHOP_ALREADY_HIGHER_TIER, "%bw_lang_prefix%&cYou already have a higher tier item.");
-        yml.addDefault(Messages.SHOP_UTILITY_NPC_SILVERFISH_NAME, "%bw_team_color%&l%bw_team_name% &r%bw_team_color%Traça");
+        yml.addDefault(Messages.SHOP_UTILITY_NPC_SILVERFISH_NAME, "%bw_time_bar%");
         yml.addDefault(Messages.SHOP_UTILITY_NPC_IRON_GOLEM_NAME, "%bw_team_color%%bw_despawn_time%s &8[ %bw_team_color%%bw_health%&8]");
         yml.addDefault(Messages.SHOP_SEPARATOR_NAME, "&8⇧ Categorias");
         yml.addDefault(Messages.SHOP_SEPARATOR_LORE, Collections.singletonList("&8⇩ Itens"));

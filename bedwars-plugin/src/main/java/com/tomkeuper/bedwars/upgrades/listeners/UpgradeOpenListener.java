@@ -8,7 +8,9 @@ import com.tomkeuper.bedwars.arena.Arena;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.entity.Player;
 
 public class UpgradeOpenListener implements Listener {
 
@@ -25,6 +27,25 @@ public class UpgradeOpenListener implements Listener {
                 if (a.isPlayer(e.getPlayer())) {
                     BedWars.getUpgradeManager().getMenuForArena(a).open(e.getPlayer());
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onUpgradesOpenLeftClick(EntityDamageByEntityEvent e) {
+        if (!(e.getDamager() instanceof Player player)) return;
+        IArena a = Arena.getArenaByPlayer(player);
+        if (a == null) return;
+        if (!a.getStatus().equals(GameState.playing)) return;
+        Location l = e.getEntity().getLocation();
+        for (ITeam t : a.getTeams()) {
+            Location l2 = t.getTeamUpgrades();
+            if (l.getBlockX() == l2.getBlockX() && l.getBlockY() == l2.getBlockY() && l.getBlockZ() == l2.getBlockZ()) {
+                e.setCancelled(true);
+                if (a.isPlayer(player)) {
+                    BedWars.getUpgradeManager().getMenuForArena(a).open(player);
+                }
+                return;
             }
         }
     }

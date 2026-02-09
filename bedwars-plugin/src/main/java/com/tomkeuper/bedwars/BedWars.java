@@ -57,6 +57,7 @@ import com.tomkeuper.bedwars.commands.leave.LeaveCommand;
 import com.tomkeuper.bedwars.commands.party.PartyCommand;
 import com.tomkeuper.bedwars.commands.rejoin.RejoinCommand;
 import com.tomkeuper.bedwars.commands.shout.ShoutCommand;
+import com.tomkeuper.bedwars.commands.history.HistoryCommand;
 import com.tomkeuper.bedwars.configuration.*;
 import com.tomkeuper.bedwars.connectionmanager.redis.RedisConnection;
 import com.tomkeuper.bedwars.database.H2;
@@ -67,14 +68,18 @@ import com.tomkeuper.bedwars.handlers.items.LobbyItem;
 import com.tomkeuper.bedwars.handlers.items.PreGameItem;
 import com.tomkeuper.bedwars.handlers.items.SpectatorItem;
 import com.tomkeuper.bedwars.handlers.main.CommandItemHandler;
+import com.tomkeuper.bedwars.handlers.main.HistoryItemHandler;
 import com.tomkeuper.bedwars.handlers.main.LeaveItemHandler;
 import com.tomkeuper.bedwars.handlers.main.StatsItemHandler;
+import com.tomkeuper.bedwars.history.MatchHistoryEventListener;
+import com.tomkeuper.bedwars.history.MatchHistoryListener;
 import com.tomkeuper.bedwars.hologram.HologramManager;
 import com.tomkeuper.bedwars.language.English;
 import com.tomkeuper.bedwars.language.LangListener;
 import com.tomkeuper.bedwars.language.Portuguese;
 import com.tomkeuper.bedwars.levels.internal.InternalLevel;
 import com.tomkeuper.bedwars.levels.internal.LevelListeners;
+import com.tomkeuper.bedwars.levels.internal.PlayerLevel;
 import com.tomkeuper.bedwars.listeners.*;
 import com.tomkeuper.bedwars.listeners.arenaselector.ArenaSelectorListener;
 import com.tomkeuper.bedwars.listeners.blockstatus.BlockStatusListener;
@@ -388,7 +393,9 @@ public class BedWars extends JavaPlugin {
                 new LangListener(),
                 new Warnings(this),
                 new ChatAFK(),
-                new GameEndListener()
+                new GameEndListener(),
+                new MatchHistoryListener(),
+                new MatchHistoryEventListener()
         );
 
         if (config.getBoolean(ConfigPath.GENERAL_CONFIGURATION_HEAL_POOL_ENABLE))
@@ -432,7 +439,8 @@ public class BedWars extends JavaPlugin {
         if (config.getBoolean(ConfigPath.GENERAL_CONFIGURATION_PERFORMANCE_ROTATE_GEN))
             Bukkit.getScheduler().runTaskTimer(this, new OneTick(), 120, 1);
 
-        Bukkit.getScheduler().runTaskLater(this, new HologramTask(), config.getInt(ConfigPath.GENERAL_CONFIGURATION_PERFORMANCE_HOLOGRAM_UPDATE_RATE));
+        int hologramRate = Math.max(1, config.getInt(ConfigPath.GENERAL_CONFIGURATION_PERFORMANCE_HOLOGRAM_UPDATE_RATE));
+        Bukkit.getScheduler().runTaskTimer(this, new HologramTask(), hologramRate, hologramRate);
 
         nms.registerEntities();
         if (config.getString(ConfigPath.GENERAL_CONFIGURATION_DATABASE_TYPE).equalsIgnoreCase("mysql")) {
@@ -513,7 +521,7 @@ public class BedWars extends JavaPlugin {
 
         ShopDataMigrator.runIfNeeded();
 
-        registerItemHandlers(new StatsItemHandler("stats", this, api), new CommandItemHandler("command", this, api), new LeaveItemHandler("leave", this, api));
+        registerItemHandlers(new StatsItemHandler("stats", this, api), new HistoryItemHandler("history", this, api), new CommandItemHandler("command", this, api), new LeaveItemHandler("leave", this, api));
         shopCache = new ShopCache();
         playerQuickBuyCache = new PlayerQuickBuyCache();
         for (Language l : Language.getLanguages()) {
@@ -640,6 +648,8 @@ public class BedWars extends JavaPlugin {
                 }
             }
         }
+
+        PlayerLevel.saveAll();
     }
 
     public BukkitAudiences adventure() {
@@ -914,6 +924,7 @@ public class BedWars extends JavaPlugin {
         nms.registerCommand("reconectar", new RejoinCommand("reconectar"));
         nms.registerCommand("l", new LeaveCommand("l"));
         nms.registerCommand("party", new PartyCommand("party"));
+        nms.registerCommand("historico", new HistoryCommand("historico"));
     }
 
     @FunctionalInterface

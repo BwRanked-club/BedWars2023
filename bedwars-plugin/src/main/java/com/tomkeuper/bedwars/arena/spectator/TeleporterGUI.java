@@ -7,6 +7,7 @@ import com.tomkeuper.bedwars.api.configuration.ConfigPath;
 import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.arena.Arena;
+import com.tomkeuper.bedwars.arena.Misc;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -117,7 +118,7 @@ public class TeleporterGUI {
         im.setDisplayName(getMsg(targetPlayer, Messages.ARENA_SPECTATOR_TELEPORTER_GUI_HEAD_NAME)
                 .replace("%bw_v_prefix%", BedWars.getChatSupport().getPrefix(targetPlayer))
                 .replace("%bw_v_suffix%", BedWars.getChatSupport().getSuffix(targetPlayer))
-                .replace("%bw_player%", targetPlayer.getDisplayName())
+                .replace("%bw_player%", Misc.getPlayerName(targetPlayer))
                 .replace("%bw_team_color%", String.valueOf(targetPlayerTeam.getColor().chat()))
                 .replace("%bw_team%", targetPlayerTeam.getDisplayName(Language.getPlayerLanguage(GUIholder)))
                 .replace("%bw_playername%", targetPlayer.getName()));

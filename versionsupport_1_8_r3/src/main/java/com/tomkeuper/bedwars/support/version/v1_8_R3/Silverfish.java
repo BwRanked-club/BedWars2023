@@ -1,16 +1,15 @@
 package com.tomkeuper.bedwars.support.version.v1_8_R3;
 
 import com.tomkeuper.bedwars.api.arena.team.ITeam;
-import com.tomkeuper.bedwars.api.language.Language;
-import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.support.version.common.VersionCommon;
 import net.minecraft.server.v1_8_R3.*;
-import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_8_R3.util.UnsafeList;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.lang.reflect.Field;
@@ -67,13 +66,31 @@ public class Silverfish extends EntitySilverfish {
         customEnt.getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(speed);
         customEnt.getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(damage);
         ((CraftLivingEntity)customEnt.getBukkitEntity()).setRemoveWhenFarAway(false);
-        customEnt.setCustomName(Language.getDefaultLanguage().m(Messages.SHOP_UTILITY_NPC_SILVERFISH_NAME)
-                .replace("%bw_despawn_time%", String.valueOf(despawn)
-                .replace("%bw_health%", StringUtils.repeat(Language.getDefaultLanguage().m(Messages.FORMATTING_DESPAWNABLE_UTILITY_NPC_HEALTH) + " ", 10))
-                .replace("%bw_team_color%", team.getColor().chat().toString())));
         customEnt.setCustomNameVisible(true);
         mcWorld.addEntity(customEnt, CreatureSpawnEvent.SpawnReason.CUSTOM);
+
+        Player initialTarget = findInitialTarget(loc, team);
+        if (initialTarget != null && customEnt.getBukkitEntity() instanceof Creature creature) {
+            creature.setTarget(initialTarget);
+        }
         return (LivingEntity) customEnt.getBukkitEntity();
+    }
+
+    private static Player findInitialTarget(Location loc, ITeam team) {
+        if (loc == null || team == null || team.getArena() == null || loc.getWorld() == null) return null;
+        Player closest = null;
+        double best = Double.MAX_VALUE;
+        for (Player player : loc.getWorld().getPlayers()) {
+            if (player == null || !player.isOnline()) continue;
+            if (team.wasMember(player.getUniqueId())) continue;
+            if (team.getArena().isReSpawning(player.getUniqueId()) || team.getArena().isSpectator(player)) continue;
+            double dist = player.getLocation().distanceSquared(loc);
+            if (dist < best) {
+                best = dist;
+                closest = player;
+            }
+        }
+        return closest;
     }
 
     @Override

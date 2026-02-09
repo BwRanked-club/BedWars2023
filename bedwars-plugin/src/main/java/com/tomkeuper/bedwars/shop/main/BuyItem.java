@@ -147,11 +147,19 @@ public class BuyItem implements IBuyItem {
         if (yml.get(path + ".auto-equip") != null) {
             autoEquip = yml.getBoolean(path + ".auto-equip");
         }
-        // Resolve content root from the current buy-item path (e.g., ...category-content.<name>.tiers.<tier>.buy-items.<item>)
+        // Resolve content root from the current buy-item path
+        // Example: ...category-content.<name>.content-tiers.<tier>.buy-items.<item>
         String contentRoot = path;
-        int idx = contentRoot.indexOf(".tiers.");
+        String tiersMarker = "." + ConfigPath.SHOP_CATEGORY_CONTENT_CONTENT_TIERS + ".";
+        int idx = contentRoot.indexOf(tiersMarker);
         if (idx > 0) {
             contentRoot = contentRoot.substring(0, idx);
+        } else {
+            // Backward compatibility for legacy paths using ".tiers."
+            int legacyIdx = contentRoot.indexOf(".tiers.");
+            if (legacyIdx > 0) {
+                contentRoot = contentRoot.substring(0, legacyIdx);
+            }
         }
         // Preferred: read flags relative to content root, with legacy fallback using the identifier path
         if (yml.get(contentRoot + "." + ConfigPath.SHOP_CATEGORY_CONTENT_IS_PERMANENT) != null) {

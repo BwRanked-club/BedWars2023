@@ -9,6 +9,7 @@ import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.api.server.ServerType;
 import com.tomkeuper.bedwars.arena.Arena;
+import com.tomkeuper.bedwars.arena.Misc;
 import com.tomkeuper.bedwars.commands.party.PartyCommand;
 import com.tomkeuper.bedwars.commands.shout.ShoutCommand;
 import com.tomkeuper.bedwars.configuration.Permissions;
@@ -41,7 +42,7 @@ public class ChatFormatting implements Listener {
                 .replace("%bw_v_suffix%", BedWars.getChatSupport().getSuffix(eventTriggerPlayer))
                 .replace("%bw_playername%", eventTriggerPlayer.getName())
                 .replace("%bw_level%", BedWars.getLevelSupport().getLevel(eventTriggerPlayer))
-                .replace("%bw_player%", eventTriggerPlayer.getDisplayName());
+                .replace("%bw_player%", Misc.getPlayerName(eventTriggerPlayer));
         if (team != null) {
             String teamFormat = getMsg(recipientPlayer, Messages.FORMAT_PAPI_PLAYER_TEAM_TEAM)
                     .replace("%bw_team_color%", String.valueOf(team.getColor().chat()))

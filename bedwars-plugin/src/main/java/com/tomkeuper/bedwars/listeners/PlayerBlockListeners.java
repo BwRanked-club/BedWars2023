@@ -13,6 +13,7 @@ import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.api.region.Region;
 import com.tomkeuper.bedwars.api.server.ServerType;
 import com.tomkeuper.bedwars.arena.Arena;
+import com.tomkeuper.bedwars.arena.Misc;
 import com.tomkeuper.bedwars.configuration.Sounds;
 import com.tomkeuper.bedwars.listeners.offline.OfflineGraceService;
 import com.tomkeuper.bedwars.popuptower.TowerEast;
@@ -332,7 +333,7 @@ public class PlayerBlockListeners implements Listener {
                                 .replace("%bw_team_color%", bedTeam.getColor().chat().toString())
                                 .replace("%bw_team_name%", bedTeam.getDisplayName(lang))
                                 .replace("%bw_player_color%", arena.getTeam(player).getColor().chat().toString())
-                                .replace("%bw_player%", player.getDisplayName())
+                                .replace("%bw_player%", Misc.getPlayerName(player))
                                 .replace("%bw_playername%", player.getName()));
                     }
 

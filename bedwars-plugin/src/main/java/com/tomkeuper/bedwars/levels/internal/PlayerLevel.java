@@ -75,7 +75,16 @@ public class PlayerLevel {
      * Get PlayerLevel by player.
      */
     public static PlayerLevel getLevelByPlayer(UUID player) {
-        return levelByPlayer.getOrDefault(player, new PlayerLevel(player, 1, 0));
+        PlayerLevel existing = levelByPlayer.get(player);
+        if (existing != null) return existing;
+        return new PlayerLevel(player, 1, 0);
+    }
+
+    /**
+     * Get cached PlayerLevel by player without creating a new entry.
+     */
+    public static PlayerLevel getCachedLevelByPlayer(UUID player) {
+        return levelByPlayer.get(player);
     }
 
     public static void saveAll() {
@@ -274,15 +283,28 @@ public class PlayerLevel {
                 nextLevelCost
         );
 
-        if (BedWars.plugin != null && BedWars.plugin.isEnabled()) {
-            Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, saveTask);
-        } else {
+        boolean useSchedulerAsync = BedWars.plugin != null
+                && BedWars.plugin.isEnabled()
+                && !BedWars.isShuttingDown()
+                && Bukkit.isPrimaryThread();
+
+        if (useSchedulerAsync) {
             try {
-                saveTask.run();
+                Bukkit.getScheduler().runTaskAsynchronously(BedWars.plugin, saveTask);
+                modified = false;
+                return;
             } catch (Exception ignored) {
+                // fallback to direct save if scheduler rejects tasks during shutdown
             }
         }
 
-        modified = false;
+        try {
+            saveTask.run();
+            modified = false;
+        } catch (Exception ex) {
+            if (BedWars.plugin != null) {
+                BedWars.plugin.getLogger().warning("Failed to save level data for " + uuid + ": " + ex.getMessage());
+            }
+        }
     }
 }

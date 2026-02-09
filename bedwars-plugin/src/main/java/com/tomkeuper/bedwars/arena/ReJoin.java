@@ -56,8 +56,11 @@ public class ReJoin {
             json.addProperty("uuid", player.getUniqueId().toString());
             json.addProperty("arena_id", arena.getWorldName());
             json.addProperty("server", BedWars.config.getString(ConfigPath.GENERAL_CONFIGURATION_BUNGEE_OPTION_SERVER_ID));
-
-            BedWars.getRedisConnection().sendMessage(json.toString());
+            if (BedWars.getRedisConnection() != null) {
+                BedWars.getRedisConnection().sendMessage(json.toString());
+            } else {
+                BedWars.debug("Redis is not available; skipping rejoin publish for " + player.getUniqueId());
+            }
         }
     }
 

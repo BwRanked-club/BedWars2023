@@ -893,11 +893,13 @@ public class BedWarsTeam implements ITeam {
 
         @Override
         public void update() {
+            if (hidden) return;
             h.update();
         }
 
         @Override
         public void update(Player player) {
+            if (hidden) return;
             h.update(player);
         }
 

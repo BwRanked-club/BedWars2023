@@ -17,6 +17,7 @@ import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.api.server.ServerType;
 import com.tomkeuper.bedwars.arena.Arena;
 import com.tomkeuper.bedwars.arena.LastHit;
+import com.tomkeuper.bedwars.arena.Misc;
 import com.tomkeuper.bedwars.arena.SetupSession;
 import com.tomkeuper.bedwars.arena.team.BedWarsTeam;
 import com.tomkeuper.bedwars.configuration.Sounds;
@@ -24,6 +25,7 @@ import com.tomkeuper.bedwars.listeners.dropshandler.PlayerDrops;
 import com.tomkeuper.bedwars.support.paper.PaperSupport;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -165,7 +167,7 @@ public class PlayerListeners implements Listener {
         double remaining = Math.max(((Player) e.getEntity()).getHealth() - e.getFinalDamage(), 0);
         String msg = fmt
                 .replace("%bw_damage_amount%", new DecimalFormat("#.#").format(((Player) e.getEntity()).getHealth() - e.getFinalDamage()))
-                .replace("%bw_player%", player.getDisplayName())
+                .replace("%bw_player%", Misc.getPlayerName(player))
                 .replace("%bw_team%", team.getColor().chat() + team.getDisplayName(lang))
                 .replace("%bw_health_remaining%", new DecimalFormat("#.#").format(remaining));
         damager.sendMessage(msg);
@@ -443,24 +445,24 @@ public class PlayerListeners implements Listener {
             Language lang = Language.getPlayerLanguage(on);
             on.sendMessage(playerKillEvent.getMessage().apply(on)
                     .replace("%bw_player_color%", victimsTeam.getColor().chat().toString())
-                    .replace("%bw_player%", victim.getDisplayName())
+                    .replace("%bw_player%", Misc.getPlayerName(victim))
                     .replace("%bw_playername%", victim.getName())
                     .replace("%bw_team%", victimsTeam.getDisplayName(lang))
                     .replace("%bw_killer_color%", killersTeam == null ? "" : killersTeam.getColor().chat().toString())
                     .replace("%bw_killer_playername%", killer == null ? "" : killer.getName())
-                    .replace("%bw_killer_name%", killer == null ? "" : killer.getDisplayName())
+                    .replace("%bw_killer_name%", killer == null ? "" : Misc.getPlayerName(killer))
                     .replace("%bw_killer_team_name%", killersTeam == null ? "" : killersTeam.getDisplayName(lang)));
         }
         for (Player on : a.getSpectators()) {
             Language lang = Language.getPlayerLanguage(on);
             on.sendMessage(playerKillEvent.getMessage().apply(on)
                     .replace("%bw_player_color%", victimsTeam.getColor().chat().toString())
-                    .replace("%bw_player%", victim.getDisplayName())
+                    .replace("%bw_player%", Misc.getPlayerName(victim))
                     .replace("%bw_playername%", victim.getName())
                     .replace("%bw_team%", victimsTeam.getDisplayName(lang))
                     .replace("%bw_killer_color%", killersTeam == null ? "" : killersTeam.getColor().chat().toString())
                     .replace("%bw_killer_playername%", killer == null ? "" : killer.getName())
-                    .replace("%bw_killer_name%", killer == null ? "" : killer.getDisplayName())
+                    .replace("%bw_killer_name%", killer == null ? "" : Misc.getPlayerName(killer))
                     .replace("%bw_killer_team_name%", killersTeam == null ? "" : killersTeam.getDisplayName(lang)));
         }
 
@@ -650,7 +652,16 @@ public class PlayerListeners implements Listener {
         if (a == null || !a.isPlayer(shooter)) return;
 
         String utility = (proj instanceof Snowball) ? "silverfish" : "";
-        if (!utility.isEmpty()) spawnUtility(utility, proj.getLocation(), a.getTeam(shooter), shooter);
+        if (!utility.isEmpty()) {
+            Location spawn = proj.getLocation().clone();
+            if (spawn.getBlock() != null && spawn.getBlock().getType() != Material.AIR) {
+                spawn.add(0, 1, 0);
+            }
+            Vector centered = centerXZ(spawn.toVector());
+            spawn.setX(centered.getX());
+            spawn.setZ(centered.getZ());
+            spawnUtility(utility, spawn, a.getTeam(shooter), shooter);
+        }
     }
 
     @EventHandler

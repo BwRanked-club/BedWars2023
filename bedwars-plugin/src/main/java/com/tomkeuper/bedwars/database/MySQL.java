@@ -7,6 +7,8 @@ import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.shop.IQuickBuyElement;
 import com.tomkeuper.bedwars.api.stats.IPlayerStats;
 import com.tomkeuper.bedwars.stats.PlayerStats;
+import com.tomkeuper.bedwars.history.MatchHistoryEventRecord;
+import com.tomkeuper.bedwars.history.MatchHistoryRecord;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -168,6 +170,37 @@ public class MySQL implements IDatabase {
             try (Statement st = connection.createStatement()) {
                 st.executeUpdate(sql);
             }
+
+            sql = "CREATE TABLE IF NOT EXISTS match_history (" +
+                    "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+                    "uuid VARCHAR(36) NOT NULL," +
+                    "match_id VARCHAR(36)," +
+                    "name VARCHAR(200)," +
+                    "arena_name VARCHAR(200)," +
+                    "arena_display VARCHAR(200)," +
+                    "arena_group VARCHAR(64)," +
+                    "team_size INT," +
+                    "mode VARCHAR(64)," +
+                    "team_name VARCHAR(64)," +
+                    "team_color VARCHAR(32)," +
+                    "placement INT," +
+                    "win TINYINT(1)," +
+                    "kills INT," +
+                    "final_kills INT," +
+                    "total_kills INT," +
+                    "deaths INT," +
+                    "final_deaths INT," +
+                    "beds_destroyed INT," +
+                    "started_at BIGINT," +
+                    "ended_at BIGINT," +
+                    "duration_seconds INT," +
+                    "server_id VARCHAR(64)," +
+                    "INDEX idx_match_history_uuid (uuid)" +
+                    ");";
+            try (Statement st = connection.createStatement()) {
+                st.executeUpdate(sql);
+            }
+            ensureMatchHistorySchema(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -623,18 +656,22 @@ public class MySQL implements IDatabase {
     }
 
     public void saveMapRating(UUID player, String arenaName, String arenaDisplay, String arenaGroup, int rating) {
-        String sql = "INSERT INTO map_ratings (uuid, arena_name, arena_display, arena_group, rating) " +
-                "VALUES (?, ?, ?, ?, ?) " +
-                "ON DUPLICATE KEY UPDATE rating=VALUES(rating), arena_display=VALUES(arena_display), " +
-                "arena_group=VALUES(arena_group), updated_at=CURRENT_TIMESTAMP;";
         try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, player.toString());
-                statement.setString(2, arenaName);
-                statement.setString(3, arenaDisplay);
-                statement.setString(4, arenaGroup);
-                statement.setInt(5, rating);
-                statement.executeUpdate();
+            try (PreparedStatement delete = connection.prepareStatement(
+                    "DELETE FROM map_ratings WHERE uuid = ? AND arena_name = ?;")) {
+                delete.setString(1, player.toString());
+                delete.setString(2, arenaName);
+                delete.executeUpdate();
+            }
+            try (PreparedStatement insert = connection.prepareStatement(
+                    "INSERT INTO map_ratings (uuid, arena_name, arena_display, arena_group, rating, created_at, updated_at) " +
+                            "VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);")) {
+                insert.setString(1, player.toString());
+                insert.setString(2, arenaName);
+                insert.setString(3, arenaDisplay);
+                insert.setString(4, arenaGroup);
+                insert.setInt(5, rating);
+                insert.executeUpdate();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -657,6 +694,293 @@ public class MySQL implements IDatabase {
             e.printStackTrace();
         }
         return 0D;
+    }
+
+    public void saveMatchHistory(List<MatchHistoryRecord> records) {
+        if (records == null || records.isEmpty()) return;
+        String sql = "INSERT INTO match_history (uuid, match_id, name, arena_name, arena_display, arena_group, team_size, mode, team_name, team_color, placement, win, kills, final_kills, total_kills, deaths, final_deaths, beds_destroyed, started_at, ended_at, duration_seconds, server_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                for (MatchHistoryRecord record : records) {
+                    statement.setString(1, record.getPlayerId().toString());
+                    statement.setString(2, record.getMatchId() != null ? record.getMatchId().toString() : null);
+                    statement.setString(3, record.getPlayerName());
+                    statement.setString(4, record.getArenaName());
+                    statement.setString(5, record.getArenaDisplay());
+                    statement.setString(6, record.getArenaGroup());
+                    statement.setInt(7, record.getTeamSize());
+                    statement.setString(8, record.getMode());
+                    statement.setString(9, record.getTeamName());
+                    statement.setString(10, record.getTeamColor());
+                    statement.setInt(11, record.getPlacement());
+                    statement.setInt(12, record.isWin() ? 1 : 0);
+                    statement.setInt(13, record.getKills());
+                    statement.setInt(14, record.getFinalKills());
+                    statement.setInt(15, record.getTotalKills());
+                    statement.setInt(16, record.getDeaths());
+                    statement.setInt(17, record.getFinalDeaths());
+                    statement.setInt(18, record.getBedsDestroyed());
+                    statement.setLong(19, record.getStartedAt());
+                    statement.setLong(20, record.getEndedAt());
+                    statement.setInt(21, record.getDurationSeconds());
+                    statement.setString(22, record.getServerId());
+                    statement.addBatch();
+                }
+                statement.executeBatch();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<MatchHistoryRecord> getMatchHistory(UUID playerId, int offset, int limit) {
+        List<MatchHistoryRecord> records = new java.util.ArrayList<>();
+        String sql = "SELECT id, uuid, match_id, name, arena_name, arena_display, arena_group, team_size, mode, team_name, team_color, placement, win, kills, final_kills, total_kills, deaths, final_deaths, beds_destroyed, started_at, ended_at, duration_seconds, server_id " +
+                "FROM match_history WHERE uuid = ? ORDER BY ended_at ASC LIMIT ? OFFSET ?;";
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, playerId.toString());
+                statement.setInt(2, limit);
+                statement.setInt(3, offset);
+                try (ResultSet result = statement.executeQuery()) {
+                    while (result.next()) {
+                        records.add(new MatchHistoryRecord(
+                                result.getLong("id"),
+                                safeUuid(result.getString("match_id")),
+                                UUID.fromString(result.getString("uuid")),
+                                result.getString("name"),
+                                result.getString("arena_name"),
+                                result.getString("arena_display"),
+                                result.getString("arena_group"),
+                                result.getInt("team_size"),
+                                result.getString("mode"),
+                                result.getString("team_name"),
+                                result.getString("team_color"),
+                                result.getInt("placement"),
+                                result.getInt("win") == 1,
+                                result.getInt("kills"),
+                                result.getInt("final_kills"),
+                                result.getInt("total_kills"),
+                                result.getInt("deaths"),
+                                result.getInt("final_deaths"),
+                                result.getInt("beds_destroyed"),
+                                result.getLong("started_at"),
+                                result.getLong("ended_at"),
+                                result.getInt("duration_seconds"),
+                                result.getString("server_id")
+                        ));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return records;
+    }
+
+    public int countMatchHistory(UUID playerId) {
+        String sql = "SELECT COUNT(*) FROM match_history WHERE uuid = ?;";
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, playerId.toString());
+                try (ResultSet result = statement.executeQuery()) {
+                    if (result.next()) {
+                        return result.getInt(1);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public void trimMatchHistory(UUID playerId, int maxRecords) {
+        if (maxRecords <= 0) return;
+        String sql = "DELETE FROM match_history WHERE uuid = ? AND id NOT IN (" +
+                "SELECT id FROM (SELECT id FROM match_history WHERE uuid = ? ORDER BY ended_at DESC LIMIT ?) AS t" +
+                ");";
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, playerId.toString());
+                statement.setString(2, playerId.toString());
+                statement.setInt(3, maxRecords);
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void purgeMatchHistoryOlderThan(int days) {
+        if (days <= 0) return;
+        long threshold = System.currentTimeMillis() - (days * 86400000L);
+        String sql = "DELETE FROM match_history WHERE ended_at < ?;";
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setLong(1, threshold);
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveMatchHistoryEvents(List<MatchHistoryEventRecord> records) {
+        if (records == null || records.isEmpty()) return;
+        String sql = "INSERT INTO match_history_events (match_id, event_time, event_type, actor_uuid, actor_name, target_uuid, target_name, team_name, team_color, meta) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                for (MatchHistoryEventRecord record : records) {
+                    statement.setString(1, record.getMatchId() != null ? record.getMatchId().toString() : null);
+                    statement.setLong(2, record.getEventTime());
+                    statement.setString(3, record.getEventType());
+                    statement.setString(4, record.getActorId() != null ? record.getActorId().toString() : null);
+                    statement.setString(5, record.getActorName());
+                    statement.setString(6, record.getTargetId() != null ? record.getTargetId().toString() : null);
+                    statement.setString(7, record.getTargetName());
+                    statement.setString(8, record.getTeamName());
+                    statement.setString(9, record.getTeamColor());
+                    statement.setString(10, record.getMeta());
+                    statement.addBatch();
+                }
+                statement.executeBatch();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<MatchHistoryEventRecord> getMatchHistoryEvents(UUID matchId, int offset, int limit) {
+        List<MatchHistoryEventRecord> records = new java.util.ArrayList<>();
+        String sql = "SELECT id, match_id, event_time, event_type, actor_uuid, actor_name, target_uuid, target_name, team_name, team_color, meta " +
+                "FROM match_history_events WHERE match_id = ? ORDER BY event_time ASC LIMIT ? OFFSET ?;";
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, matchId != null ? matchId.toString() : "");
+                statement.setInt(2, limit);
+                statement.setInt(3, offset);
+                try (ResultSet result = statement.executeQuery()) {
+                    while (result.next()) {
+                        records.add(new MatchHistoryEventRecord(
+                                result.getLong("id"),
+                                safeUuid(result.getString("match_id")),
+                                result.getLong("event_time"),
+                                result.getString("event_type"),
+                                safeUuid(result.getString("actor_uuid")),
+                                result.getString("actor_name"),
+                                safeUuid(result.getString("target_uuid")),
+                                result.getString("target_name"),
+                                result.getString("team_name"),
+                                result.getString("team_color"),
+                                result.getString("meta")
+                        ));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return records;
+    }
+
+    public int countMatchHistoryEvents(UUID matchId) {
+        String sql = "SELECT COUNT(*) FROM match_history_events WHERE match_id = ?;";
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, matchId != null ? matchId.toString() : "");
+                try (ResultSet result = statement.executeQuery()) {
+                    if (result.next()) {
+                        return result.getInt(1);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public void trimMatchHistoryEvents(UUID matchId, int maxRecords) {
+        if (maxRecords <= 0 || matchId == null) return;
+        String sql = "DELETE FROM match_history_events WHERE match_id = ? AND id NOT IN (" +
+                "SELECT id FROM (SELECT id FROM match_history_events WHERE match_id = ? ORDER BY event_time DESC LIMIT ?) AS t" +
+                ");";
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, matchId.toString());
+                statement.setString(2, matchId.toString());
+                statement.setInt(3, maxRecords);
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteMatchHistoryEvents(UUID matchId) {
+        if (matchId == null) return;
+        String sql = "DELETE FROM match_history_events WHERE match_id = ?;";
+        try (Connection connection = dataSource.getConnection()) {
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, matchId.toString());
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void ensureMatchHistorySchema(Connection connection) throws SQLException {
+        if (!columnExists(connection, "match_history", "match_id")) {
+            try (Statement st = connection.createStatement()) {
+                st.executeUpdate("ALTER TABLE match_history ADD COLUMN match_id VARCHAR(36);");
+            }
+        }
+        try (Statement st = connection.createStatement()) {
+            String sql = "CREATE TABLE IF NOT EXISTS match_history_events (" +
+                    "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
+                    "match_id VARCHAR(36) NOT NULL," +
+                    "event_time BIGINT," +
+                    "event_type VARCHAR(64)," +
+                    "actor_uuid VARCHAR(36)," +
+                    "actor_name VARCHAR(200)," +
+                    "target_uuid VARCHAR(36)," +
+                    "target_name VARCHAR(200)," +
+                    "team_name VARCHAR(64)," +
+                    "team_color VARCHAR(32)," +
+                    "meta TEXT," +
+                    "INDEX idx_match_history_events_match (match_id)," +
+                    "INDEX idx_match_history_events_time (event_time)" +
+                    ");";
+            st.executeUpdate(sql);
+        }
+    }
+
+    private boolean columnExists(Connection connection, String tableName, String columnName) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME = ?;";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, database);
+            ps.setString(2, tableName);
+            ps.setString(3, columnName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    private UUID safeUuid(String raw) {
+        if (raw == null || raw.isBlank()) return null;
+        try {
+            return UUID.fromString(raw);
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
 }

@@ -5,6 +5,7 @@ import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.api.party.Party;
+import com.tomkeuper.bedwars.arena.Misc;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +29,7 @@ public class Internal implements Party {
     @Override
     public boolean hasParty(Player p) {
         for (Party party : getParties()) {
-            if (party.members.contains(p)) return true;
+            if (containsPlayer(party.members, p)) return true;
         }
         return false;
     }
@@ -36,7 +37,7 @@ public class Internal implements Party {
     @Override
     public int partySize(Player p) {
         for (Party party : getParties()) {
-            if (party.members.contains(p)) {
+            if (containsPlayer(party.members, p)) {
                 return party.members.size();
             }
         }
@@ -46,8 +47,8 @@ public class Internal implements Party {
     @Override
     public boolean isOwner(Player p) {
         for (Party party : getParties()) {
-            if (party.members.contains(p)) {
-                if (party.owner == p) return true;
+            if (containsPlayer(party.members, p)) {
+                if (samePlayer(party.owner, p)) return true;
             }
         }
         return false;
@@ -56,11 +57,11 @@ public class Internal implements Party {
     @Override
     public List<Player> getMembers(Player owner) {
         for (Party party : getParties()) {
-            if (party.members.contains(owner)) {
+            if (containsPlayer(party.members, owner)) {
                 return party.members;
             }
         }
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
@@ -83,14 +84,14 @@ public class Internal implements Party {
     @Override
     public void removeFromParty(Player member) {
         for (Party p : new ArrayList<>(getParties())) {
-            if (p.owner == member) {
+            if (samePlayer(p.owner, member)) {
                 disband(member);
-            } else if (p.members.contains(member)) {
+            } else if (containsPlayer(p.members, member)) {
                 for (Player mem : p.members) {
                     Language language = Language.getPlayerLanguage(mem);
-                    mem.sendMessage(getMsg(language, member, Messages.COMMAND_PARTY_LEAVE_SUCCESS).replace("%bw_playername%", member.getName()).replace("%bw_player%", member.getDisplayName()));
+                    mem.sendMessage(getMsg(language, member, Messages.COMMAND_PARTY_LEAVE_SUCCESS).replace("%bw_playername%", member.getName()).replace("%bw_player%", Misc.getPlayerName(member)));
                 }
-                p.members.remove(member);
+                p.members.removeIf(mem -> samePlayer(mem, member));
 
                 if (BedWars.getRedisConnection() != null) {
                     JsonObject json = new JsonObject();
@@ -129,8 +130,8 @@ public class Internal implements Party {
     @Override
     public boolean isMember(Player owner, Player check) {
         for (Party p : parties) {
-            if (p.owner == owner) {
-                if (p.members.contains(check)) return true;
+            if (samePlayer(p.owner, owner)) {
+                if (containsPlayer(p.members, check)) return true;
             }
         }
         return false;
@@ -140,12 +141,12 @@ public class Internal implements Party {
     public void removePlayer(Player owner, Player target) {
         Party p = getParty(owner);
         if (p != null) {
-            if (p.members.contains(target)) {
+            if (containsPlayer(p.members, target)) {
                 for (Player mem : p.members) {
                     Language language = Language.getPlayerLanguage(mem);
-                    mem.sendMessage(getMsg(language, mem, Messages.COMMAND_PARTY_REMOVE_SUCCESS).replace("%bw_playername%", mem.getName()).replace("%bw_player%", mem.getDisplayName()));
+                    mem.sendMessage(getMsg(language, mem, Messages.COMMAND_PARTY_REMOVE_SUCCESS).replace("%bw_playername%", mem.getName()).replace("%bw_player%", Misc.getPlayerName(mem)));
                 }
-                p.members.remove(owner);
+                p.members.removeIf(mem -> samePlayer(mem, target));
                 if (p.members.isEmpty() || p.members.size() == 1) {
                     disband(p.owner);
                     parties.remove(p);
@@ -157,7 +158,7 @@ public class Internal implements Party {
     @Override
     public Player getOwner(Player member) {
         for (Internal.Party party : Internal.getParties()) {
-            if (party.members.contains(member)) {
+            if (containsPlayer(party.members, member)) {
                 return party.owner;
             }
         }
@@ -180,9 +181,22 @@ public class Internal implements Party {
     @Nullable
     private Party getParty(Player owner) {
         for (Party p : getParties()) {
-            if (p.getOwner() == owner) return p;
+            if (samePlayer(p.getOwner(), owner) || containsPlayer(p.members, owner)) return p;
         }
         return null;
+    }
+
+    private static boolean samePlayer(Player a, Player b) {
+        if (a == null || b == null) return false;
+        return a.getUniqueId().equals(b.getUniqueId());
+    }
+
+    private static boolean containsPlayer(List<Player> members, Player player) {
+        if (members == null || player == null) return false;
+        for (Player member : members) {
+            if (samePlayer(member, player)) return true;
+        }
+        return false;
     }
 
     static class Party {

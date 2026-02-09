@@ -2,6 +2,7 @@ package com.tomkeuper.bedwars.commands.party;
 
 import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.language.Messages;
+import com.tomkeuper.bedwars.arena.Misc;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -83,12 +84,12 @@ public class PartyCommand extends BukkitCommand {
                     if (BedWars.getPartyManager().hasParty(Bukkit.getPlayer(args[1]))) {
                         BedWars.getPartyManager().addMember(Bukkit.getPlayer(args[1]), p);
                         for (Player on : BedWars.getPartyManager().getMembers(Bukkit.getPlayer(args[1]))) {
-                            on.sendMessage(getMsg(on, Messages.COMMAND_PARTY_ACCEPT_SUCCESS).replace("%bw_playername%", p.getName()).replace("%bw_player%", p.getDisplayName()));
+                            on.sendMessage(getMsg(on, Messages.COMMAND_PARTY_ACCEPT_SUCCESS).replace("%bw_playername%", p.getName()).replace("%bw_player%", Misc.getPlayerName(p)));
                         }
                     } else {
                         BedWars.getPartyManager().createParty(Bukkit.getPlayer(args[1]), p);
                         for (Player on : BedWars.getPartyManager().getMembers(Bukkit.getPlayer(args[1]))) {
-                            on.sendMessage(getMsg(on, Messages.COMMAND_PARTY_ACCEPT_SUCCESS).replace("%bw_playername%", p.getName()).replace("%bw_player%", p.getDisplayName()));
+                            on.sendMessage(getMsg(on, Messages.COMMAND_PARTY_ACCEPT_SUCCESS).replace("%bw_playername%", p.getName()).replace("%bw_player%", Misc.getPlayerName(p)));
                         }
                     }
                 } else {

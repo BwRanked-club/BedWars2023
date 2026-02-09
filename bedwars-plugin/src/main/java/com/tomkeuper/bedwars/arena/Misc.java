@@ -39,12 +39,15 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Pattern;
 
 import static com.tomkeuper.bedwars.BedWars.*;
 import static com.tomkeuper.bedwars.api.language.Language.getList;
 import static com.tomkeuper.bedwars.api.language.Language.getMsg;
 
 public final class Misc {
+    private static final String FALLBACK_PLAYER_NAME = "%bw_playername%";
+    private static final Pattern SINGLE_PLACEHOLDER_PATTERN = Pattern.compile("^%[a-zA-Z0-9_]+%$");
 
     private Misc() {
     }
@@ -305,7 +308,7 @@ public final class Misc {
     public static String replaceStatsPlaceholders(@NotNull Player player, @NotNull String s, boolean papiReplacements) {
         IPlayerStats stats = BedWars.getStatsManager().get(player.getUniqueId());
 
-        s = s.replace("%bw_player%", player.getDisplayName())
+        s = s.replace("%bw_player%", getPlayerName(player))
                 .replace("%bw_playername%", player.getName())
                 .replace("%bw_prefix%", BedWars.getChatSupport().getPrefix(player))
                 .replace("%bw_kills%", String.valueOf(stats.getKills()))
@@ -326,6 +329,52 @@ public final class Misc {
                 .replace("%bw_play_last%", sdf.format(Timestamp.from(last)));
 
         return papiReplacements ? SupportPAPI.getSupportPAPI().replace(player, s) : s;
+    }
+
+    public static String getPlayerName(@NotNull Player player) {
+        String configured = BedWars.config.getString(ConfigPath.SB_CONFIG_SIDEBAR_PLAYER_NAME);
+        if (configured == null) {
+            return player.getDisplayName();
+        }
+
+        String trimmed = configured.trim();
+        if (trimmed.isEmpty()) {
+            return player.getDisplayName();
+        }
+
+        String stripped = stripColors(trimmed);
+        if ("%bw_player%".equalsIgnoreCase(stripped)) {
+            return player.getDisplayName();
+        }
+        if (FALLBACK_PLAYER_NAME.equalsIgnoreCase(stripped)) {
+            return player.getName();
+        }
+
+        String resolved = SupportPAPI.getSupportPAPI().replace(player, trimmed);
+        if (resolved == null || resolved.trim().isEmpty()) {
+            return player.getDisplayName();
+        }
+
+        if (resolved.equals(trimmed)) {
+            return player.getDisplayName();
+        }
+
+        String resolvedStripped = stripColors(resolved);
+        if (isSinglePlaceholder(resolvedStripped)) {
+            return player.getDisplayName();
+        }
+
+        return resolved;
+    }
+
+    private static boolean isSinglePlaceholder(String value) {
+        if (value == null) return false;
+        return SINGLE_PLACEHOLDER_PATTERN.matcher(value.trim()).matches();
+    }
+
+    private static String stripColors(String value) {
+        if (value == null) return "";
+        return ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', value));
     }
 
     public static boolean isNumber(@NotNull String s) {
