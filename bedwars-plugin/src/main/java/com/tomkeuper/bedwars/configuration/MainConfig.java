@@ -80,6 +80,7 @@ public class MainConfig extends ConfigManager {
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_START_COUNTDOWN_REGULAR, 40);
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_START_COUNTDOWN_HALF, 25);
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_START_COUNTDOWN_SHORTENED, 5);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_START_COUNTDOWN_FULL_ON_JOIN, 10);
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_RESTART, 15);
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_RE_SPAWN_COUNTDOWN, 5);
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_REJOIN_RE_SPAWN_COUNTDOWN, 10);

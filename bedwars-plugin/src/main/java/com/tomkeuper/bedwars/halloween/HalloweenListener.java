@@ -80,8 +80,11 @@ public class HalloweenListener implements Listener {
             PlayerLevel level = PlayerLevel.getLevelByPlayer(e.getPlayer().getUniqueId());
             if (level != null) {
                 e.getBlock().getDrops().clear();
-                level.addXp(5, PlayerXpGainEvent.XpSource.OTHER);
-                e.getPlayer().sendMessage(Language.getMsg(e.getPlayer(), Messages.XP_REWARD_HALLOWEEN));
+                int gained = level.addXp(5, PlayerXpGainEvent.XpSource.OTHER);
+                if (gained > 0) {
+                    e.getPlayer().sendMessage(Language.getMsg(e.getPlayer(), Messages.XP_REWARD_HALLOWEEN)
+                            .replace("%bw_xp%", String.valueOf(gained)) + PlayerLevel.getXpMultiplierSuffix(e.getPlayer()));
+                }
             }
         }
     }

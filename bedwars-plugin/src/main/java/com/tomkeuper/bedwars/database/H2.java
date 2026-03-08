@@ -258,6 +258,28 @@ public class H2 implements IDatabase {
     }
 
     @Override
+    public boolean resetStatsTable() {
+        try {
+            checkConnection();
+            try (Statement statement = connection.createStatement()) {
+                statement.executeUpdate("TRUNCATE TABLE GLOBAL_STATS;");
+            }
+            return true;
+        } catch (SQLException ignored) {
+            try {
+                checkConnection();
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate("DELETE FROM GLOBAL_STATS;");
+                }
+                return true;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
+    @Override
     public Object getCustomStat(String columnName, UUID player) {
         String sql = "SELECT " + columnName + " FROM GLOBAL_STATS WHERE UUID = ?;";
         try {

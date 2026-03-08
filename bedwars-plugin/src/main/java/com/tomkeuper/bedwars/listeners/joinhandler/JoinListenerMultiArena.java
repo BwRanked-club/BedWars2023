@@ -45,6 +45,13 @@ public class JoinListenerMultiArena implements Listener {
                 }
             }
 
+            // Reconcile visibility for all arenas to keep TAB/entity visibility consistent.
+            for (com.tomkeuper.bedwars.api.arena.IArena arena : Arena.getArenas()) {
+                if (arena instanceof com.tomkeuper.bedwars.arena.Arena) {
+                    ((com.tomkeuper.bedwars.arena.Arena) arena).syncArenaPlayerVisibility();
+                }
+            }
+
             // To prevent invisibility issues handle ReJoin after sending invisibility packets
             if (reJoin != null) {
                 if (reJoin.canReJoin()) {
@@ -72,4 +79,3 @@ public class JoinListenerMultiArena implements Listener {
         p.setFoodLevel(20);
     }
 }
-

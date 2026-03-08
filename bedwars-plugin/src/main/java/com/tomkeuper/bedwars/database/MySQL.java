@@ -392,6 +392,24 @@ public class MySQL implements IDatabase {
     }
 
     @Override
+    public boolean resetStatsTable() {
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement()) {
+            statement.executeUpdate("TRUNCATE TABLE global_stats;");
+            return true;
+        } catch (SQLException ignored) {
+            try (Connection connection = dataSource.getConnection();
+                 Statement statement = connection.createStatement()) {
+                statement.executeUpdate("DELETE FROM global_stats;");
+                return true;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    @Override
     public List<UUID> listQuickBuyUUIDs() {
         List<UUID> list = new java.util.ArrayList<>();
         String sql = "SELECT uuid FROM quick_buy;";

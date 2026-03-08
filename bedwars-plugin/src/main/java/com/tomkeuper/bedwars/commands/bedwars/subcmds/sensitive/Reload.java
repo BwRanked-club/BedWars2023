@@ -22,19 +22,24 @@ public class Reload extends SubCommand {
         setPriority(11);
         showInList(true);
         setPermission(Permissions.PERMISSION_RELOAD);
-        setDisplayInfo(Misc.msgHoverClick("§6 ▪ §7/" + getParent().getName() + " " + getSubCommandName() + "       §8 - §ereload messages",
-                "§fReload messages.\n§cNot recommended!", "/" + getParent().getName() + " " + getSubCommandName(), ClickEvent.Action.RUN_COMMAND));
+        setDisplayInfo(Misc.msgHoverClick("\u00A76 \u25AA \u00A77/" + getParent().getName() + " " + getSubCommandName() + "       \u00A78 - \u00A7ereload messages",
+                "\u00A7fReload messages.\n\u00A7cNot recommended!", "/" + getParent().getName() + " " + getSubCommandName(), ClickEvent.Action.RUN_COMMAND));
     }
 
     @Override
     public boolean execute(String[] args, CommandSender s) {
         if (!MainCommand.isLobbySet()) {
-            s.sendMessage("§c▪ §7You have to set the lobby location first!");
+            s.sendMessage("\u00A7c\u25AA \u00A77You have to set the lobby location first!");
             return true;
         }
+
+        com.tomkeuper.bedwars.BedWars.config.reload();
+        com.tomkeuper.bedwars.BedWars.reloadCombatSettingsFromConfig();
+        s.sendMessage("\u00A76 \u25AA \u00A77config.yml reloaded!");
+
         for (Language l : Language.getLanguages()) {
             l.reload();
-            s.sendMessage("§6 ▪ §7" + l.getLangName() + " reloaded!");
+            s.sendMessage("\u00A76 \u25AA \u00A77" + l.getLangName() + " reloaded!");
         }
         return true;
     }

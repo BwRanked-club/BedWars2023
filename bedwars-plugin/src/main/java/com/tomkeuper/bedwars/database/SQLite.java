@@ -284,6 +284,24 @@ public class SQLite implements IDatabase {
     }
 
     @Override
+    public boolean resetStatsTable() {
+        try {
+            checkConnection();
+            try (Statement statement = connection.createStatement()) {
+                statement.executeUpdate("DELETE FROM global_stats;");
+                try {
+                    statement.executeUpdate("DELETE FROM sqlite_sequence WHERE name='global_stats';");
+                } catch (SQLException ignored) {
+                }
+            }
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
     public Object getCustomStat(String columnName, UUID player) {
         String sql = "SELECT " + columnName + " FROM global_stats WHERE uuid = ?;";
         try {

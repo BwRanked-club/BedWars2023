@@ -27,6 +27,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -34,6 +35,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
@@ -42,27 +44,35 @@ import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.tomkeuper.bedwars.BedWars.plugin;
 import static com.tomkeuper.bedwars.api.language.Language.getMsg;
 
 public class PlayerListeners implements Listener {
 
-    private final double tntJumpStrengthReductionConstant;
-    private final double tntJumpYAxisReductionConstant;
-    private final double tntJumpHorizontalForgiveness;
-    private final double tntDamageSelf;
-    private final double tntDamageTeammates;
-    private final double tntDamageOthers;
+    private double tntJumpStrengthReductionConstant;
+    private double tntJumpYAxisReductionConstant;
+    private double tntJumpHorizontalForgiveness;
+    private double tntDamageSelf;
+    private double tntDamageTeammates;
+    private double tntDamageOthers;
+    private final Map<UUID, Location> deathSpectateLocations = new HashMap<>();
 
     public PlayerListeners() {
-        this.tntJumpStrengthReductionConstant = BedWars.config.getYml().getDouble(ConfigPath.GENERAL_TNT_JUMP_STRENGTH_REDUCTION);
-        this.tntJumpYAxisReductionConstant = BedWars.config.getYml().getDouble(ConfigPath.GENERAL_TNT_JUMP_Y_REDUCTION);
-        this.tntJumpHorizontalForgiveness = BedWars.config.getYml().getDouble(ConfigPath.GENERAL_TNT_JUMP_HORIZONTAL_FORGIVENESS);
-        this.tntDamageSelf = BedWars.config.getYml().getDouble(ConfigPath.GENERAL_TNT_JUMP_DAMAGE_SELF);
-        this.tntDamageTeammates = BedWars.config.getYml().getDouble(ConfigPath.GENERAL_TNT_JUMP_DAMAGE_TEAMMATES);
-        this.tntDamageOthers = BedWars.config.getYml().getDouble(ConfigPath.GENERAL_TNT_JUMP_DAMAGE_OTHERS);
+        reloadCombatSettings();
+    }
+
+    public void reloadCombatSettings() {
+        YamlConfiguration yml = BedWars.config.getYml();
+        this.tntJumpStrengthReductionConstant = yml.getDouble(ConfigPath.GENERAL_TNT_JUMP_STRENGTH_REDUCTION);
+        this.tntJumpYAxisReductionConstant = yml.getDouble(ConfigPath.GENERAL_TNT_JUMP_Y_REDUCTION);
+        this.tntJumpHorizontalForgiveness = yml.getDouble(ConfigPath.GENERAL_TNT_JUMP_HORIZONTAL_FORGIVENESS);
+        this.tntDamageSelf = yml.getDouble(ConfigPath.GENERAL_TNT_JUMP_DAMAGE_SELF);
+        this.tntDamageTeammates = yml.getDouble(ConfigPath.GENERAL_TNT_JUMP_DAMAGE_TEAMMATES);
+        this.tntDamageOthers = yml.getDouble(ConfigPath.GENERAL_TNT_JUMP_DAMAGE_OTHERS);
     }
 
     private static boolean isPlaying(IArena arena) {
@@ -105,6 +115,35 @@ public class PlayerListeners implements Listener {
         v.setX(Math.floor(v.getX()) + 0.5);
         v.setZ(Math.floor(v.getZ()) + 0.5);
         return v;
+    }
+
+    private Location resolveDeathSpectateLocation(Player victim, IArena arena, EntityDamageEvent damageEvent) {
+        Location location = victim.getLocation().clone();
+        World world = location.getWorld();
+        if (world == null) {
+            return arena.getSpectatorLocation();
+        }
+
+        boolean diedInVoid = damageEvent != null && damageEvent.getCause() == EntityDamageEvent.DamageCause.VOID;
+        if (diedInVoid) {
+            int x = location.getBlockX();
+            int z = location.getBlockZ();
+            int highestY = world.getHighestBlockYAt(x, z);
+            if (highestY > 1) {
+                location.setY(highestY + 2.0);
+            } else {
+                Location fallback = arena.getSpectatorLocation();
+                location = fallback == null ? location : fallback.clone();
+            }
+        } else {
+            location.add(0, 5, 0);
+        }
+
+        double minY = 1.0;
+        double maxY = Math.max(minY, world.getMaxHeight() - 1.0);
+        if (location.getY() < minY) location.setY(minY);
+        if (location.getY() > maxY) location.setY(maxY);
+        return location;
     }
 
     private static void spawnUtility(String s, Location loc, ITeam t, Player p) {
@@ -329,6 +368,8 @@ public class PlayerListeners implements Listener {
             return;
         }
 
+        deathSpectateLocations.put(victim.getUniqueId(), resolveDeathSpectateLocation(victim, a, dmg));
+
         BedWars.nms.clearArrowsFromPlayerBody(victim);
 
         boolean victimsBedDestroyed = victimsTeam.isBedDestroyed();
@@ -548,8 +589,10 @@ public class PlayerListeners implements Listener {
             return;
         }
         if (t.isBedDestroyed()) {
-            e.setRespawnLocation(a.getSpectatorLocation());
-            a.addSpectator(player, true, null);
+            Location spectateLoc = deathSpectateLocations.remove(player.getUniqueId());
+            if (spectateLoc == null) spectateLoc = a.getSpectatorLocation();
+            e.setRespawnLocation(spectateLoc);
+            a.addSpectator(player, true, spectateLoc);
             t.getMembers().remove(player);
             player.sendMessage(getMsg(player, Messages.PLAYER_DIE_ELIMINATED_CHAT));
             if (t.getMembers().isEmpty()) {
@@ -571,6 +614,13 @@ public class PlayerListeners implements Listener {
                 t.respawnMember(player);
             }
         }
+
+        deathSpectateLocations.remove(player.getUniqueId());
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        deathSpectateLocations.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler

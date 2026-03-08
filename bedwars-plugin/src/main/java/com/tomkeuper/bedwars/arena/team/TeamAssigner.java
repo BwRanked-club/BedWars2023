@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TeamAssigner implements ITeamAssigner {
 
@@ -30,19 +29,8 @@ public class TeamAssigner implements ITeamAssigner {
         if (arena.getPlayers().size() > maxInTeam && maxInTeam > 1) {
             List<List<Player>> parties = arena.getPlayers().stream()
                     .filter(BedWars.getPartyManager()::isOwner)
-                    .map(owner -> {
-                        List<Player> members = BedWars.getPartyManager().getMembers(owner);
-                        if (members == null) return Collections.<Player>emptyList();
-
-                        List<Player> filtered = members.stream()
-                                .filter(arena::isPlayer)
-                                .collect(Collectors.toList());
-
-                        filtered.remove(owner);
-
-                        return filtered;
-                    })
-                    .filter(list -> !list.isEmpty())
+                    .map(owner -> buildPartySnapshot(arena, owner))
+                    .filter(list -> list.size() > 1)
                     .sorted((a, b) -> Integer.compare(b.size(), a.size()))
                     .toList();
 
@@ -110,6 +98,26 @@ public class TeamAssigner implements ITeamAssigner {
             }
         }
         return best;
+    }
+
+    private List<Player> buildPartySnapshot(IArena arena, Player owner) {
+        if (arena == null || owner == null || !arena.isPlayer(owner)) return Collections.emptyList();
+
+        List<Player> snapshot = new ArrayList<>();
+        snapshot.add(owner);
+
+        List<Player> members = BedWars.getPartyManager().getMembers(owner);
+        if (members == null) return snapshot;
+
+        for (Player member : members) {
+            if (member == null || !arena.isPlayer(member)) continue;
+            boolean alreadyAdded = snapshot.stream()
+                    .anyMatch(existing -> existing.getUniqueId().equals(member.getUniqueId()));
+            if (!alreadyAdded) {
+                snapshot.add(member);
+            }
+        }
+        return snapshot;
     }
 
     private ITeam chooseMostAvailableTeam(List<ITeam> teams, int maxInTeam) {

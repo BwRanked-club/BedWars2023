@@ -6,6 +6,7 @@ import com.tomkeuper.bedwars.api.events.player.PlayerXpGainEvent;
 import com.tomkeuper.bedwars.configuration.LevelsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -199,15 +200,24 @@ public class PlayerLevel {
     /**
      * Add xp to player with source.
      */
-    public void addXp(int xp, PlayerXpGainEvent.XpSource source) {
-        if (xp < 0) return;
-        PlayerXpGainEvent event = new PlayerXpGainEvent(Bukkit.getPlayer(uuid), xp, source);
+    public int addXp(int xp, PlayerXpGainEvent.XpSource source) {
+        if (xp < 0) return 0;
+        Player player = Bukkit.getPlayer(uuid);
+        int finalXp = XpMultiplierUtil.applyMultiplier(player, xp);
+        PlayerXpGainEvent event = new PlayerXpGainEvent(player, finalXp, source);
         Bukkit.getPluginManager().callEvent(event);
-        if (event.isCancelled()) return;
-        this.currentXp += event.getAmount();
+        if (event.isCancelled()) return 0;
+        finalXp = Math.max(0, event.getAmount());
+        if (finalXp < 1) return 0;
+        this.currentXp += finalXp;
         upgradeLevel();
         updateProgressBar();
         modified = true;
+        return finalXp;
+    }
+
+    public static String getXpMultiplierSuffix(Player player) {
+        return XpMultiplierUtil.getMultiplierSuffix(player);
     }
 
     /**

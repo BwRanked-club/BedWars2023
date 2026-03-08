@@ -214,6 +214,7 @@ public class Internal implements Party {
         }
 
         void addMember(Player p) {
+            if (containsPlayer(members, p)) return;
             members.add(p);
         }
     }

@@ -25,8 +25,11 @@ public class PerMinuteTask {
         }
         task = Bukkit.getScheduler().runTaskTimer(BedWars.plugin, () -> {
             for (Player p : arena.getPlayers()) {
-                PlayerLevel.getLevelByPlayer(p.getUniqueId()).addXp(xp, PlayerXpGainEvent.XpSource.PER_MINUTE);
-                p.sendMessage(Language.getMsg(p, Messages.XP_REWARD_PER_MINUTE).replace("%bw_xp%", String.valueOf(xp)));
+                int gained = PlayerLevel.getLevelByPlayer(p.getUniqueId()).addXp(xp, PlayerXpGainEvent.XpSource.PER_MINUTE);
+                if (gained > 0) {
+                    p.sendMessage(Language.getMsg(p, Messages.XP_REWARD_PER_MINUTE)
+                            .replace("%bw_xp%", String.valueOf(gained)) + PlayerLevel.getXpMultiplierSuffix(p));
+                }
             }
         }, 60 * 20, 60 * 20);
     }

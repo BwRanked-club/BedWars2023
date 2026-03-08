@@ -164,6 +164,10 @@ public class BedWars extends JavaPlugin {
     public static ShopCache shopCache;
     @Getter
     public static StatsManager statsManager;
+    @Getter
+    private static PlayerListeners playerListeners;
+    @Getter
+    private static FireballListener fireballListener;
     public static BedWars plugin;
     public static VersionSupport nms;
     public static ArenaManager arenaManager = new ArenaManager();
@@ -291,6 +295,15 @@ public class BedWars extends JavaPlugin {
         }
     }
 
+    public static void reloadCombatSettingsFromConfig() {
+        if (playerListeners != null) {
+            playerListeners.reloadCombatSettings();
+        }
+        if (fireballListener != null) {
+            fireballListener.reloadCombatSettings();
+        }
+    }
+
     public static boolean registerItemHandler(IPermanentItemHandler handler) {
         return itemHandlers.putIfAbsent(handler.getId(), handler) == null;
     }
@@ -377,15 +390,18 @@ public class BedWars extends JavaPlugin {
                 }
             }, 1L);
 
+        playerListeners = new PlayerListeners();
+        fireballListener = new FireballListener();
+
         registerEvents(
                 new QuitAndTeleportListener(),
                 new PlayerBlockListeners(),
-                new PlayerListeners(),
+                playerListeners,
                 new PlayerInventoryListeners(),
                 new PlayerInteractListeners(),
                 new RefreshGUI(),
                 new ServerListeners(),
-                new FireballListener(),
+                fireballListener,
                 new EggBridgeListener(),
                 new SpectatorListeners(),
                 new BaseListener(),

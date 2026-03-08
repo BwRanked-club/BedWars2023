@@ -196,6 +196,7 @@ public class ConfigPath {
     public static final String GENERAL_CONFIGURATION_START_COUNTDOWN_REGULAR = "countdowns.game-start-regular";
     public static final String GENERAL_CONFIGURATION_START_COUNTDOWN_SHORTENED = "countdowns.game-start-shortened";
     public static final String GENERAL_CONFIGURATION_START_COUNTDOWN_HALF = "countdowns.game-start-half-arena";
+    public static final String GENERAL_CONFIGURATION_START_COUNTDOWN_FULL_ON_JOIN = "countdowns.game-start-full-on-join";
     public static final String GENERAL_CONFIGURATION_RESTART = "countdowns.game-restart";
     public static final String GENERAL_CONFIGURATION_RE_SPAWN_COUNTDOWN = "countdowns.player-re-spawn";
     public static final String GENERAL_CONFIGURATION_REJOIN_RE_SPAWN_COUNTDOWN = "countdowns.player-rejoin-re-spawn";

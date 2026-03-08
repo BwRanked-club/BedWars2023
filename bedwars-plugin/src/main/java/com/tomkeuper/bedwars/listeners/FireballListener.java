@@ -31,6 +31,7 @@ import org.bukkit.util.Vector;
 
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -40,26 +41,34 @@ import static com.tomkeuper.bedwars.BedWars.config;
 public class FireballListener implements Listener {
 
 
-    private final List<String> explosionProofMaterials;
-    private final double fireballExplosionSize, fireballHorizontalSelf, fireballHorizontalOthers, fireballVerticalSelf, fireballVerticalOthers;
-    private final double damageSelf, damageEnemy, damageTeammates;
-    private final double fireballSpeedMultiplier, fireballCooldown;
-    private final boolean fireballMakeFire;
+    private List<String> explosionProofMaterials;
+    private double fireballExplosionSize, fireballHorizontalSelf, fireballHorizontalOthers, fireballVerticalSelf, fireballVerticalOthers;
+    private double damageSelf, damageEnemy, damageTeammates;
+    private double fireballSpeedMultiplier, fireballCooldown;
+    private boolean fireballMakeFire;
 
     public FireballListener() {
-        YamlConfiguration config = BedWars.config.getYml();
-        explosionProofMaterials = config.getList(ConfigPath.GENERAL_FIREBALL_EXPLOSION_PROOF_BLOCKS).stream().map(Object::toString).collect(Collectors.toList());
-        fireballExplosionSize = config.getDouble(ConfigPath.GENERAL_FIREBALL_EXPLOSION_SIZE);
-        fireballMakeFire = config.getBoolean(ConfigPath.GENERAL_FIREBALL_MAKE_FIRE);
-        fireballHorizontalSelf = config.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_HORIZONTAL_SELF) * -1;
-        fireballHorizontalOthers = config.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_HORIZONTAL_OTHERS) * -1;
-        fireballVerticalSelf = config.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_VERTICAL_SELF);
-        fireballVerticalOthers = config.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_VERTICAL_OTHERS);
-        damageSelf = config.getDouble(ConfigPath.GENERAL_FIREBALL_DAMAGE_SELF);
-        damageEnemy = config.getDouble(ConfigPath.GENERAL_FIREBALL_DAMAGE_ENEMY);
-        damageTeammates = config.getDouble(ConfigPath.GENERAL_FIREBALL_DAMAGE_TEAMMATES);
-        fireballSpeedMultiplier = config.getDouble(ConfigPath.GENERAL_FIREBALL_SPEED_MULTIPLIER);
-        fireballCooldown = config.getDouble(ConfigPath.GENERAL_FIREBALL_COOLDOWN);
+        reloadCombatSettings();
+    }
+
+    public void reloadCombatSettings() {
+        YamlConfiguration yml = BedWars.config.getYml();
+        List<?> list = yml.getList(ConfigPath.GENERAL_FIREBALL_EXPLOSION_PROOF_BLOCKS);
+        explosionProofMaterials = list == null
+                ? Collections.emptyList()
+                : list.stream().map(Object::toString).collect(Collectors.toList());
+
+        fireballExplosionSize = yml.getDouble(ConfigPath.GENERAL_FIREBALL_EXPLOSION_SIZE);
+        fireballMakeFire = yml.getBoolean(ConfigPath.GENERAL_FIREBALL_MAKE_FIRE);
+        fireballHorizontalSelf = yml.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_HORIZONTAL_SELF) * -1;
+        fireballHorizontalOthers = yml.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_HORIZONTAL_OTHERS) * -1;
+        fireballVerticalSelf = yml.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_VERTICAL_SELF);
+        fireballVerticalOthers = yml.getDouble(ConfigPath.GENERAL_FIREBALL_KNOCKBACK_VERTICAL_OTHERS);
+        damageSelf = yml.getDouble(ConfigPath.GENERAL_FIREBALL_DAMAGE_SELF);
+        damageEnemy = yml.getDouble(ConfigPath.GENERAL_FIREBALL_DAMAGE_ENEMY);
+        damageTeammates = yml.getDouble(ConfigPath.GENERAL_FIREBALL_DAMAGE_TEAMMATES);
+        fireballSpeedMultiplier = yml.getDouble(ConfigPath.GENERAL_FIREBALL_SPEED_MULTIPLIER);
+        fireballCooldown = yml.getDouble(ConfigPath.GENERAL_FIREBALL_COOLDOWN);
     }
 
     @EventHandler

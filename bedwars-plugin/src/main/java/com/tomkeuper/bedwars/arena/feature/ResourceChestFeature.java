@@ -238,10 +238,18 @@ public class ResourceChestFeature implements Listener {
         if (inserted > 0) {
             sendDepositMessage(event.getPlayer(), event.getItem(), inserted);
             ITeam team2 = arena.getTeam(event.getPlayer());
-            if (team2 != null && event.getItem().getType().name().contains("SWORD")) {
+            if (team2 != null && BedWars.nms.isSword(event.getItem()) && !hasSwordInInventory(player)) {
                 team2.defaultSword(player, true);
             }
         }
+    }
+
+    private boolean hasSwordInInventory(Player player) {
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (item == null || item.getType() == Material.AIR) continue;
+            if (BedWars.nms.isSword(item)) return true;
+        }
+        return false;
     }
 
     private int safeDeposit(Player player, ItemStack hand, Inventory inventory) {

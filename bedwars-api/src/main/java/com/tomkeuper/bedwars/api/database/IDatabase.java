@@ -150,4 +150,11 @@ public interface IDatabase {
      * @return list of player UUIDs that have Quick Buy data.
      */
     List<UUID> listQuickBuyUUIDs();
+
+    /**
+     * Clears all rows from the player statistics table.
+     *
+     * @return true if the table was reset successfully, false otherwise.
+     */
+    boolean resetStatsTable();
 }

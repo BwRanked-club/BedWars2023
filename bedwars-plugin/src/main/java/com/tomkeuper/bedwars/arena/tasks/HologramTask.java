@@ -19,12 +19,14 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.Map;
 
 public class HologramTask implements Runnable {
 
     @Override
     public void run() {
         for (IArena a : Arena.getArenas()) {
+            if (a == null) continue;
             World world = a.getWorld();
             if (world == null) continue;
             if (a.getStatus() != GameState.playing) continue;
@@ -37,15 +39,20 @@ public class HologramTask implements Runnable {
                 List<ShopHolo> shopHolos = a.getShopHolograms(iso);
                 if (shopHolos == null || shopHolos.isEmpty()) continue;
                 for (ShopHolo shopHolo : shopHolos) {
+                    if (shopHolo == null) continue;
                     IHologram hologram = shopHolo.getHologram();
+                    if (hologram == null) continue;
                     Location holoLoc = hologram.getLocation();
+                    if (holoLoc == null) continue;
                     double distance = pLoc.distance(holoLoc);
                     if (distance > BedWars.hologramUpdateDistance) continue;
                     shopHolo.update(p);
                 }
             }
 
-            for (ITeam team : a.getTeams()) {
+            List<ITeam> teams = a.getTeams();
+            if (teams == null) continue;
+            for (ITeam team : teams) {
                 if (!(team instanceof BedWarsTeam)) continue;
                 for (Player p : world.getPlayers()) {
                     String iso = Language.getPlayerLanguage(p).getIso();
@@ -61,20 +68,26 @@ public class HologramTask implements Runnable {
             }
 
             List<IGenerator> generators = a.getOreGenerators();
+            if (generators == null) continue;
             for (IGenerator generator : generators) {
+                if (generator == null) continue;
                 GeneratorType type = generator.getType();
                 if (type != GeneratorType.EMERALD && type != GeneratorType.DIAMOND) continue;
                 Location genLoc = generator.getLocation();
+                if (genLoc == null) continue;
+                Map<String, IGenHolo> languageHolograms = generator.getLanguageHolograms();
+                if (languageHolograms == null || languageHolograms.isEmpty()) continue;
                 for (Player p : world.getPlayers()) {
                     String iso = Language.getPlayerLanguage(p).getIso();
-                    IGenHolo holo = generator.getLanguageHolograms().get(iso);
+                    IGenHolo holo = languageHolograms.get(iso);
                     GeneratorHolder holder = generator.getHologramHolder();
+                    if (holo == null) continue;
                     Location pLoc = p.getLocation();
                     double distance = pLoc.distance(genLoc);
                     if (distance > BedWars.hologramUpdateDistance) continue;
 
                     holo.update(p);
-                    holder.update(p);
+                    if (holder != null) holder.update(p);
                 }
             }
         }

@@ -444,20 +444,19 @@ public class Arena implements IArena {
     }
 
     public static boolean joinRandomArena(Player p) {
+        if (getPartyManager().hasParty(p) && !getPartyManager().isOwner(p)) {
+            p.sendMessage(getMsg(p, Messages.COMMAND_JOIN_DENIED_NOT_PARTY_LEADER));
+            return false;
+        }
         List<IArena> arenas = getSorted(getArenas());
-
-        int amount = getPartyManager().hasParty(p) ? (int) getPartyManager().getMembers(p).stream().filter(member -> {
-            IArena arena = Arena.getArenaByPlayer(member);
-            return arena == null || arena.isSpectator(member);
-        }).count() : 1;
+        int amount = getJoinRequestAmount(p);
+        if (amount < 1) return false;
 
         for (IArena a : arenas) {
-            if (a.getPlayers().size() == a.getMaxPlayers()) continue;
-            if (a.getMaxPlayers() - a.getPlayers().size() >= amount) {
-                if (a.addPlayer(p, false)) break;
-            }
+            if (!canJoinArenaWithGroup(a, amount)) continue;
+            if (a.addPlayer(p, false)) return true;
         }
-        return true;
+        return false;
     }
 
     public static List<IArena> getSorted(List<IArena> arenas) {
@@ -486,25 +485,62 @@ public class Arena implements IArena {
     }
 
     public static boolean joinRandomFromGroup(Player p, @NotNull String group) {
+        if (getPartyManager().hasParty(p) && !getPartyManager().isOwner(p)) {
+            p.sendMessage(getMsg(p, Messages.COMMAND_JOIN_DENIED_NOT_PARTY_LEADER));
+            return false;
+        }
         List<IArena> arenas = getSorted(getArenas());
-
-        int amount = getPartyManager().hasParty(p) ? (int) getPartyManager().getMembers(p).stream().filter(member -> {
-            IArena arena = Arena.getArenaByPlayer(member);
-            return arena == null || arena.isSpectator(member);
-        }).count() : 1;
+        int amount = getJoinRequestAmount(p);
+        if (amount < 1) return false;
 
         String[] groups = group.split("\\+");
         for (IArena a : arenas) {
-            if (a.getPlayers().size() == a.getMaxPlayers()) continue;
+            if (!canJoinArenaWithGroup(a, amount)) continue;
             for (String g : groups) {
                 if (a.getGroup().equalsIgnoreCase(g)) {
-                    if (a.getMaxPlayers() - a.getPlayers().size() >= amount) {
-                        if (a.addPlayer(p, false)) return true;
-                    }
+                    if (a.addPlayer(p, false)) return true;
                 }
             }
         }
         return false;
+    }
+
+    private static int getJoinRequestAmount(Player p) {
+        if (p == null) return 0;
+        if (!getPartyManager().hasParty(p)) return 1;
+
+        int amount = 0;
+        Set<UUID> seen = new HashSet<>();
+        for (Player member : new ArrayList<>(getPartyManager().getMembers(p))) {
+            if (member == null || !member.isOnline()) continue;
+            if (!seen.add(member.getUniqueId())) continue;
+            IArena arena = Arena.getArenaByPlayer(member);
+            if (arena == null || arena.isSpectator(member)) {
+                amount++;
+            }
+        }
+
+        if (!seen.contains(p.getUniqueId())) {
+            IArena arena = Arena.getArenaByPlayer(p);
+            if (arena == null || arena.isSpectator(p)) {
+                amount++;
+            }
+        }
+
+        return Math.max(amount, 1);
+    }
+
+    private static boolean canJoinArenaWithGroup(IArena arena, int groupSize) {
+        if (arena == null || groupSize < 1) return false;
+        if (arena.getMaxPlayers() - arena.getPlayers().size() < groupSize) return false;
+        if (groupSize > arena.getMaxInTeam()) return false;
+
+        GameState status = arena.getStatus();
+        if (status == GameState.waiting) return true;
+        if (status != GameState.starting) return false;
+
+        StartingTask startingTask = arena.getStartingTask();
+        return startingTask != null && startingTask.getCountdown() > 1;
     }
 
     public static void setGamesBeforeRestart(int gamesBeforeRestart) {
@@ -714,6 +750,24 @@ public class Arena implements IArena {
         registerScoreboards();
     }
 
+    private List<Player> getJoinablePartyMembers(Player owner) {
+        List<Player> members = new ArrayList<>();
+        if (owner == null) return members;
+
+        Set<UUID> seen = new HashSet<>();
+        for (Player member : new ArrayList<>(getPartyManager().getMembers(owner))) {
+            if (member == null || !member.isOnline()) continue;
+            if (member.getUniqueId().equals(owner.getUniqueId())) continue;
+            if (!seen.add(member.getUniqueId())) continue;
+
+            IArena arena = Arena.getArenaByPlayer(member);
+            if (arena == null || arena.isSpectator(member)) {
+                members.add(member);
+            }
+        }
+        return members;
+    }
+
     public boolean addPlayer(Player p, boolean skipOwnerCheck) {
         if (p == null) return false;
 
@@ -726,6 +780,7 @@ public class Arena implements IArena {
 
         boolean isStatusChange = false;
         isOnABase.remove(p);
+        List<Player> partyMembersToAdd = Collections.emptyList();
 
         if (getArenaByPlayer(p) != null) return false;
 
@@ -734,20 +789,17 @@ public class Arena implements IArena {
                 p.sendMessage(getMsg(p, Messages.COMMAND_JOIN_DENIED_NOT_PARTY_LEADER));
                 return false;
             }
-            int partySize = (int) getPartyManager().getMembers(p).stream().filter(member -> {
-                IArena arena = Arena.getArenaByPlayer(member);
-                return arena == null || arena.isSpectator(member);
-            }).count();
+            partyMembersToAdd = getJoinablePartyMembers(p);
+            int partySize = partyMembersToAdd.size() + 1;
+
+            if (partySize > maxInTeam) {
+                p.sendMessage(getMsg(p, Messages.COMMAND_JOIN_DENIED_PARTY_TOO_BIG));
+                return false;
+            }
 
             if (partySize > maxInTeam * getTeams().size() - getPlayers().size()) {
                 p.sendMessage(getMsg(p, Messages.COMMAND_JOIN_DENIED_PARTY_TOO_BIG));
                 return false;
-            }
-            for (Player mem : new ArrayList<>(getPartyManager().getMembers(p))) {
-                if (mem == p) continue;
-                IArena a = Arena.getArenaByPlayer(mem);
-                if (a != null && a.isSpectator(mem)) a.removeSpectator(mem, false);
-                addPlayer(mem, true);
             }
         }
 
@@ -805,7 +857,18 @@ public class Arena implements IArena {
                     }
                 }
 
-                if (partyMembers >= maxPlayers) {
+                if (players.size() >= getMaxPlayers()) {
+                    Bukkit.getScheduler().runTaskLater(BedWars.plugin, () -> {
+                        changeStatus(GameState.starting);
+                        if (startingTask != null) {
+                            int fullOnJoinCountdown = Math.max(1, BedWars.config.getInt(ConfigPath.GENERAL_CONFIGURATION_START_COUNTDOWN_FULL_ON_JOIN));
+                            if (startingTask.getCountdown() > fullOnJoinCountdown) {
+                                startingTask.setCountdown(fullOnJoinCountdown);
+                            }
+                        }
+                    }, 10L);
+                    isStatusChange = true;
+                } else if (partyMembers >= maxPlayers) {
                     Bukkit.getScheduler().runTaskLater(BedWars.plugin, () -> changeStatus(GameState.starting), 10L);
                     isStatusChange = true;
                 } else if (minPlayers <= players.size() && teams > 0 && players.size() != teammates / teams) {
@@ -851,6 +914,7 @@ public class Arena implements IArena {
                     BedWars.nms.spigotHidePlayer(on, p);
                 }
             }
+            syncArenaPlayerVisibility();
             if (getServerType() == ServerType.BUNGEE) BedWars.nms.sendPlayerSpawnPackets(p, this);
         }, 17L);
 
@@ -864,6 +928,31 @@ public class Arena implements IArena {
 
         if (!isStatusChange && (BedWars.getServerType() == ServerType.MULTIARENA || BedWars.getServerType() == ServerType.SHARED)) {
             BoardManager.getInstance().giveTabFeatures(p, this, false);
+        }
+
+        if (!partyMembersToAdd.isEmpty()) {
+            List<Player> addedMembers = new ArrayList<>();
+            for (Player member : partyMembersToAdd) {
+                if (addPlayer(member, true)) {
+                    addedMembers.add(member);
+                    continue;
+                }
+
+                for (Player added : addedMembers) {
+                    if (isPlayer(added)) {
+                        removePlayer(added, false, true);
+                    }
+                }
+                if (isPlayer(p)) {
+                    removePlayer(p, false, true);
+                }
+                p.sendMessage(getMsg(p, Messages.COMMAND_JOIN_DENIED_PARTY_TOO_BIG));
+                if (member != null) {
+                    BedWars.debug("Could not add party member " + member.getName() + " with owner " + p.getName()
+                            + " to arena " + getArenaName());
+                }
+                return false;
+            }
         }
 
         refreshSigns();
@@ -949,13 +1038,18 @@ public class Arena implements IArena {
                     BedWars.nms.spigotHidePlayer(on, p);
                 }
             }
+            syncArenaPlayerVisibility();
 
             if (!playerBefore) {
                 if (staffTeleport == null)
                     PaperSupport.teleportC(p, getSpectatorLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
                 else PaperSupport.teleport(p, staffTeleport);
             } else {
-                PaperSupport.teleport(p, getSpectatorLocation());
+                if (staffTeleport == null) {
+                    PaperSupport.teleport(p, getSpectatorLocation());
+                } else {
+                    PaperSupport.teleport(p, staffTeleport);
+                }
             }
 
             p.setAllowFlight(true);
@@ -1134,6 +1228,7 @@ public class Arena implements IArena {
                         BedWars.nms.spigotHidePlayer(on, p);
                     }
                 }
+                syncArenaPlayerVisibility();
                 if (!disconnect) BoardManager.getInstance().giveTabFeatures(p, null, false);
             }, 5L);
         }
@@ -1232,6 +1327,7 @@ public class Arena implements IArena {
                         BedWars.nms.spigotHidePlayer(on, p);
                     }
                 }
+                syncArenaPlayerVisibility();
                 if (!disconnect) BoardManager.getInstance().giveTabFeatures(p, null, false);
             });
         }
@@ -2113,6 +2209,52 @@ public class Arena implements IArena {
                 continue;
             }
             addSign(l);
+        }
+    }
+
+    /**
+     * Synchronize player visibility and TAB visibility for this arena.
+     *
+     * Rules:
+     * - Player in match sees only players in match.
+     * - Spectator sees players + spectators from this arena.
+     * - Outside player does not see this arena players/spectators.
+     */
+    public void syncArenaPlayerVisibility() {
+        List<Player> online = new ArrayList<>(Bukkit.getOnlinePlayers());
+        if (online.isEmpty()) return;
+
+        for (Player viewer : online) {
+            if (viewer == null || !viewer.isOnline()) continue;
+
+            boolean viewerIsPlayer = isPlayer(viewer);
+            boolean viewerIsSpectator = isSpectator(viewer);
+            boolean viewerInThisArena = viewerIsPlayer || viewerIsSpectator;
+
+            for (Player target : online) {
+                if (target == null || !target.isOnline() || target.equals(viewer)) continue;
+
+                boolean targetIsPlayer = isPlayer(target);
+                boolean targetIsSpectator = isSpectator(target);
+                boolean targetInThisArena = targetIsPlayer || targetIsSpectator;
+
+                if (!viewerInThisArena && !targetInThisArena) continue;
+
+                boolean shouldSee;
+                if (viewerIsPlayer) {
+                    shouldSee = targetIsPlayer;
+                } else if (viewerIsSpectator) {
+                    shouldSee = targetIsPlayer || targetIsSpectator;
+                } else {
+                    shouldSee = !targetInThisArena;
+                }
+
+                if (shouldSee) {
+                    BedWars.nms.spigotShowPlayer(target, viewer);
+                } else {
+                    BedWars.nms.spigotHidePlayer(target, viewer);
+                }
+            }
         }
     }
 
