@@ -40,6 +40,7 @@ import static com.tomkeuper.bedwars.api.language.Language.getMsg;
 public class BoardManager implements IScoreboardService {
     private static final String FALLBACK_PLAYER_NAME = "%bw_playername%";
     private static final Pattern SINGLE_PLACEHOLDER_PATTERN = Pattern.compile("^%[a-zA-Z0-9_]+%$");
+    private static final int TAB_PLAYER_RETRY_LIMIT = 8;
     private static ScoreboardManager scoreboardManager;
     private static TabListFormatManager tabListFormatManager;
     private static PlaceholderManager placeholderManager;
@@ -346,7 +347,15 @@ public class BoardManager implements IScoreboardService {
 
     @Override
     public void giveTabFeatures(@NotNull Player player, @Nullable IArena arena, boolean delay) {
+        giveTabFeatures(player, arena, delay ? 5L : 0L, TAB_PLAYER_RETRY_LIMIT);
+    }
+
+    private void giveTabFeatures(@NotNull Player player, @Nullable IArena arena, long delayTicks, int retriesLeft) {
         Bukkit.getScheduler().runTaskLater(BedWars.plugin, () -> {
+            if (!player.isOnline()) {
+                return;
+            }
+
             String arenaDisplayname = (arena != null) ? arena.getDisplayName() : "null";
             BedWars.debug("giveTabFeatures() player: " + player.getDisplayName() + " arena: " + arenaDisplayname);
 
@@ -363,7 +372,13 @@ public class BoardManager implements IScoreboardService {
                 return;
             }
             if (tabPlayer == null) {
-                BedWars.plugin.getLogger().severe("An error occurred while giving Tab Features to player, TAB tabPlayer is null!");
+                if (retriesLeft > 0) {
+                    BedWars.debug("TAB tabPlayer is not loaded yet for " + player.getName() + ". Retrying TAB sync.");
+                    giveTabFeatures(player, arena, 2L, retriesLeft - 1);
+                    return;
+                }
+
+                BedWars.plugin.getLogger().warning("Could not give TAB features to player " + player.getName() + " because TAB did not finish loading the player.");
                 return;
             }
 
@@ -390,22 +405,23 @@ public class BoardManager implements IScoreboardService {
 
             if (scoreboardName != null) {
                 Scoreboard scoreboard = scoreboardManager.getRegisteredScoreboards().get(scoreboardName);
-                scoreboardManager.showScoreboard(tabPlayer, scoreboard);
+                if (scoreboard != null) {
+                    scoreboardManager.showScoreboard(tabPlayer, scoreboard);
+                }
             }
 
             setHeaderFooter(tabPlayer, arena);
 
-            if (BedWars.config.getBoolean(ConfigPath.SB_CONFIG_SIDEBAR_NAME_FORMATTING_ENABLED)) {
+            if (BedWars.config.getBoolean(ConfigPath.SB_CONFIG_SIDEBAR_NAME_FORMATTING_ENABLED) && tabListFormatManager != null) {
                 tabListFormatManager.setPrefix(tabPlayer, "%bw_prefix_tab%");
                 tabListFormatManager.setSuffix(tabPlayer, "%bw_suffix_tab%");
+                tabListFormatManager.setName(tabPlayer, getTabPlayerNameFormat((Player) tabPlayer.getPlayer()));
             }
 
             nameTagManager.setPrefix(tabPlayer, "%bw_prefix_head%");
             nameTagManager.setSuffix(tabPlayer, "%bw_suffix_head%");
 
-            tabListFormatManager.setName(tabPlayer, getTabPlayerNameFormat((Player) tabPlayer.getPlayer()));
-
-        }, delay ? 5 : 0);
+        }, delayTicks);
     }
 
     /**

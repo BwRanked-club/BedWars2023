@@ -526,6 +526,27 @@ public interface IArena {
     List<ShopHolo> getShopHolograms(String iso);
 
     /**
+     * Register a shop hologram for a specific language ISO code.
+     *
+     * @param iso      The ISO code of the language.
+     * @param hologram The hologram to register.
+     */
+    default void registerShopHologram(String iso, ShopHolo hologram) {
+    }
+
+    /**
+     * Find a shop hologram for a specific language, team and location.
+     *
+     * @param iso      The ISO code of the language.
+     * @param team     The team linked to the hologram.
+     * @param location The hologram location.
+     * @return The matching hologram, or {@code null} when none exists.
+     */
+    default @Nullable ShopHolo findShopHologram(String iso, ITeam team, Location location) {
+        return null;
+    }
+
+    /**
      * Get the list of next events to come in the arena.
      * Note: The events are not ordered.
      *

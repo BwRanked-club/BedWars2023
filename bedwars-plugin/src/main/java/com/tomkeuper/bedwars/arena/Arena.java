@@ -2575,6 +2575,56 @@ public class Arena implements IArena {
     }
 
     @Override
+    public void registerShopHologram(String iso, ShopHolo hologram) {
+        if (iso == null || hologram == null) {
+            return;
+        }
+
+        shopHolosIso.computeIfAbsent(iso, key -> new ArrayList<>()).add(hologram);
+    }
+
+    @Override
+    public ShopHolo findShopHologram(String iso, ITeam team, Location location) {
+        if (iso == null || team == null || location == null) {
+            return null;
+        }
+
+        List<ShopHolo> holograms = shopHolosIso.get(iso);
+        if (holograms == null || holograms.isEmpty()) {
+            return null;
+        }
+
+        for (ShopHolo hologram : holograms) {
+            if (hologram == null || hologram.getTeam() != team || hologram.getHologram() == null) {
+                continue;
+            }
+
+            Location hologramLocation = hologram.getHologram().getLocation();
+            if (sameHologramLocation(hologramLocation, location)) {
+                return hologram;
+            }
+        }
+
+        return null;
+    }
+
+    private boolean sameHologramLocation(Location first, Location second) {
+        if (first == null || second == null) {
+            return false;
+        }
+        if (first.getWorld() == null || second.getWorld() == null) {
+            return false;
+        }
+        if (!Objects.equals(first.getWorld().getName(), second.getWorld().getName())) {
+            return false;
+        }
+
+        return Double.compare(first.getX(), second.getX()) == 0
+                && Double.compare(first.getY(), second.getY()) == 0
+                && Double.compare(first.getZ(), second.getZ()) == 0;
+    }
+
+    @Override
     public List<BossBar> getDragonBossbars() {
         return dragonBossbars;
     }

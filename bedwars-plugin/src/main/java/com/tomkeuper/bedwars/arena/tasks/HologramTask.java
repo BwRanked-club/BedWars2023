@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class HologramTask implements Runnable {
 
@@ -43,10 +44,12 @@ public class HologramTask implements Runnable {
                     IHologram hologram = shopHolo.getHologram();
                     if (hologram == null) continue;
                     Location holoLoc = hologram.getLocation();
-                    if (holoLoc == null) continue;
-                    double distance = pLoc.distance(holoLoc);
-                    if (distance > BedWars.hologramUpdateDistance) continue;
-                    shopHolo.update(p);
+                    if (!isWithinRange(pLoc, holoLoc)) continue;
+                    try {
+                        shopHolo.update(p);
+                    } catch (Throwable t) {
+                        logHologramFailure("shop", a, p, t);
+                    }
                 }
             }
 
@@ -61,9 +64,12 @@ public class HologramTask implements Runnable {
                     Location bedLoc = bedHolo.getHologram().getLocation();
 
                     Location pLoc = p.getLocation();
-                    double distance = pLoc.distance(bedLoc);
-                    if (distance > BedWars.hologramUpdateDistance) continue;
-                    bedHolo.update(p);
+                    if (!isWithinRange(pLoc, bedLoc)) continue;
+                    try {
+                        bedHolo.update(p);
+                    } catch (Throwable t) {
+                        logHologramFailure("bed", a, p, t);
+                    }
                 }
             }
 
@@ -83,13 +89,39 @@ public class HologramTask implements Runnable {
                     GeneratorHolder holder = generator.getHologramHolder();
                     if (holo == null) continue;
                     Location pLoc = p.getLocation();
-                    double distance = pLoc.distance(genLoc);
-                    if (distance > BedWars.hologramUpdateDistance) continue;
+                    if (!isWithinRange(pLoc, genLoc)) continue;
 
-                    holo.update(p);
-                    if (holder != null) holder.update(p);
+                    try {
+                        holo.update(p);
+                        if (holder != null) holder.update(p);
+                    } catch (Throwable t) {
+                        logHologramFailure("generator", a, p, t);
+                    }
                 }
             }
         }
+    }
+
+    private boolean isWithinRange(Location playerLocation, Location hologramLocation) {
+        if (playerLocation == null || hologramLocation == null) {
+            return false;
+        }
+        if (playerLocation.getWorld() == null || hologramLocation.getWorld() == null) {
+            return false;
+        }
+        if (!playerLocation.getWorld().equals(hologramLocation.getWorld())) {
+            return false;
+        }
+
+        double maxDistanceSquared = BedWars.hologramUpdateDistance * BedWars.hologramUpdateDistance;
+        return playerLocation.distanceSquared(hologramLocation) <= maxDistanceSquared;
+    }
+
+    private void logHologramFailure(String type, IArena arena, Player player, Throwable throwable) {
+        String arenaName = arena == null ? "unknown" : arena.getArenaName();
+        String playerName = player == null ? "unknown" : player.getName();
+        BedWars.plugin.getLogger().log(Level.SEVERE,
+                "[HologramTask] Failed to update " + type + " hologram for player " + playerName + " in arena " + arenaName,
+                throwable);
     }
 }

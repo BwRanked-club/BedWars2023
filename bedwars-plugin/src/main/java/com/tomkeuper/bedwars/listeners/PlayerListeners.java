@@ -45,6 +45,7 @@ import org.bukkit.util.Vector;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -572,8 +573,13 @@ public class PlayerListeners implements Listener {
                     if (holder != null) holder.update(player);
                 }
             }
-            for (ShopHolo sh : a.getShopHolograms(iso)) {
-                sh.update(player);
+            List<ShopHolo> shopHolograms = a.getShopHolograms(iso);
+            if (shopHolograms != null) {
+                for (ShopHolo sh : shopHolograms) {
+                    if (sh != null) {
+                        sh.update(player);
+                    }
+                }
             }
 
             a.sendSpectatorCommandItems(player);
