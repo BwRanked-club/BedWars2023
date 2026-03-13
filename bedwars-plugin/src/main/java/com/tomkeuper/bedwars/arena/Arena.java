@@ -4,9 +4,11 @@ import com.tomkeuper.bedwars.BedWars;
 import com.tomkeuper.bedwars.api.arena.GameState;
 import com.tomkeuper.bedwars.api.arena.IArena;
 import com.tomkeuper.bedwars.api.arena.NextEvent;
+import com.tomkeuper.bedwars.api.arena.PlayerReplacementResult;
 import com.tomkeuper.bedwars.api.arena.generator.GeneratorType;
 import com.tomkeuper.bedwars.api.arena.generator.IGenerator;
 import com.tomkeuper.bedwars.api.arena.shop.ShopHolo;
+import com.tomkeuper.bedwars.api.arena.team.IBedHolo;
 import com.tomkeuper.bedwars.api.arena.team.ITeam;
 import com.tomkeuper.bedwars.api.arena.team.ITeamAssigner;
 import com.tomkeuper.bedwars.api.arena.team.TeamColor;
@@ -1373,6 +1375,286 @@ public class Arena implements IArena {
         return true;
     }
 
+    public PlayerReplacementResult replacePlayer(Player replacedPlayer, Player incomingPlayer) {
+        if (!Bukkit.isPrimaryThread())
+            return PlayerReplacementResult.failure(PlayerReplacementResult.Status.NOT_PRIMARY_THREAD, this, null, replacedPlayer, incomingPlayer);
+
+        if (replacedPlayer == null || incomingPlayer == null)
+            return PlayerReplacementResult.failure(PlayerReplacementResult.Status.INTERNAL_ERROR, this, null, replacedPlayer, incomingPlayer);
+
+        if (getStatus() != GameState.playing)
+            return PlayerReplacementResult.failure(PlayerReplacementResult.Status.ARENA_NOT_PLAYING, this, null, replacedPlayer, incomingPlayer);
+
+        if (replacedPlayer.getUniqueId().equals(incomingPlayer.getUniqueId()))
+            return PlayerReplacementResult.failure(PlayerReplacementResult.Status.SAME_PLAYER, this, null, replacedPlayer, incomingPlayer);
+
+        if (!isPlayer(replacedPlayer) || !players.contains(replacedPlayer))
+            return PlayerReplacementResult.failure(PlayerReplacementResult.Status.REPLACED_PLAYER_NOT_ACTIVE, this, null, replacedPlayer, incomingPlayer);
+
+
+        ITeam targetTeam = getTeam(replacedPlayer);
+        if (targetTeam == null)
+            return PlayerReplacementResult.failure(PlayerReplacementResult.Status.REPLACED_PLAYER_TEAM_NOT_FOUND, this, null, replacedPlayer, incomingPlayer);
+
+        if (!incomingPlayer.isOnline())
+            return PlayerReplacementResult.failure(PlayerReplacementResult.Status.NEW_PLAYER_OFFLINE, this, targetTeam, replacedPlayer, incomingPlayer);
+
+        if (isPlayer(incomingPlayer) || players.contains(incomingPlayer))
+            return PlayerReplacementResult.failure(PlayerReplacementResult.Status.NEW_PLAYER_ALREADY_PLAYING, this, targetTeam, replacedPlayer, incomingPlayer);
+
+
+        IArena incomingArena = Arena.getArenaByPlayer(incomingPlayer);
+        if (incomingArena != null && incomingArena != this)
+            return PlayerReplacementResult.failure(PlayerReplacementResult.Status.NEW_PLAYER_BUSY, this, targetTeam, replacedPlayer, incomingPlayer);
+
+        if (incomingArena == this && !isSpectator(incomingPlayer))
+            return PlayerReplacementResult.failure(PlayerReplacementResult.Status.NEW_PLAYER_BUSY, this, targetTeam, replacedPlayer, incomingPlayer);
+
+        int occupiedSlots = 0;
+        for (Player member : targetTeam.getMembers()) {
+            if (member == null) continue;
+            if (member.getUniqueId().equals(replacedPlayer.getUniqueId())) continue;
+            occupiedSlots++;
+        }
+        if (occupiedSlots >= getMaxInTeam())
+            return PlayerReplacementResult.failure(PlayerReplacementResult.Status.TEAM_SLOT_UNAVAILABLE, this, targetTeam, replacedPlayer, incomingPlayer);
+
+
+        try {
+            prepareIncomingReplacement(incomingPlayer);
+            if (!eliminateReplacedPlayer(replacedPlayer))
+                return PlayerReplacementResult.failure(PlayerReplacementResult.Status.INTERNAL_ERROR, this, targetTeam, replacedPlayer, incomingPlayer);
+
+            admitIncomingReplacement(incomingPlayer, targetTeam);
+            broadcastReplacement(replacedPlayer, incomingPlayer, targetTeam);
+            return PlayerReplacementResult.success(this, targetTeam, replacedPlayer, incomingPlayer);
+        } catch (Exception ex) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to replace player " + replacedPlayer.getName() + " with " + incomingPlayer.getName() + " in arena " + getArenaName(), ex);
+            return PlayerReplacementResult.failure(PlayerReplacementResult.Status.INTERNAL_ERROR, this, targetTeam, replacedPlayer, incomingPlayer);
+        }
+    }
+
+    private void prepareIncomingReplacement(Player player) {
+        clearArenaTransientState(player);
+        cleanupTeamMembership(player, true);
+
+        if (isSpectator(player)) {
+            spectators.remove(player);
+            String iso = Language.getPlayerLanguage(player).getIso();
+            List<ShopHolo> holos = shopHolosIso.getOrDefault(iso, Collections.emptyList());
+            for (ShopHolo holo : holos) {
+                holo.clearForPlayer(player);
+            }
+        }
+
+        leaving.remove(player);
+        player.closeInventory();
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            player.removePotionEffect(effect.getType());
+        }
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(null);
+        player.setAllowFlight(false);
+        player.setFlying(false);
+        player.setFireTicks(0);
+        player.setFallDistance(0f);
+        nms.setCollide(player, this, true);
+
+        ReJoin reJoin = ReJoin.getPlayer(player);
+        if (reJoin != null) {
+            reJoin.destroy(false);
+        }
+
+        if (getServerType() != ServerType.BUNGEE && PlayerGoods.getPlayerGoods(player) == null) {
+            PlayerGoods.createIfNeeded(player, true);
+            playerLocation.put(player, player.getLocation());
+        }
+    }
+
+    private boolean eliminateReplacedPlayer(Player player) {
+        clearArenaTransientState(player);
+        cleanupTeamMembership(player, true);
+        players.remove(player);
+        return addSpectator(player, true, null);
+    }
+
+    private void admitIncomingReplacement(Player player, ITeam team) {
+        players.remove(player);
+        spectators.remove(player);
+        leaving.remove(player);
+        players.add(player);
+        setArenaByPlayer(player, this);
+        team.addPlayers(player);
+
+        if (getServerType() == ServerType.BUNGEE) {
+            player.getEnderChest().clear();
+        } else {
+            playerLocation.putIfAbsent(player, player.getLocation());
+        }
+
+        player.setHealth(player.getMaxHealth());
+        player.setFoodLevel(20);
+        player.setFireTicks(0);
+        player.setFallDistance(0f);
+        player.setVelocity(new Vector(0, 0, 0));
+
+        team.firstSpawn(player);
+        applyTeamStateToPlayer(team, player);
+        refreshReplacementHolograms(player);
+        BoardManager.getInstance().giveTabFeatures(player, this, false);
+
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (!player.isOnline()) return;
+            if (getServerType() == ServerType.BUNGEE) {
+                BedWars.nms.sendPlayerSpawnPackets(player, this);
+            }
+            for (Player on : Bukkit.getOnlinePlayers()) {
+                if (on == null || on.equals(player)) continue;
+                if (isPlayer(on)) {
+                    BedWars.nms.spigotShowPlayer(player, on);
+                    BedWars.nms.spigotShowPlayer(on, player);
+                } else {
+                    BedWars.nms.spigotHidePlayer(player, on);
+                    BedWars.nms.spigotHidePlayer(on, player);
+                }
+            }
+            syncArenaPlayerVisibility();
+            if (getServerType() == ServerType.BUNGEE) {
+                BedWars.nms.sendPlayerSpawnPackets(player, this);
+            }
+        });
+    }
+
+    private void applyTeamStateToPlayer(ITeam team, Player player) {
+        for (PotionEffect effect : team.getBaseEffects()) {
+            player.addPotionEffect(effect, true);
+        }
+        if (team instanceof BedWarsTeam bedWarsTeam) {
+            for (PotionEffect effect : bedWarsTeam.getTeamEffects()) {
+                player.addPotionEffect(effect, true);
+            }
+        }
+
+        if (!team.getBowsEnchantments().isEmpty()) {
+            for (ItemStack item : player.getInventory().getContents()) {
+                if (item == null || item.getType() != Material.BOW) continue;
+                ItemMeta meta = item.getItemMeta();
+                if (meta == null) continue;
+                for (var enchant : team.getBowsEnchantments()) {
+                    meta.addEnchant(enchant.getEnchantment(), enchant.getAmplifier(), true);
+                }
+                item.setItemMeta(meta);
+            }
+        }
+        if (!team.getSwordsEnchantments().isEmpty()) {
+            for (ItemStack item : player.getInventory().getContents()) {
+                if (item == null || !nms.isSword(item)) continue;
+                ItemMeta meta = item.getItemMeta();
+                if (meta == null) continue;
+                for (var enchant : team.getSwordsEnchantments()) {
+                    meta.addEnchant(enchant.getEnchantment(), enchant.getAmplifier(), true);
+                }
+                item.setItemMeta(meta);
+            }
+        }
+        if (!team.getArmorsEnchantments().isEmpty()) {
+            for (ItemStack item : player.getInventory().getArmorContents()) {
+                if (item == null || !nms.isArmor(item)) continue;
+                ItemMeta meta = item.getItemMeta();
+                if (meta == null) continue;
+                for (var enchant : team.getArmorsEnchantments()) {
+                    meta.addEnchant(enchant.getEnchantment(), enchant.getAmplifier(), true);
+                }
+                item.setItemMeta(meta);
+            }
+        }
+        player.updateInventory();
+    }
+
+    private void refreshReplacementHolograms(Player player) {
+        String iso = Language.getPlayerLanguage(player).getIso();
+
+        for (IGenerator generator : getOreGenerators()) {
+            generator.updateHolograms(player);
+        }
+        for (ITeam team : getTeams()) {
+            for (IGenerator generator : team.getGenerators()) {
+                generator.updateHolograms(player);
+            }
+            if (team.isShopSpawned()) {
+                nms.spawnShopHologram(
+                        getConfig().getArenaLoc("Team." + team.getName() + ".Upgrade"),
+                        (getMaxInTeam() > 1 ? Messages.NPC_NAME_TEAM_UPGRADES.replace("%group%", group) : Messages.NPC_NAME_SOLO_UPGRADES.replace("%group%", group)),
+                        Collections.singletonList(player),
+                        this,
+                        team
+                );
+                nms.spawnShopHologram(
+                        getConfig().getArenaLoc("Team." + team.getName() + ".Shop"),
+                        (getMaxInTeam() > 1 ? Messages.NPC_NAME_TEAM_SHOP.replace("%group%", group) : Messages.NPC_NAME_SOLO_SHOP.replace("%group%", group)),
+                        Collections.singletonList(player),
+                        this,
+                        team
+                );
+            }
+            IBedHolo bedHolo = team.getBedHologram(iso);
+            if (bedHolo != null) {
+                bedHolo.show(player);
+            }
+        }
+    }
+
+    private void cleanupTeamMembership(Player player, boolean removeCache) {
+        for (ITeam team : getTeams()) {
+            team.getMembers().removeIf(member -> member.getUniqueId().equals(player.getUniqueId()));
+            if (removeCache) {
+                team.getMembersCache().removeIf(member -> member.getUniqueId().equals(player.getUniqueId()));
+            }
+            team.destroyBedHolo(player);
+        }
+    }
+
+    private void clearArenaTransientState(Player player) {
+        respawnSessions.remove(player);
+        showTime.remove(player);
+        fireballCooldowns.remove(player.getUniqueId());
+        afkCheck.remove(player.getUniqueId());
+        BedWars.getAPI().getAFKUtil().setPlayerAFK(player, false);
+        OfflineGraceService.cancelGrace(player.getUniqueId());
+
+        Integer milkTask = magicMilk.remove(player.getUniqueId());
+        if (milkTask != null && milkTask > 0) {
+            Bukkit.getScheduler().cancelTask(milkTask);
+        }
+
+        LastHit lastHit = LastHit.getLastHit(player);
+        if (lastHit != null) {
+            lastHit.remove();
+        }
+    }
+
+    private void broadcastReplacement(Player replacedPlayer, Player incomingPlayer, ITeam team) {
+        for (Player target : Stream.concat(getPlayers().stream(), getSpectators().stream()).toList()) {
+            target.sendMessage(getMsg(target, Messages.COMMAND_REPLACE_PLAYER_BROADCAST)
+                    .replace("%bw_old_player%", replacedPlayer.getName())
+                    .replace("%bw_old_player_display%", Misc.getPlayerName(replacedPlayer))
+                    .replace("%bw_new_player%", incomingPlayer.getName())
+                    .replace("%bw_new_player_display%", Misc.getPlayerName(incomingPlayer))
+                    .replace("%bw_team_color%", team.getColor().chat().toString())
+                    .replace("%bw_team_name%", team.getDisplayName(getPlayerLanguage(target)))
+                    .replace("%bw_arena%", getDisplayName()));
+        }
+
+        replacedPlayer.sendMessage(getMsg(replacedPlayer, Messages.COMMAND_REPLACE_PLAYER_REMOVED)
+                .replace("%bw_old_player%", replacedPlayer.getName())
+                .replace("%bw_old_player_display%", Misc.getPlayerName(replacedPlayer))
+                .replace("%bw_new_player%", incomingPlayer.getName())
+                .replace("%bw_new_player_display%", Misc.getPlayerName(incomingPlayer))
+                .replace("%bw_team_color%", team.getColor().chat().toString())
+                .replace("%bw_team_name%", team.getDisplayName(getPlayerLanguage(replacedPlayer)))
+                .replace("%bw_arena%", getDisplayName()));
+    }
+
     public boolean reJoin(Player p) {
         ReJoin reJoin = ReJoin.getPlayer(p);
         if (reJoin == null || reJoin.getArena() != this || !reJoin.canReJoin()) return false;
@@ -2214,7 +2496,7 @@ public class Arena implements IArena {
 
     /**
      * Synchronize player visibility and TAB visibility for this arena.
-     *
+     * <p>
      * Rules:
      * - Player in match sees only players in match.
      * - Spectator sees players + spectators from this arena.

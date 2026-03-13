@@ -66,6 +66,7 @@ public class MainCommand extends BukkitCommand implements ParentCommand {
         new ArenaGroup(this, "arenaGroup"); //priority 8
         new Build(this, "build"); //priority 9
         new Level(this, "level");
+        new ReplacePlayer(this, "replacePlayer");
         new Reload(this, "reload"); //priority 11
         new ResetStats(this, "resetStats"); //priority 12
         new CmdList(this, "cmds"); //priority 20

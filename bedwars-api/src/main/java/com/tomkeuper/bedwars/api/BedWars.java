@@ -2,6 +2,7 @@ package com.tomkeuper.bedwars.api;
 
 import com.tomkeuper.bedwars.api.addon.IAddonManager;
 import com.tomkeuper.bedwars.api.arena.IArena;
+import com.tomkeuper.bedwars.api.arena.PlayerReplacementResult;
 import com.tomkeuper.bedwars.api.arena.shop.IContentTier;
 import com.tomkeuper.bedwars.api.chat.IChat;
 import com.tomkeuper.bedwars.api.command.ParentCommand;
@@ -390,6 +391,17 @@ public interface BedWars {
          * @param p the player
          */
         void sendLobbyCommandItems(Player p);
+
+        /**
+         * Replaces an active player in a running arena with another player.
+         * The replaced player becomes a spectator without kill credit or rejoin access.
+         *
+         * @param arena           the target arena
+         * @param replacedPlayer  the player currently occupying the slot
+         * @param incomingPlayer  the player who should join the team
+         * @return the replacement result
+         */
+        PlayerReplacementResult replacePlayer(@Nullable IArena arena, Player replacedPlayer, Player incomingPlayer);
     }
 
     Configs getConfigs();

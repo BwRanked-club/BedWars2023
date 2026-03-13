@@ -90,6 +90,19 @@ public class Messages {
     public static String COMMAND_FORCESTART_NOT_IN_GAME = "cmd-start-no-game";
     public static String COMMAND_FORCESTART_SUCCESS = "cmd-start";
     public static String COMMAND_FORCESTART_NO_PERM = "cmd-start-no-perm";
+    public static String COMMAND_REPLACE_PLAYER_USAGE = "cmd-replace-player-usage";
+    public static String COMMAND_REPLACE_PLAYER_ARENA_NOT_FOUND = "cmd-replace-player-arena-not-found";
+    public static String COMMAND_REPLACE_PLAYER_OLD_NOT_FOUND = "cmd-replace-player-old-not-found";
+    public static String COMMAND_REPLACE_PLAYER_NEW_NOT_FOUND = "cmd-replace-player-new-not-found";
+    public static String COMMAND_REPLACE_PLAYER_NOT_PLAYING = "cmd-replace-player-not-playing";
+    public static String COMMAND_REPLACE_PLAYER_OLD_NOT_ACTIVE = "cmd-replace-player-old-not-active";
+    public static String COMMAND_REPLACE_PLAYER_NEW_BUSY = "cmd-replace-player-new-busy";
+    public static String COMMAND_REPLACE_PLAYER_TEAM_FULL = "cmd-replace-player-team-full";
+    public static String COMMAND_REPLACE_PLAYER_SAME_PLAYER = "cmd-replace-player-same-player";
+    public static String COMMAND_REPLACE_PLAYER_ERROR = "cmd-replace-player-error";
+    public static String COMMAND_REPLACE_PLAYER_SUCCESS = "cmd-replace-player-success";
+    public static String COMMAND_REPLACE_PLAYER_BROADCAST = "cmd-replace-player-broadcast";
+    public static String COMMAND_REPLACE_PLAYER_REMOVED = "cmd-replace-player-removed";
     public static String COMMAND_COOLDOWN = "cmd-cooldown";
 
     /** Arena join/ leave related */

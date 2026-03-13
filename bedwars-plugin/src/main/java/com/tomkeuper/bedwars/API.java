@@ -2,6 +2,7 @@ package com.tomkeuper.bedwars;
 
 import com.tomkeuper.bedwars.api.addon.IAddonManager;
 import com.tomkeuper.bedwars.api.arena.IArena;
+import com.tomkeuper.bedwars.api.arena.PlayerReplacementResult;
 import com.tomkeuper.bedwars.api.arena.shop.IContentTier;
 import com.tomkeuper.bedwars.api.chat.IChat;
 import com.tomkeuper.bedwars.api.command.ParentCommand;
@@ -228,6 +229,29 @@ public class API implements com.tomkeuper.bedwars.api.BedWars {
         @Override
         public void sendLobbyCommandItems(Player p) {
             Arena.sendLobbyCommandItems(p);
+        }
+
+        @Override
+        public PlayerReplacementResult replacePlayer(@Nullable IArena arena, Player replacedPlayer, Player incomingPlayer) {
+            if (arena == null) {
+                return PlayerReplacementResult.failure(
+                        PlayerReplacementResult.Status.ARENA_NOT_FOUND,
+                        null,
+                        null,
+                        replacedPlayer,
+                        incomingPlayer
+                );
+            }
+            if (!(arena instanceof Arena targetArena)) {
+                return PlayerReplacementResult.failure(
+                        PlayerReplacementResult.Status.UNSUPPORTED_ARENA_IMPLEMENTATION,
+                        arena,
+                        null,
+                        replacedPlayer,
+                        incomingPlayer
+                );
+            }
+            return targetArena.replacePlayer(replacedPlayer, incomingPlayer);
         }
     };
     private final Configs configs = new Configs() {
