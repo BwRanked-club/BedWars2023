@@ -145,7 +145,8 @@ public class Messages {
 
     /** Stats related */
     public static String PLAYER_STATS_GUI_PATH = "stats";
-    public static String PLAYER_STATS_GUI_INV_NAME = PLAYER_STATS_GUI_PATH+"-inv-name";
+    public static String PLAYER_STATS_GUI_INV_NAME = PLAYER_STATS_GUI_PATH + "-inv-name";
+    public static String PLAYER_STATS_PLAYER_NOT_FOUND = "stats-player-not-found";
     public static String PLAYER_HISTORY_GUI_PATH = "history";
     public static String PLAYER_HISTORY_GUI_INV_NAME = PLAYER_HISTORY_GUI_PATH + "-inv-name";
     public static String PLAYER_HISTORY_GUI_ENTRY_NAME = PLAYER_HISTORY_GUI_PATH + "-entry-name";

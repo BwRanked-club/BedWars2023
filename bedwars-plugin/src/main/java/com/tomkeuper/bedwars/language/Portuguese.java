@@ -20,152 +20,152 @@ public class Portuguese extends Language {
         yml.addDefault(Messages.PREFIX, "");
         yml.addDefault("name", "Português");
 
-        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_HEADER_LOBBY, "&6%bw_server_ip%");
+        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_HEADER_LOBBY, "&b%bw_server_ip%");
         yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_HEADER_WAITING, "&a%bw_server_ip%");
-        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_HEADER_STARTING, "&6%bw_server_ip%");
-        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_HEADER_PLAYING, "&d%bw_server_ip%");
-        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_HEADER_RESTARTING, "&c%bw_server_ip%");
-        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_HEADER_SPECTATOR, "&9%bw_server_ip%");
+        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_HEADER_STARTING, "&b%bw_server_ip%");
+        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_HEADER_PLAYING, "&b%bw_server_ip%");
+        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_HEADER_RESTARTING, "&b%bw_server_ip%");
+        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_HEADER_SPECTATOR, "&b%bw_server_ip%");
 
-        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_FOOTER_LOBBY, "&6%bw_server_ip%");
+        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_FOOTER_LOBBY, "&b%bw_server_ip%");
         yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_FOOTER_WAITING, "&a%bw_server_ip%");
-        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_FOOTER_STARTING, "&6%bw_server_ip%");
-        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_FOOTER_PLAYING, "&d%bw_server_ip%");
-        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_FOOTER_RESTARTING, "&c%bw_server_ip%");
-        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_FOOTER_SPECTATOR, "&9%bw_server_ip%");
+        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_FOOTER_STARTING, "&b%bw_server_ip%");
+        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_FOOTER_PLAYING, "&b%bw_server_ip%");
+        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_FOOTER_RESTARTING, "&b%bw_server_ip%");
+        yml.addDefault(Messages.FORMATTING_SIDEBAR_TAB_FOOTER_SPECTATOR, "&b%bw_server_ip%");
 
-        yml.addDefault(Messages.COMMAND_MAIN, Arrays.asList("", "&2▪ &7/" + BedWars.mainCmd + " stats", "&2▪ &7/" + BedWars.mainCmd + " historico", "&2▪ &7/" + BedWars.mainCmd + " join &o<arena/grupo>", "&2▪ &7/" + BedWars.mainCmd + " leave", "&2▪ &7/" + BedWars.mainCmd + " lang", "&2▪ &7/" + BedWars.mainCmd + " gui", "&2▪ &7/" + BedWars.mainCmd + " start &3(vip)"));
-        yml.addDefault(Messages.COMMAND_LANG_LIST_HEADER, "%bw_lang_prefix% &2Idiomas disponíveis:");
-        yml.addDefault(Messages.COMMAND_LANG_LIST_FORMAT, "&a▪  &7%bw_lang_iso% - &f%bw_name%");
-        yml.addDefault(Messages.COMMAND_LANG_USAGE, "%bw_lang_prefix%&7Use: /lang &f&o<linguagem>");
-        yml.addDefault(Messages.COMMAND_LANG_SELECTED_NOT_EXIST, "%bw_lang_prefix%&cEsta linguagem não existe!");
+        yml.addDefault(Messages.COMMAND_MAIN, Arrays.asList("", "&a▪ &f/" + BedWars.mainCmd + " stats", "&a▪ &f/" + BedWars.mainCmd + " historico", "&a▪ &f/" + BedWars.mainCmd + " join &o<arena/grupo>", "&a▪ &f/" + BedWars.mainCmd + " leave", "&a▪ &f/" + BedWars.mainCmd + " lang", "&a▪ &f/" + BedWars.mainCmd + " gui", "&a▪ &f/" + BedWars.mainCmd + " start &b(vip)"));
+        yml.addDefault(Messages.COMMAND_LANG_LIST_HEADER, "%bw_lang_prefix% &aIdiomas disponíveis:");
+        yml.addDefault(Messages.COMMAND_LANG_LIST_FORMAT, "&a▪  &f%bw_lang_iso% - &f%bw_name%");
+        yml.addDefault(Messages.COMMAND_LANG_USAGE, "%bw_lang_prefix%&fUse: /lang &f&o<linguagem>");
+        yml.addDefault(Messages.COMMAND_LANG_SELECTED_NOT_EXIST, "%bw_lang_prefix%&bEsta linguagem não existe!");
         yml.addDefault(Messages.COMMAND_LANG_SELECTED_SUCCESSFULLY, "%bw_lang_prefix%&aIdioma alterado!");
-        yml.addDefault(Messages.COMMAND_LANG_USAGE_DENIED, "%bw_lang_prefix%&cVocê não pode mudar o idioma durante a partida.");
-        yml.addDefault(Messages.COMMAND_JOIN_USAGE, "§a▪ §7Use: /" + BedWars.mainCmd + " join §o<arena/grupo>");
-        yml.addDefault(Messages.COMMAND_JOIN_GROUP_OR_ARENA_NOT_FOUND, "%bw_lang_prefix%&cNão existe nenhuma arena ou grupo de arena chamado: %bw_name%");
-        yml.addDefault(Messages.COMMAND_JOIN_DENIED_IS_FULL, "%bw_lang_prefix%&cEsta arena está cheia!\n&aVocê pode adquirir vantagens doando. &7&o(clique)");
-        yml.addDefault(Messages.COMMAND_JOIN_NO_EMPTY_FOUND, "%bw_lang_prefix%&cNão há nenhuma arena disponível no momento");
-        yml.addDefault(Messages.COMMAND_JOIN_DENIED_IS_FULL_OF_VIPS, "%bw_lang_prefix%&cPedimos desculpas, mas esta arena está cheia.\n&cSabemos que é um doador, mas esta arena já está cheia de staffs e/ou doadores.");
-        yml.addDefault(Messages.COMMAND_JOIN_DENIED_PARTY_TOO_BIG, "%bw_lang_prefix%&cA sua party é muito grande para poder entrar na arena. :(");
-        yml.addDefault(Messages.COMMAND_JOIN_DENIED_NOT_PARTY_LEADER, "%bw_lang_prefix%&cApenas o líder da party pode escolher a arena.");
-        yml.addDefault(Messages.COMMAND_JOIN_PLAYER_JOIN_MSG, "%bw_lang_prefix%&7%bw_player% &eentrou (&b%bw_on%&e/&b%bw_max%&e)!");
-        yml.addDefault(Messages.COMMAND_JOIN_SPECTATOR_MSG, "%bw_lang_prefix%§6Você agora está assistindo §9%bw_arena%§6.\n%bw_lang_prefix%§eVocê pode sair da arena a qualquer momento com §c/leave§e.");
-        yml.addDefault(Messages.COMMAND_JOIN_SPECTATOR_DENIED_MSG, "&cEspectadores não são permitidos nesta arena!");
-        yml.addDefault(Messages.COMMAND_TP_PLAYER_NOT_FOUND, "%bw_lang_prefix%&cJogador não encontrado!");
-        yml.addDefault(Messages.COMMAND_TP_NOT_IN_ARENA, "%bw_lang_prefix%&cEste jogador não está em uma arena de bedwars!");
-        yml.addDefault(Messages.COMMAND_TP_NOT_STARTED, "%bw_lang_prefix%&cA arena onde o jogador está ainda não começou!");
-        yml.addDefault(Messages.COMMAND_TP_USAGE, "%bw_lang_prefix%&cUse: /bw tp <jogador>");
-        yml.addDefault(Messages.REJOIN_NO_ARENA, "%bw_lang_prefix%&cNão tem partidas para você se reconectar.");
-        yml.addDefault(Messages.REJOIN_DENIED, "%bw_lang_prefix%&cVocê não pode mais se juntar à arena. Jogo terminou ou cama destruída.");
-        yml.addDefault(Messages.REJOIN_ALLOWED, "%bw_lang_prefix%&eEntrando na arena &a%bw_arena%&e!");
-        yml.addDefault(Messages.COMMAND_REJOIN_PLAYER_RECONNECTED, "%bw_lang_prefix%&7%bw_player% &ese reconectou!");
-        yml.addDefault(Messages.COMMAND_LEAVE_DENIED_NOT_IN_ARENA, "%bw_lang_prefix%&cVocê não está em uma arena!");
+        yml.addDefault(Messages.COMMAND_LANG_USAGE_DENIED, "%bw_lang_prefix%&bVocê não pode mudar o idioma durante a partida.");
+        yml.addDefault(Messages.COMMAND_JOIN_USAGE, "§a▪ �&fUse: /" + BedWars.mainCmd + " join §o<arena/grupo>");
+        yml.addDefault(Messages.COMMAND_JOIN_GROUP_OR_ARENA_NOT_FOUND, "%bw_lang_prefix%&bNão existe nenhuma arena ou grupo de arena chamado: %bw_name%");
+        yml.addDefault(Messages.COMMAND_JOIN_DENIED_IS_FULL, "%bw_lang_prefix%&bEsta arena está cheia!\n&aVocê pode adquirir vantagens doando. &f&o(clique)");
+        yml.addDefault(Messages.COMMAND_JOIN_NO_EMPTY_FOUND, "%bw_lang_prefix%&bNão há nenhuma arena disponível no momento");
+        yml.addDefault(Messages.COMMAND_JOIN_DENIED_IS_FULL_OF_VIPS, "%bw_lang_prefix%&bPedimos desculpas, mas esta arena está cheia.\n&bSabemos que é um doador, mas esta arena já está cheia de staffs e/ou doadores.");
+        yml.addDefault(Messages.COMMAND_JOIN_DENIED_PARTY_TOO_BIG, "%bw_lang_prefix%&bA sua party é muito grande para poder entrar na arena. :(");
+        yml.addDefault(Messages.COMMAND_JOIN_DENIED_NOT_PARTY_LEADER, "%bw_lang_prefix%&bApenas o líder da party pode escolher a arena.");
+        yml.addDefault(Messages.COMMAND_JOIN_PLAYER_JOIN_MSG, "%bw_lang_prefix%&f%bw_player% &bentrou (&b%bw_on%&b/&b%bw_max%&b)!");
+        yml.addDefault(Messages.COMMAND_JOIN_SPECTATOR_MSG, "%bw_lang_prefix%�&bVocê agora está assistindo �&b%bw_arena%�&b.\n%bw_lang_prefix%�&bVocê pode sair da arena a qualquer momento com �&b/leave�&b.");
+        yml.addDefault(Messages.COMMAND_JOIN_SPECTATOR_DENIED_MSG, "&bEspectadores não são permitidos nesta arena!");
+        yml.addDefault(Messages.COMMAND_TP_PLAYER_NOT_FOUND, "%bw_lang_prefix%&bJogador não encontrado!");
+        yml.addDefault(Messages.COMMAND_TP_NOT_IN_ARENA, "%bw_lang_prefix%&bEste jogador não está em uma arena de bedwars!");
+        yml.addDefault(Messages.COMMAND_TP_NOT_STARTED, "%bw_lang_prefix%&bA arena onde o jogador está ainda não começou!");
+        yml.addDefault(Messages.COMMAND_TP_USAGE, "%bw_lang_prefix%&bUse: /bw tp <jogador>");
+        yml.addDefault(Messages.REJOIN_NO_ARENA, "%bw_lang_prefix%&bNão tem partidas para você se reconectar.");
+        yml.addDefault(Messages.REJOIN_DENIED, "%bw_lang_prefix%&bVocê não pode mais se juntar à arena. Jogo terminou ou cama destruída.");
+        yml.addDefault(Messages.REJOIN_ALLOWED, "%bw_lang_prefix%&bEntrando na arena &a%bw_arena%&b!");
+        yml.addDefault(Messages.COMMAND_REJOIN_PLAYER_RECONNECTED, "%bw_lang_prefix%&f%bw_player% &bse reconectou!");
+        yml.addDefault(Messages.COMMAND_LEAVE_DENIED_NOT_IN_ARENA, "%bw_lang_prefix%&bVocê não está em uma arena!");
         yml.addDefault(Messages.COMMAND_LEAVE_HAS_PARTY_POPUP_TITLE, "Você tem certeza?");
-        yml.addDefault(Messages.COMMAND_LEAVE_HAS_PARTY_POPUP_STAY, "&cNão");
+        yml.addDefault(Messages.COMMAND_LEAVE_HAS_PARTY_POPUP_STAY, "&bNão");
         yml.addDefault(Messages.COMMAND_LEAVE_HAS_PARTY_POPUP_STAY_LORE, List.of("&fFicar na arena"));
         yml.addDefault(Messages.COMMAND_LEAVE_HAS_PARTY_POPUP_BRING_PARTY, "&aSim");
         yml.addDefault(Messages.COMMAND_LEAVE_HAS_PARTY_POPUP_BRING_PARTY_LORE, List.of("&fPuxar a party com você"));
-        yml.addDefault(Messages.COMMAND_LEAVE_MSG, "%bw_lang_prefix%&7%bw_player% &esaiu (&b%bw_on%&e/&b%bw_max%&e)!");
-        yml.addDefault(Messages.COMMAND_NOT_ALLOWED_IN_GAME, "%bw_lang_prefix%&cVocê não pode fazer isso durante o jogo.");
-        yml.addDefault(Messages.COMMAND_NOT_FOUND_OR_INSUFF_PERMS, "%bw_lang_prefix%&cComando não encontrado ou você não tem permissão!");
-        yml.addDefault(Messages.COMMAND_PARTY_HELP, Arrays.asList("&6▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
+        yml.addDefault(Messages.COMMAND_LEAVE_MSG, "%bw_lang_prefix%&f%bw_player% &bsaiu (&b%bw_on%&b/&b%bw_max%&b)!");
+        yml.addDefault(Messages.COMMAND_NOT_ALLOWED_IN_GAME, "%bw_lang_prefix%&bVocê não pode fazer isso durante o jogo.");
+        yml.addDefault(Messages.COMMAND_NOT_FOUND_OR_INSUFF_PERMS, "%bw_lang_prefix%&bComando não encontrado ou você não tem permissão!");
+        yml.addDefault(Messages.COMMAND_PARTY_HELP, Arrays.asList("&b▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
                 "&aComandos da Party:",
-                "&e/party help &7- &bIrá mostrar essa mensagem",
-                "&e/party invite <player> &7- &bConvida o jogador para sua party",
-                "&e/party leave &7- &bSaia da sua party",
-                "&e/party info &7- &bShow party members and owner",
-                "&e/party promote <jogador> &7- &bTransfer party ownership",
-                "&e/party remove <jogador> &7- &bRemova o jogador da party",
-                "&e/party accept <jogador> &7- &bAceite um pedido de party",
-                "&e/party disband &7- &bRecuse um pedido de party")
+                "&b/party help &f- &bIrá mostrar essa mensagem",
+                "&b/party invite <player> &f- &bConvida o jogador para sua party",
+                "&b/party leave &f- &bSaia da sua party",
+                "&b/party info &f- &bShow party members and owner",
+                "&b/party promote <jogador> &f- &bTransfer party ownership",
+                "&b/party remove <jogador> &f- &bRemova o jogador da party",
+                "&b/party accept <jogador> &f- &bAceite um pedido de party",
+                "&b/party disband &f- &bRecuse um pedido de party")
         );
-        yml.addDefault(Messages.COMMAND_PARTY_INVITE_USAGE, "%bw_lang_prefix%&eUse: &7/party invite <jogador>");
-        yml.addDefault(Messages.COMMAND_PARTY_INVITE_DENIED_PLAYER_OFFLINE, "%bw_lang_prefix%&7%bw_player% &enão está online.");
-        yml.addDefault(Messages.COMMAND_PARTY_INVITE_SENT, "%bw_lang_prefix%&ePedido enviado para &7%bw_player%&6.");
-        yml.addDefault(Messages.COMMAND_PARTY_INVITE_SENT_TARGET_RECEIVE_MSG, "%bw_lang_prefix%&b%bw_player% &econvidou você para uma party! &o&7(Clique para aceitar)");
-        yml.addDefault(Messages.COMMAND_PARTY_INVITE_DENIED_CANNOT_INVITE_YOURSELF, "%bw_lang_prefix%&cVocê não pode se convidar!");
-        yml.addDefault(Messages.COMMAND_PARTY_INVITE_DENIED_PLAYER_OFFLINE, "%bw_lang_prefix%&7%bw_player% &enão está online.");
-        yml.addDefault(Messages.COMMAND_PARTY_ACCEPT_DENIED_NO_INVITE, "%bw_lang_prefix%&cVocê não tem solicitações de party.");
-        yml.addDefault(Messages.COMMAND_PARTY_ACCEPT_DENIED_ALREADY_IN_PARTY, "%bw_lang_prefix%&eVocê já está em uma party!");
-        yml.addDefault(Messages.COMMAND_PARTY_INSUFFICIENT_PERMISSIONS, "%bw_lang_prefix%&cSomente o dono da party pode fazer isso!");
-        yml.addDefault(Messages.COMMAND_PARTY_ACCEPT_USAGE, "%bw_lang_prefix%&eUse: &7/party accept <jogador>");
-        yml.addDefault(Messages.COMMAND_PARTY_ACCEPT_SUCCESS, "%bw_lang_prefix%&7%bw_player% &eentrou na party.");
-        yml.addDefault(Messages.COMMAND_PARTY_GENERAL_DENIED_NOT_IN_PARTY, "%bw_lang_prefix%&cVocê não está em uma party.");
-        yml.addDefault(Messages.COMMAND_PARTY_LEAVE_DENIED_IS_OWNER_NEEDS_DISBAND, "%bw_lang_prefix%&cVocê não pode sair da sua party.\n&eTente usar: &b/party disband");
-        yml.addDefault(Messages.COMMAND_PARTY_LEAVE_SUCCESS, "%bw_lang_prefix%&7%bw_player% &esaiu da party!");
-        yml.addDefault(Messages.COMMAND_PARTY_DISBAND_SUCCESS, "%bw_lang_prefix%&eA party foi desfeita");
-        yml.addDefault(Messages.COMMAND_PARTY_REMOVE_USAGE, "%bw_lang_prefix%&7Use: &e/party remove <player>");
-        yml.addDefault(Messages.COMMAND_PARTY_REMOVE_SUCCESS, "%bw_lang_prefix%&7%bw_player% &efoi removido da party.");
-        yml.addDefault(Messages.COMMAND_PARTY_REMOVE_DENIED_TARGET_NOT_PARTY_MEMBER, "%bw_lang_prefix%&7%bw_player% &enão está na sua party!");
-        yml.addDefault(Messages.COMMAND_PARTY_PROMOTE_SUCCESS, "%bw_lang_prefix%&eVocê promoveu com sucesso %bw_player% a dono");
-        yml.addDefault(Messages.COMMAND_PARTY_PROMOTE_OWNER, "%bw_lang_prefix%&eVocê foi promovido a dono do grupo");
-        yml.addDefault(Messages.COMMAND_PARTY_PROMOTE_NEW_OWNER, "%bw_lang_prefix%&7 &e%bw_player% foi promovido a dono");
-        yml.addDefault(Messages.COMMAND_PARTY_INFO_OWNER, "\n%bw_lang_prefix%&eO dono do grupo é: &7%bw_party_owner%");
-        yml.addDefault(Messages.COMMAND_PARTY_INFO_PLAYERS, "%bw_lang_prefix%&eMembros do grupo são:");
-        yml.addDefault(Messages.COMMAND_PARTY_INFO_PLAYER, "&7%bw_player%");
-        yml.addDefault(Messages.COMMAND_PARTY_CHAT_ENABLED_DISABLED, "&e&lPARTY &8&l┃ &fO chat da party está %bw_party_chat_status% &f!");
-        yml.addDefault(Messages.COMMAND_FORCESTART_NOT_IN_GAME, "§c▪ §7Você não está jogando!");
-        yml.addDefault(Messages.COMMAND_FORCESTART_SUCCESS, "§c▪ §7Contagem regressiva encurtada!");
-        yml.addDefault(Messages.COMMAND_FORCESTART_NO_PERM, "%bw_lang_prefix%&7Você não pode inicializar uma partida.\n§7Por favor, considere doar para obter vantagens VIP.");
-        yml.addDefault(Messages.COMMAND_COOLDOWN, "&cVocê não pode fazer isso ainda! Aguarde mais %bw_seconds% segundos!");
-        yml.addDefault(Messages.COMMAND_SHOUT_DISABLE_SOLO, "&cGlobal é desativado nesse modo!");
+        yml.addDefault(Messages.COMMAND_PARTY_INVITE_USAGE, "%bw_lang_prefix%&bUse: &f/party invite <jogador>");
+        yml.addDefault(Messages.COMMAND_PARTY_INVITE_DENIED_PLAYER_OFFLINE, "%bw_lang_prefix%&f%bw_player% &bnão está online.");
+        yml.addDefault(Messages.COMMAND_PARTY_INVITE_SENT, "%bw_lang_prefix%&bPedido enviado para &f%bw_player%&b.");
+        yml.addDefault(Messages.COMMAND_PARTY_INVITE_SENT_TARGET_RECEIVE_MSG, "%bw_lang_prefix%&b%bw_player% &bconvidou você para uma party! &o&f(Clique para aceitar)");
+        yml.addDefault(Messages.COMMAND_PARTY_INVITE_DENIED_CANNOT_INVITE_YOURSELF, "%bw_lang_prefix%&bVocê não pode se convidar!");
+        yml.addDefault(Messages.COMMAND_PARTY_INVITE_DENIED_PLAYER_OFFLINE, "%bw_lang_prefix%&f%bw_player% &bnão está online.");
+        yml.addDefault(Messages.COMMAND_PARTY_ACCEPT_DENIED_NO_INVITE, "%bw_lang_prefix%&bVocê não tem solicitações de party.");
+        yml.addDefault(Messages.COMMAND_PARTY_ACCEPT_DENIED_ALREADY_IN_PARTY, "%bw_lang_prefix%&bVocê já está em uma party!");
+        yml.addDefault(Messages.COMMAND_PARTY_INSUFFICIENT_PERMISSIONS, "%bw_lang_prefix%&bSomente o dono da party pode fazer isso!");
+        yml.addDefault(Messages.COMMAND_PARTY_ACCEPT_USAGE, "%bw_lang_prefix%&bUse: &f/party accept <jogador>");
+        yml.addDefault(Messages.COMMAND_PARTY_ACCEPT_SUCCESS, "%bw_lang_prefix%&f%bw_player% &bentrou na party.");
+        yml.addDefault(Messages.COMMAND_PARTY_GENERAL_DENIED_NOT_IN_PARTY, "%bw_lang_prefix%&bVocê não está em uma party.");
+        yml.addDefault(Messages.COMMAND_PARTY_LEAVE_DENIED_IS_OWNER_NEEDS_DISBAND, "%bw_lang_prefix%&bVocê não pode sair da sua party.\n&bTente usar: &b/party disband");
+        yml.addDefault(Messages.COMMAND_PARTY_LEAVE_SUCCESS, "%bw_lang_prefix%&f%bw_player% &bsaiu da party!");
+        yml.addDefault(Messages.COMMAND_PARTY_DISBAND_SUCCESS, "%bw_lang_prefix%&bA party foi desfeita");
+        yml.addDefault(Messages.COMMAND_PARTY_REMOVE_USAGE, "%bw_lang_prefix%&fUse: &b/party remove <player>");
+        yml.addDefault(Messages.COMMAND_PARTY_REMOVE_SUCCESS, "%bw_lang_prefix%&f%bw_player% &bfoi removido da party.");
+        yml.addDefault(Messages.COMMAND_PARTY_REMOVE_DENIED_TARGET_NOT_PARTY_MEMBER, "%bw_lang_prefix%&f%bw_player% &bnão está na sua party!");
+        yml.addDefault(Messages.COMMAND_PARTY_PROMOTE_SUCCESS, "%bw_lang_prefix%&bVocê promoveu com sucesso %bw_player% a dono");
+        yml.addDefault(Messages.COMMAND_PARTY_PROMOTE_OWNER, "%bw_lang_prefix%&bVocê foi promovido a dono do grupo");
+        yml.addDefault(Messages.COMMAND_PARTY_PROMOTE_NEW_OWNER, "%bw_lang_prefix%&f &b%bw_player% foi promovido a dono");
+        yml.addDefault(Messages.COMMAND_PARTY_INFO_OWNER, "\n%bw_lang_prefix%&bO dono do grupo é: &f%bw_party_owner%");
+        yml.addDefault(Messages.COMMAND_PARTY_INFO_PLAYERS, "%bw_lang_prefix%&bMembros do grupo são:");
+        yml.addDefault(Messages.COMMAND_PARTY_INFO_PLAYER, "&f%bw_player%");
+        yml.addDefault(Messages.COMMAND_PARTY_CHAT_ENABLED_DISABLED, "&b&lPARTY &f&l┃ &fO chat da party está %bw_party_chat_status% &f!");
+        yml.addDefault(Messages.COMMAND_FORCESTART_NOT_IN_GAME, "�&b▪ �&fVocê não está jogando!");
+        yml.addDefault(Messages.COMMAND_FORCESTART_SUCCESS, "�&b▪ �&fContagem regressiva encurtada!");
+        yml.addDefault(Messages.COMMAND_FORCESTART_NO_PERM, "%bw_lang_prefix%&fVocê não pode inicializar uma partida.\n�&fPor favor, considere doar para obter vantagens VIP.");
+        yml.addDefault(Messages.COMMAND_COOLDOWN, "&bVocê não pode fazer isso ainda! Aguarde mais %bw_seconds% segundos!");
+        yml.addDefault(Messages.COMMAND_SHOUT_DISABLE_SOLO, "&bGlobal é desativado nesse modo!");
         yml.addDefault(Messages.COMMAND_LEAVE_STARTED, "&a&lTeleportando você para o lobby em %bw_leave_delay% segundos... Clique-direito novamente para cancelar!");
-        yml.addDefault(Messages.COMMAND_LEAVE_CANCELED, "&c&lTeleporte cancelado!");
-        yml.addDefault(Messages.ARENA_JOIN_VIP_KICK, "%bw_lang_prefix%&cDesculpe, mas você foi expulso porque um doador entrou na arena.\n&aPor favor, considere doar para mais vantagens. &7&o(clique)");
-        yml.addDefault(Messages.ARENA_START_COUNTDOWN_STOPPED_INSUFF_PLAYERS_CHAT, "%bw_lang_prefix%§cNão há jogadores suficientes! Contagem regressiva parada!");
-        yml.addDefault(Messages.ARENA_RESTART_PLAYER_KICK, "%bw_lang_prefix%&eA arena em que você estava está reiniciando.");
-        yml.addDefault(Messages.ARENA_STATUS_PLAYING_NAME, "&cJogando");
-        yml.addDefault(Messages.ARENA_STATUS_RESTARTING_NAME, "&4Reiniciando");
-        yml.addDefault(Messages.ARENA_STATUS_WAITING_NAME, "&2Esperando §c%bw_full%");
-        yml.addDefault(Messages.ARENA_STATUS_STARTING_NAME, "&6Iniciando §c%bw_full%");
-        yml.addDefault(Messages.ARENA_GUI_INV_NAME, "&8Clique para entrar!");
+        yml.addDefault(Messages.COMMAND_LEAVE_CANCELED, "&b&lTeleporte cancelado!");
+        yml.addDefault(Messages.ARENA_JOIN_VIP_KICK, "%bw_lang_prefix%&bDesculpe, mas você foi expulso porque um doador entrou na arena.\n&aPor favor, considere doar para mais vantagens. &f&o(clique)");
+        yml.addDefault(Messages.ARENA_START_COUNTDOWN_STOPPED_INSUFF_PLAYERS_CHAT, "%bw_lang_prefix%�&bNão há jogadores suficientes! Contagem regressiva parada!");
+        yml.addDefault(Messages.ARENA_RESTART_PLAYER_KICK, "%bw_lang_prefix%&bA arena em que você estava está reiniciando.");
+        yml.addDefault(Messages.ARENA_STATUS_PLAYING_NAME, "&bJogando");
+        yml.addDefault(Messages.ARENA_STATUS_RESTARTING_NAME, "&bReiniciando");
+        yml.addDefault(Messages.ARENA_STATUS_WAITING_NAME, "&aEsperando �&b%bw_full%");
+        yml.addDefault(Messages.ARENA_STATUS_STARTING_NAME, "&bIniciando �&b%bw_full%");
+        yml.addDefault(Messages.ARENA_GUI_INV_NAME, "&fClique para entrar!");
         yml.addDefault(Messages.ARENA_GUI_ARENA_CONTENT_NAME, "&a&l%bw_name%");
-        yml.addDefault(Messages.ARENA_GUI_ARENA_CONTENT_LORE, Arrays.asList("", "&7Status: %bw_arena_status%", "&7Jogadores: &f%bw_on%&7/&f%bw_max%", "&7Tipo: &a%bw_group%", "", "&aBotão esquerdo para entrar.", "&eBotão direito para assistir."));
+        yml.addDefault(Messages.ARENA_GUI_ARENA_CONTENT_LORE, Arrays.asList("", "&fStatus: %bw_arena_status%", "&fJogadores: &f%bw_on%&f/&f%bw_max%", "&fTipo: &a%bw_group%", "", "&aBotão esquerdo para entrar.", "&bBotão direito para assistir."));
         yml.addDefault(Messages.ARENA_GUI_SKIPPED_ITEM_NAME, "&r%bw_server_ip%");
         yml.addDefault(Messages.ARENA_GUI_SKIPPED_ITEM_LORE, Collections.emptyList());
-        yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_CHAT, "%bw_lang_prefix%&eO jogo começa em &6%bw_time% &esegundos!");
+        yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_CHAT, "%bw_lang_prefix%&bO jogo começa em &b%bw_time% &bsegundos!");
         yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_TITLE, " ");
         yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_SUB_TITLE, "&a%bw_seconds%");
-        yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_SUB_TITLE + "-5", "&e❺");
-        yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_SUB_TITLE + "-4", "&e❹");
-        yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_SUB_TITLE + "-3", "&c❸");
-        yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_SUB_TITLE + "-2", "&c❷");
-        yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_SUB_TITLE + "-1", "&c❶");
+        yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_SUB_TITLE + "-5", "&b❺");
+        yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_SUB_TITLE + "-4", "&b❹");
+        yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_SUB_TITLE + "-3", "&b❸");
+        yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_SUB_TITLE + "-2", "&b❷");
+        yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_SUB_TITLE + "-1", "&b❶");
         yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_CANCELLED_TITLE, " ");
-        yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_CANCELLED_SUB_TITLE, "&cAguardando mais jogadores...");
+        yml.addDefault(Messages.ARENA_STATUS_START_COUNTDOWN_CANCELLED_SUB_TITLE, "&bAguardando mais jogadores...");
         yml.addDefault(Messages.ARENA_STATUS_START_PLAYER_TITLE, "&aCOMEÇOU");
         yml.addDefault(Messages.ARENA_STATUS_START_PLAYER_TUTORIAL, Arrays.asList("&a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
                 "&f                                   &lBedWars", "",
-                "&e&l    Proteja sua cama e destrua as camas inimigas.",
-                "&e&l      Melhore você e sua equipe coletando",
-                "&e&l   Ferro, Ouro, Esmeralda e Diamante de geradores",
-                "&e&l             para adquirir as melhorias.", "",
+                "&b&l    Proteja sua cama e destrua as camas inimigas.",
+                "&b&l      Melhore você e sua equipe coletando",
+                "&b&l   Ferro, Ouro, Esmeralda e Diamante de geradores",
+                "&b&l             para adquirir as melhorias.", "",
                 "&a▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"));
-        yml.addDefault(Messages.ARENA_JOIN_DENIED_SELECTOR, "%bw_lang_prefix%&cDesculpe, mas você não pode participar desta partida neste momento. Use o botão direito do mouse para espectar.");
-        yml.addDefault(Messages.ARENA_SPECTATE_DENIED_SELECTOR, "%bw_lang_prefix%&cDesculpe, mas você não pode espectar esta partida neste momento. Utilize o botão esquerdo para entrar na partida.");
-        yml.addDefault(Messages.ARENA_JOIN_DENIED_NO_PROXY, "&cDesculpe, mas precisa entrar em uma arena usando BedWarsProxy. \n&eSe você quiser configurar uma arena, certifique-se de dar a si mesmo a permissão bw.setup para que você possa entrar no servidor diretamente!");
-        yml.addDefault(Messages.ARENA_JOIN_DENIED_NO_TIME, "&cEste jogo já começou!");
-        yml.addDefault(Messages.ARENA_SPECTATOR_TELEPORTER_GUI_NAME, "&8Teletransportador");
+        yml.addDefault(Messages.ARENA_JOIN_DENIED_SELECTOR, "%bw_lang_prefix%&bDesculpe, mas você não pode participar desta partida neste momento. Use o botão direito do mouse para espectar.");
+        yml.addDefault(Messages.ARENA_SPECTATE_DENIED_SELECTOR, "%bw_lang_prefix%&bDesculpe, mas você não pode espectar esta partida neste momento. Utilize o botão esquerdo para entrar na partida.");
+        yml.addDefault(Messages.ARENA_JOIN_DENIED_NO_PROXY, "&bDesculpe, mas precisa entrar em uma arena usando BedWarsProxy. \n&bSe você quiser configurar uma arena, certifique-se de dar a si mesmo a permissão bw.setup para que você possa entrar no servidor diretamente!");
+        yml.addDefault(Messages.ARENA_JOIN_DENIED_NO_TIME, "&bEste jogo já começou!");
+        yml.addDefault(Messages.ARENA_SPECTATOR_TELEPORTER_GUI_NAME, "&fTeletransportador");
         yml.addDefault(Messages.ARENA_SPECTATOR_TELEPORTER_GUI_HEAD_NAME, "%bw_v_prefix%%bw_player%");
-        yml.addDefault(Messages.ARENA_SPECTATOR_TELEPORTER_GUI_HEAD_LORE, Arrays.asList("&7Vida: &f%bw_player_health%%", "&7Fome: &f%bw_player_food%", "", "&7Clique para teletransportar."));
-        yml.addDefault(Messages.ARENA_SPECTATOR_LEAVE_ITEM_NAME, "&c&lRetornar ao lobby");
-        yml.addDefault(Messages.ARENA_SPECTATOR_LEAVE_ITEM_LORE, Collections.singletonList("&7Clique com o botão direito para sair."));
-        yml.addDefault(Messages.ARENA_SPECTATOR_FIRST_PERSON_ENTER_TITLE, "&aEspectando: &7%bw_player%");
-        yml.addDefault(Messages.ARENA_SPECTATOR_FIRST_PERSON_ENTER_SUBTITLE, "&cUtilize o SHIFT para sair.");
-        yml.addDefault(Messages.ARENA_SPECTATOR_FIRST_PERSON_LEAVE_TITLE, "&eSaindo do modo espectador!");
+        yml.addDefault(Messages.ARENA_SPECTATOR_TELEPORTER_GUI_HEAD_LORE, Arrays.asList("&fVida: &f%bw_player_health%%", "&fFome: &f%bw_player_food%", "", "&fClique para teletransportar."));
+        yml.addDefault(Messages.ARENA_SPECTATOR_LEAVE_ITEM_NAME, "&b&lRetornar ao lobby");
+        yml.addDefault(Messages.ARENA_SPECTATOR_LEAVE_ITEM_LORE, Collections.singletonList("&fClique com o botão direito para sair."));
+        yml.addDefault(Messages.ARENA_SPECTATOR_FIRST_PERSON_ENTER_TITLE, "&aEspectando: &f%bw_player%");
+        yml.addDefault(Messages.ARENA_SPECTATOR_FIRST_PERSON_ENTER_SUBTITLE, "&bUtilize o SHIFT para sair.");
+        yml.addDefault(Messages.ARENA_SPECTATOR_FIRST_PERSON_LEAVE_TITLE, "&bSaindo do modo espectador!");
         yml.addDefault(Messages.ARENA_SPECTATOR_FIRST_PERSON_LEAVE_SUBTITLE, "");
-        yml.addDefault(Messages.ARENA_LEAVE_PARTY_DISBANDED, "%bw_lang_prefix%§cO dono da party saiu e a party foi desfeita.");
-        yml.addDefault(Messages.GENERATOR_HOLOGRAM_TIER, "&eNível &c%bw_tier%");
+        yml.addDefault(Messages.ARENA_LEAVE_PARTY_DISBANDED, "%bw_lang_prefix%�&bO dono da party saiu e a party foi desfeita.");
+        yml.addDefault(Messages.GENERATOR_HOLOGRAM_TIER, "&bNível &b%bw_tier%");
         yml.addDefault(Messages.GENERATOR_HOLOGRAM_TYPE_DIAMOND, "&b&lDiamante");
         yml.addDefault(Messages.GENERATOR_HOLOGRAM_TYPE_EMERALD, "&a&lEsmeralda");
-        yml.addDefault(Messages.GENERATOR_HOLOGRAM_TIMER, "&eGera em &c%bw_seconds% &esegundos.");
-        yml.addDefault(Messages.GENERATOR_UPGRADE_CHAT_ANNOUNCEMENT, "%bw_lang_prefix%Geradores de %bw_generator_type% &emelhorados para nível &c%bw_tier%");
-        yml.addDefault(Messages.FORMATTING_CHAT_LOBBY, "%bw_level%%bw_v_prefix%&7%bw_player%%bw_v_suffix%: %bw_message%");
-        yml.addDefault(Messages.FORMATTING_CHAT_WAITING, "%bw_level%%bw_v_prefix%&7%bw_player%%bw_v_suffix%: %bw_message%");
-        yml.addDefault(Messages.FORMATTING_CHAT_SHOUT, "%bw_level%%bw_v_prefix%&6[G] %bw_team_format% &7%bw_player%&f%bw_v_suffix%: %bw_message%");
-        yml.addDefault(Messages.FORMATTING_CHAT_TEAM, "%bw_level%%bw_v_prefix%&f%bw_team_format%&7 %bw_player%%bw_v_suffix%: %bw_message%");
-        yml.addDefault(Messages.FORMATTING_CHAT_SPECTATOR, "%bw_level%%bw_v_prefix%&7[ESPECTADOR] %bw_player%%bw_v_suffix%: %bw_message%");
-        yml.addDefault(Messages.FORMATTING_SCOREBOARD_TAB_PREFIX_SPECTATOR, List.of("&7"));
+        yml.addDefault(Messages.GENERATOR_HOLOGRAM_TIMER, "&bGera em &b%bw_seconds% &bsegundos.");
+        yml.addDefault(Messages.GENERATOR_UPGRADE_CHAT_ANNOUNCEMENT, "%bw_lang_prefix%Geradores de %bw_generator_type% &bmelhorados para nível &b%bw_tier%");
+        yml.addDefault(Messages.FORMATTING_CHAT_LOBBY, "%bw_level%%bw_v_prefix%&f%bw_player%%bw_v_suffix%: %bw_message%");
+        yml.addDefault(Messages.FORMATTING_CHAT_WAITING, "%bw_level%%bw_v_prefix%&f%bw_player%%bw_v_suffix%: %bw_message%");
+        yml.addDefault(Messages.FORMATTING_CHAT_SHOUT, "%bw_level%%bw_v_prefix%&b[G] %bw_team_format% &f%bw_player%&f%bw_v_suffix%: %bw_message%");
+        yml.addDefault(Messages.FORMATTING_CHAT_TEAM, "%bw_level%%bw_v_prefix%&f%bw_team_format%&f %bw_player%%bw_v_suffix%: %bw_message%");
+        yml.addDefault(Messages.FORMATTING_CHAT_SPECTATOR, "%bw_level%%bw_v_prefix%&f[ESPECTADOR] %bw_player%%bw_v_suffix%: %bw_message%");
+        yml.addDefault(Messages.FORMATTING_SCOREBOARD_TAB_PREFIX_SPECTATOR, List.of("&f"));
         yml.addDefault(Messages.FORMATTING_SCOREBOARD_TAB_SUFFIX_SPECTATOR, new ArrayList<>());
         yml.addDefault(Messages.FORMATTING_SCOREBOARD_TAB_PREFIX_RESTARTING, Arrays.asList("%bw_team_color%&l%bw_team_letter% &r%bw_team_color%", "%bw_team% ", "%bw_v_prefix% %bw_team_color%"));
         yml.addDefault(Messages.FORMATTING_SCOREBOARD_TAB_SUFFIX_RESTARTING, new ArrayList<>());
@@ -190,27 +190,27 @@ public class Portuguese extends Language {
 
         yml.addDefault(Messages.FORMATTING_SCOREBOARD_DATE, "dd/MM/yy");
         yml.addDefault(Messages.FORMATTING_SCOREBOARD_TEAM_GENERIC, "%bw_team_color%%bw_team_letter%&f %bw_team_name%: %bw_team_status%");
-        yml.addDefault(Messages.FORMATTING_SCOREBOARD_TEAM_ELIMINATED, "&c&l✘");
+        yml.addDefault(Messages.FORMATTING_SCOREBOARD_TEAM_ELIMINATED, "&b&l✘");
         yml.addDefault(Messages.FORMATTING_SCOREBOARD_BED_DESTROYED, "&a%bw_players_remaining%");
         yml.addDefault(Messages.FORMATTING_SCOREBOARD_TEAM_ALIVE, "&a&l✓");
         yml.addDefault(Messages.FORMATTING_SCOREBOARD_NEXEVENT_TIMER, "mm:ss");
-        yml.addDefault(Messages.FORMATTING_SCOREBOARD_YOUR_TEAM, "&7 VOCÊ");
+        yml.addDefault(Messages.FORMATTING_SCOREBOARD_YOUR_TEAM, "&f VOCÊ");
         yml.addDefault(Messages.FORMATTING_ACTION_BAR_TRACKING, "&fRastreando: %bw_team% &f- Distância: %bw_distance%m");
-        yml.addDefault(Messages.FORMATTING_BOSSBAR_DRAGON, "&7Dragão de %bw_team%");
-        yml.addDefault(Messages.FORMATTING_TEAM_WINNER_FORMAT, "      %bw_team_color%%bw_team_name% &7- %bw_winner_members%");
-        yml.addDefault(Messages.FORMATTING_SOLO_WINNER_FORMAT, "                 %bw_team_color%%bw_team_name% &7- %bw_winner_members%");
+        yml.addDefault(Messages.FORMATTING_BOSSBAR_DRAGON, "&fDragão de %bw_team%");
+        yml.addDefault(Messages.FORMATTING_TEAM_WINNER_FORMAT, "      %bw_team_color%%bw_team_name% &f- %bw_winner_members%");
+        yml.addDefault(Messages.FORMATTING_SOLO_WINNER_FORMAT, "                 %bw_team_color%%bw_team_name% &f- %bw_winner_members%");
         yml.addDefault(Messages.FORMATTING_GENERATOR_TIER1, "I");
         yml.addDefault(Messages.FORMATTING_GENERATOR_TIER2, "II");
         yml.addDefault(Messages.FORMATTING_GENERATOR_TIER3, "III");
         yml.addDefault(Messages.FORMATTING_DESPAWNABLE_UTILITY_NPC_HEALTH, "▮ ");
-        yml.addDefault(Messages.FORMATTING_DESPAWNABLE_UTILITY_NPC_TIME_BAR_PREFIX, "&8[");
-        yml.addDefault(Messages.FORMATTING_DESPAWNABLE_UTILITY_NPC_TIME_BAR_SUFFIX, "&8]");
+        yml.addDefault(Messages.FORMATTING_DESPAWNABLE_UTILITY_NPC_TIME_BAR_PREFIX, "&f[");
+        yml.addDefault(Messages.FORMATTING_DESPAWNABLE_UTILITY_NPC_TIME_BAR_SUFFIX, "&f]");
         yml.addDefault(Messages.FORMATTING_DESPAWNABLE_UTILITY_NPC_TIME_BAR_FILLED, "|");
-        yml.addDefault(Messages.FORMATTING_DESPAWNABLE_UTILITY_NPC_TIME_BAR_EMPTY, "&7|");
+        yml.addDefault(Messages.FORMATTING_DESPAWNABLE_UTILITY_NPC_TIME_BAR_EMPTY, "&f|");
         yml.addDefault(Messages.FORMATTING_STATS_DATE_FORMAT, "dd/MM/yyyy HH:mm");
         yml.addDefault(Messages.FORMAT_PAPI_PLAYER_TEAM_TEAM, "%bw_team_color%[%bw_team_name%]");
-        yml.addDefault(Messages.FORMAT_PAPI_PLAYER_TEAM_SHOUT, "&6[GLOBAL]");
-        yml.addDefault(Messages.FORMAT_PAPI_PLAYER_TEAM_SPECTATOR, "&7[ESPECTADOR]");
+        yml.addDefault(Messages.FORMAT_PAPI_PLAYER_TEAM_SHOUT, "&b[GLOBAL]");
+        yml.addDefault(Messages.FORMAT_PAPI_PLAYER_TEAM_SPECTATOR, "&f[ESPECTADOR]");
         yml.addDefault(Messages.MEANING_FULL, "Lotado");
         yml.addDefault(Messages.MEANING_SHOUT, "global");
         yml.addDefault(Messages.MEANING_NOBODY, "Ninguém");
@@ -226,238 +226,321 @@ public class Portuguese extends Language {
         yml.addDefault(Messages.MEANING_VAULT_SINGULAR, "$");
         yml.addDefault(Messages.MEANING_VAULT_PLURAL, "$");
         yml.addDefault(Messages.MEANING_ENABLED, "&aAtivado");
-        yml.addDefault(Messages.MEANING_DISABLED, "&cDesativado");
-        yml.addDefault(Messages.INTERACT_CANNOT_PLACE_BLOCK, "%bw_lang_prefix%&cVocê não pode colocar blocos aqui!");
-        yml.addDefault(Messages.INTERACT_CANNOT_BREAK_BLOCK, "%bw_lang_prefix%&cVocê só pode quebrar blocos colocados por um jogador!");
-        yml.addDefault(Messages.INTERACT_FULL_CHEST, "%bw_lang_prefix%&cO baú está cheio!");
-        yml.addDefault(Messages.INTERACT_CANNOT_BREAK_OWN_BED, "&cVocê não pode destruir sua própria cama!");
-        yml.addDefault(Messages.INTERACT_BED_DESTROY_CHAT_ANNOUNCEMENT, "\n&f&lCAMA DESTRUIDA > %bw_team_color%Cama do time %bw_team_name% &7foi destruida por %bw_player_color%%bw_player%&7!\n");
-        yml.addDefault(Messages.INTERACT_BED_DESTROY_TITLE_ANNOUNCEMENT, "&cCAMA DESTRUIDA !");
+        yml.addDefault(Messages.MEANING_DISABLED, "&bDesativado");
+        yml.addDefault(Messages.INTERACT_CANNOT_PLACE_BLOCK, "%bw_lang_prefix%&bVocê não pode colocar blocos aqui!");
+        yml.addDefault(Messages.INTERACT_CANNOT_BREAK_BLOCK, "%bw_lang_prefix%&bVocê só pode quebrar blocos colocados por um jogador!");
+        yml.addDefault(Messages.INTERACT_FULL_CHEST, "%bw_lang_prefix%&bO baú está cheio!");
+        yml.addDefault(Messages.INTERACT_CANNOT_BREAK_OWN_BED, "&bVocê não pode destruir sua própria cama!");
+        yml.addDefault(Messages.INTERACT_BED_DESTROY_CHAT_ANNOUNCEMENT, "\n&f&lCAMA DESTRUIDA > %bw_team_color%Cama do time %bw_team_name% &ffoi destruida por %bw_player_color%%bw_player%&f!\n");
+        yml.addDefault(Messages.INTERACT_BED_DESTROY_TITLE_ANNOUNCEMENT, "&bCAMA DESTRUIDA !");
         yml.addDefault(Messages.INTERACT_BED_DESTROY_SUBTITLE_ANNOUNCEMENT, "&fVocê não vai mais renascer!");
-        yml.addDefault(Messages.INTERACT_BED_DESTROY_CHAT_ANNOUNCEMENT_TO_VICTIM, "&f&lCAMA DESTRUIDA > &7Sua cama foi destruida por %bw_player_color%%bw_player%&7!");
-        yml.addDefault(Messages.INTERACT_CHEST_CANT_OPEN_TEAM_ELIMINATED, "&cVocê não pode abrir este baú porque esse time não foi eliminado!");
-        yml.addDefault(Messages.INTERACT_INVISIBILITY_REMOVED_DAMGE_TAKEN, "&cSua invisibilidade foi removida pois você tomou dano!");
-        yml.addDefault(Messages.INTERACT_MAGIC_MILK_REMOVED, "&cOs efeitos do seu leite acabaram!");
-        yml.addDefault(Messages.ITEM_DEPOSITED_SUCCESSFULLY, "&7Você guardou &c(x{AMOUNT}) {ITEM} &7no baú.");
-        yml.addDefault(Messages.EGGBRIDGE_BUILD_LIMIT_WARNING, "&cYou are too close to the build limit!");
-        yml.addDefault(Messages.PLAYER_DIE_VOID_FALL_REGULAR_KILL, "%bw_player_color%%bw_player% &7caiu no void.");
-        yml.addDefault(Messages.PLAYER_DIE_VOID_FALL_FINAL_KILL, "%bw_player_color%%bw_player% &7caiu no void. &b&lKILL FINAL!");
-        yml.addDefault(Messages.PLAYER_DIE_KNOCKED_IN_VOID_REGULAR_KILL, "%bw_player_color%%bw_player% &7foi jogado no void por %bw_killer_color%%bw_killer_name%&7.");
-        yml.addDefault(Messages.PLAYER_DIE_KNOCKED_IN_VOID_FINAL_KILL, "%bw_player_color%%bw_player% &7foi jogado no void por %bw_killer_color%%bw_killer_name%&7. &b&lKILL FINAL!");
-        yml.addDefault(Messages.PLAYER_DIE_PVP_LOG_OUT_REGULAR, "%bw_player_color%%bw_player% &7desconectou em combate com %bw_killer_color%%bw_killer_name%&7.");
-        yml.addDefault(Messages.PLAYER_DIE_PVP_LOG_OUT_FINAL, "%bw_player_color%%bw_player% &7desconectou em combate com %bw_killer_color%%bw_killer_name%&7. &b&lKILL FINAL!");
-        yml.addDefault(Messages.PLAYER_DIE_KNOCKED_BY_REGULAR_KILL, "%bw_player_color%%bw_player% &7foi empurrado por %bw_killer_color%%bw_killer_name%&7.");
-        yml.addDefault(Messages.PLAYER_DIE_KNOCKED_BY_FINAL_KILL, "%bw_player_color%%bw_player% &7foi empurrado por %bw_killer_color%%bw_killer_name%&7. &b&lKILL FINAL!");
-        yml.addDefault(Messages.PLAYER_DIE_EXPLOSION_WITH_SOURCE_REGULAR_KILL, "%bw_player_color%%bw_player% &7foi atingido por uma TNT de %bw_killer_color%%bw_killer_name%&7.");
-        yml.addDefault(Messages.PLAYER_DIE_EXPLOSION_WITH_SOURCE_FINAL_KILL, "%bw_player_color%%bw_player% &7foi atingido por uma TNT de %bw_killer_color%%bw_killer_name%&7. &b&lKILL FINAL!");
-        yml.addDefault(Messages.PLAYER_DIE_EXPLOSION_WITHOUT_SOURCE_REGULAR, "%bw_player_color%%bw_player% &7foi atingido por uma TNT.");
-        yml.addDefault(Messages.PLAYER_DIE_EXPLOSION_WITHOUT_SOURCE_FINAL_KILL, "%bw_player_color%%bw_player% &7foi atingido por uma TNT. &b&lKILL FINAL!");
-        yml.addDefault(Messages.PLAYER_DIE_PVP_REGULAR_KILL, "%bw_player_color%%bw_player% &7foi morto por %bw_killer_color%%bw_killer_name%&7.");
-        yml.addDefault(Messages.PLAYER_DIE_PVP_FINAL_KILL, "%bw_player_color%%bw_player% &7foi morto por %bw_killer_color%%bw_killer_name%&7. &b&lKILL FINAL!");
-        yml.addDefault(Messages.PLAYER_DIE_UNKNOWN_REASON_REGULAR, "%bw_player_color%%bw_player% &7morreu.");
-        yml.addDefault(Messages.PLAYER_DIE_UNKNOWN_REASON_FINAL_KILL, "%bw_player_color%%bw_player% &7morreu. &b&lKILL FINAL!");
-        yml.addDefault(Messages.PLAYER_DIE_SHOOT_REGULAR, "%bw_player_color%%bw_player% &7foi flechado por %bw_killer_color%%bw_killer_name%&7!");
-        yml.addDefault(Messages.PLAYER_DIE_SHOOT_FINAL_KILL, "%bw_player_color%%bw_player% &7foi flechado por %bw_killer_color%%bw_killer_name%&7! &b&lKILL FINAL!");
-        yml.addDefault(Messages.PLAYER_DIE_DEBUG_REGULAR, "%bw_player_color%%bw_player% &7foi morto por pela Traça de %bw_killer_color%%bw_killer_team_name%&7!");
-        yml.addDefault(Messages.PLAYER_DIE_DEBUG_FINAL_KILL, "%bw_player_color%%bw_player% &7foi morto por pela Traça de %bw_killer_color%%bw_killer_team_name%&7! &b&lKILL FINAL!");
-        yml.addDefault(Messages.PLAYER_DIE_IRON_GOLEM_REGULAR, "%bw_player_color%%bw_player% &7foi morto pelo Golem do %bw_killer_color%%bw_killer_team_name%&7!");
-        yml.addDefault(Messages.PLAYER_DIE_IRON_GOLEM_FINAL_KILL, "%bw_player_color%%bw_player% &7foi morto pelo Golem do %bw_killer_color%%bw_killer_team_name%&7! &b&lKILL FINAL!");
+        yml.addDefault(Messages.INTERACT_BED_DESTROY_CHAT_ANNOUNCEMENT_TO_VICTIM, "&f&lCAMA DESTRUIDA > &fSua cama foi destruida por %bw_player_color%%bw_player%&f!");
+        yml.addDefault(Messages.INTERACT_CHEST_CANT_OPEN_TEAM_ELIMINATED, "&bVocê não pode abrir este baú porque esse time não foi eliminado!");
+        yml.addDefault(Messages.INTERACT_INVISIBILITY_REMOVED_DAMGE_TAKEN, "&bSua invisibilidade foi removida pois você tomou dano!");
+        yml.addDefault(Messages.INTERACT_MAGIC_MILK_REMOVED, "&bOs efeitos do seu leite acabaram!");
+        yml.addDefault(Messages.ITEM_DEPOSITED_SUCCESSFULLY, "&fVocê guardou &b(x{AMOUNT}) {ITEM} &fno baú.");
+        yml.addDefault(Messages.EGGBRIDGE_BUILD_LIMIT_WARNING, "&bYou are too close to the build limit!");
+        yml.addDefault(Messages.PLAYER_DIE_VOID_FALL_REGULAR_KILL, "%bw_player_color%%bw_player% &fcaiu no void.");
+        yml.addDefault(Messages.PLAYER_DIE_VOID_FALL_FINAL_KILL, "%bw_player_color%%bw_player% &fcaiu no void. &b&lKILL FINAL!");
+        yml.addDefault(Messages.PLAYER_DIE_KNOCKED_IN_VOID_REGULAR_KILL, "%bw_player_color%%bw_player% &ffoi jogado no void por %bw_killer_color%%bw_killer_name%&f.");
+        yml.addDefault(Messages.PLAYER_DIE_KNOCKED_IN_VOID_FINAL_KILL, "%bw_player_color%%bw_player% &ffoi jogado no void por %bw_killer_color%%bw_killer_name%&f. &b&lKILL FINAL!");
+        yml.addDefault(Messages.PLAYER_DIE_PVP_LOG_OUT_REGULAR, "%bw_player_color%%bw_player% &fdesconectou em combate com %bw_killer_color%%bw_killer_name%&f.");
+        yml.addDefault(Messages.PLAYER_DIE_PVP_LOG_OUT_FINAL, "%bw_player_color%%bw_player% &fdesconectou em combate com %bw_killer_color%%bw_killer_name%&f. &b&lKILL FINAL!");
+        yml.addDefault(Messages.PLAYER_DIE_KNOCKED_BY_REGULAR_KILL, "%bw_player_color%%bw_player% &ffoi empurrado por %bw_killer_color%%bw_killer_name%&f.");
+        yml.addDefault(Messages.PLAYER_DIE_KNOCKED_BY_FINAL_KILL, "%bw_player_color%%bw_player% &ffoi empurrado por %bw_killer_color%%bw_killer_name%&f. &b&lKILL FINAL!");
+        yml.addDefault(Messages.PLAYER_DIE_EXPLOSION_WITH_SOURCE_REGULAR_KILL, "%bw_player_color%%bw_player% &ffoi atingido por uma TNT de %bw_killer_color%%bw_killer_name%&f.");
+        yml.addDefault(Messages.PLAYER_DIE_EXPLOSION_WITH_SOURCE_FINAL_KILL, "%bw_player_color%%bw_player% &ffoi atingido por uma TNT de %bw_killer_color%%bw_killer_name%&f. &b&lKILL FINAL!");
+        yml.addDefault(Messages.PLAYER_DIE_EXPLOSION_WITHOUT_SOURCE_REGULAR, "%bw_player_color%%bw_player% &ffoi atingido por uma TNT.");
+        yml.addDefault(Messages.PLAYER_DIE_EXPLOSION_WITHOUT_SOURCE_FINAL_KILL, "%bw_player_color%%bw_player% &ffoi atingido por uma TNT. &b&lKILL FINAL!");
+        yml.addDefault(Messages.PLAYER_DIE_PVP_REGULAR_KILL, "%bw_player_color%%bw_player% &ffoi morto por %bw_killer_color%%bw_killer_name%&f.");
+        yml.addDefault(Messages.PLAYER_DIE_PVP_FINAL_KILL, "%bw_player_color%%bw_player% &ffoi morto por %bw_killer_color%%bw_killer_name%&f. &b&lKILL FINAL!");
+        yml.addDefault(Messages.PLAYER_DIE_UNKNOWN_REASON_REGULAR, "%bw_player_color%%bw_player% &fmorreu.");
+        yml.addDefault(Messages.PLAYER_DIE_UNKNOWN_REASON_FINAL_KILL, "%bw_player_color%%bw_player% &fmorreu. &b&lKILL FINAL!");
+        yml.addDefault(Messages.PLAYER_DIE_SHOOT_REGULAR, "%bw_player_color%%bw_player% &ffoi flechado por %bw_killer_color%%bw_killer_name%&f!");
+        yml.addDefault(Messages.PLAYER_DIE_SHOOT_FINAL_KILL, "%bw_player_color%%bw_player% &ffoi flechado por %bw_killer_color%%bw_killer_name%&f! &b&lKILL FINAL!");
+        yml.addDefault(Messages.PLAYER_DIE_DEBUG_REGULAR, "%bw_player_color%%bw_player% &ffoi morto por pela Traça de %bw_killer_color%%bw_killer_team_name%&f!");
+        yml.addDefault(Messages.PLAYER_DIE_DEBUG_FINAL_KILL, "%bw_player_color%%bw_player% &ffoi morto por pela Traça de %bw_killer_color%%bw_killer_team_name%&f! &b&lKILL FINAL!");
+        yml.addDefault(Messages.PLAYER_DIE_IRON_GOLEM_REGULAR, "%bw_player_color%%bw_player% &ffoi morto pelo Golem do %bw_killer_color%%bw_killer_team_name%&f!");
+        yml.addDefault(Messages.PLAYER_DIE_IRON_GOLEM_FINAL_KILL, "%bw_player_color%%bw_player% &ffoi morto pelo Golem do %bw_killer_color%%bw_killer_team_name%&f! &b&lKILL FINAL!");
         yml.addDefault(Messages.PLAYER_DIE_REWARD_DIAMOND, "%bw_lang_prefix%&b+%bw_amount% %bw_meaning%");
         yml.addDefault(Messages.PLAYER_DIE_REWARD_EMERALD, "%bw_lang_prefix%&a+%bw_amount% %bw_meaning%");
         yml.addDefault(Messages.PLAYER_DIE_REWARD_IRON, "%bw_lang_prefix%&f+%bw_amount% %bw_meaning%");
-        yml.addDefault(Messages.PLAYER_DIE_REWARD_GOLD, "%bw_lang_prefix%&6+%bw_amount% %bw_meaning%");
-        yml.addDefault(Messages.ARENA_MAX_BUILD_LIMIT_REACHED, "&cLimite máximo de construção atingido!");
-        yml.addDefault(Messages.ARENA_MIN_BUILD_LIMIT_REACHED, "&cLimite mínimo de construção atingido!");
-        yml.addDefault(Messages.ARENA_FIREBALL_COOLDOWN, "&cAguarde mais %bw_cooldown%s para fazer isso novamente!");
-        yml.addDefault(Messages.ARENA_IN_GAME_ANNOUNCEMENT, Arrays.asList("&c&lSe você for desconectado, use /reconectar para voltar ao jogo.", "&c&lNão é permitido formar alianças com o time adversário! Denuncie usando /report."));
-        yml.addDefault(Messages.PLAYER_DIE_RESPAWN_TITLE, "&cVOCÊ MORREU!");
-        yml.addDefault(Messages.PLAYER_DIE_RESPAWN_SUBTITLE, "&eRenascendo em &c%bw_time% &esegundos.");
-        yml.addDefault(Messages.PLAYER_DIE_RESPAWN_CHAT, "%bw_lang_prefix%&eVocê irá renascer em &c%bw_time% &esegundos.");
+        yml.addDefault(Messages.PLAYER_DIE_REWARD_GOLD, "%bw_lang_prefix%&b+%bw_amount% %bw_meaning%");
+        yml.addDefault(Messages.ARENA_MAX_BUILD_LIMIT_REACHED, "&bLimite máximo de construção atingido!");
+        yml.addDefault(Messages.ARENA_MIN_BUILD_LIMIT_REACHED, "&bLimite mínimo de construção atingido!");
+        yml.addDefault(Messages.ARENA_FIREBALL_COOLDOWN, "&bAguarde mais %bw_cooldown%s para fazer isso novamente!");
+        yml.addDefault(Messages.ARENA_IN_GAME_ANNOUNCEMENT, Arrays.asList("&b&lSe você for desconectado, use /reconectar para voltar ao jogo.", "&b&lNão é permitido formar alianças com o time adversário! Denuncie usando /report."));
+        yml.addDefault(Messages.PLAYER_DIE_RESPAWN_TITLE, "&bVOCÊ MORREU!");
+        yml.addDefault(Messages.PLAYER_DIE_RESPAWN_SUBTITLE, "&bRenascendo em &b%bw_time% &bsegundos.");
+        yml.addDefault(Messages.PLAYER_DIE_RESPAWN_CHAT, "%bw_lang_prefix%&bVocê irá renascer em &b%bw_time% &bsegundos.");
         yml.addDefault(Messages.PLAYER_DIE_RESPAWNED_TITLE, "&aRENASCIDO!");
-        yml.addDefault(Messages.PLAYER_DIE_ELIMINATED_CHAT, "%bw_lang_prefix%&cVocê foi eliminado!");
-        yml.addDefault(Messages.PLAYER_DIE_RESPAWNED_TEXT, "%bw_lang_prefix%&eVocê renasceu!");
-        yml.addDefault(Messages.PLAYER_HIT_BOW, "%bw_lang_prefix%%bw_player% &7está com &c%bw_damage_amount% &7de vida!");
-        yml.addDefault(Messages.GAME_END_GAME_OVER_PLAYER_TITLE, "&c&lFIM DE JOGO!");
-        yml.addDefault(Messages.GAME_END_VICTORY_PLAYER_TITLE, "&6&lVITÓRIA!");
+        yml.addDefault(Messages.PLAYER_DIE_ELIMINATED_CHAT, "%bw_lang_prefix%&bVocê foi eliminado!");
+        yml.addDefault(Messages.PLAYER_DIE_RESPAWNED_TEXT, "%bw_lang_prefix%&bVocê renasceu!");
+        yml.addDefault(Messages.PLAYER_HIT_BOW, "%bw_lang_prefix%%bw_player% &festá com &b%bw_damage_amount% &fde vida!");
+        yml.addDefault(Messages.GAME_END_GAME_OVER_PLAYER_TITLE, "&b&lFIM DE JOGO!");
+        yml.addDefault(Messages.GAME_END_VICTORY_PLAYER_TITLE, "&b&lVITÓRIA!");
         yml.addDefault(Messages.GAME_END_TEAM_WON_CHAT, "%bw_lang_prefix%%bw_team_color%%bw_team_name% &aganhou o jogo!");
         yml.addDefault(Messages.FORMATTING_EACH_WINNER, "%bw_player%");
         yml.addDefault(Messages.GAME_END_FIRST_KILLER, "%bw_player%");
         yml.addDefault(Messages.GAME_END_SECOND_KILLER, "%bw_player%");
         yml.addDefault(Messages.GAME_END_THIRD_KILLER, "%bw_player%");
         yml.addDefault(Messages.GAME_END_TOP_PLAYER_CHAT, Arrays.asList(
-                "&8&m----------------------------------------",
+                "&f&m----------------------------------------",
                 "&b&lBED WARS",
                 "&fVencedor: %bw_team_color%%bw_team_name%",
                 "&fTempo de partida: &a%bw_game_time%",
                 "",
                 "&b&lTOP KILLS FINAIS:",
-                "&e1º %bw_first_format% &7- &f%bw_first_kills%",
-                "&e2º %bw_second_format% &7- &f%bw_second_kills%",
+                "&b1º %bw_first_format% &f- &f%bw_first_kills%",
+                "&b2º %bw_second_format% &f- &f%bw_second_kills%",
                 "",
                 "&b&lTOP CAMAS QUEBRADAS:",
-                "&e1º %bw_bedbreaker_format% &7- &f%bw_beds%",
-                "&8&m----------------------------------------"
+                "&b1º %bw_bedbreaker_format% &f- &f%bw_beds%",
+                "&f&m----------------------------------------"
         ));
-        yml.addDefault(Messages.GAME_END_MAP_RATING_QUESTION, "%bw_lang_prefix%&fPor favor, classifique esse mapa de acordo com sua experiência. &c(%bw_map%)");
-        yml.addDefault(Messages.GAME_END_MAP_RATING_STAR, "&7✯");
-        yml.addDefault(Messages.GAME_END_MAP_RATING_HOVER, "&eClique para avaliar com &6%bw_rating% &eestrela(s)");
-        yml.addDefault(Messages.GAME_END_MAP_RATING_SUCCESS, "%bw_lang_prefix%&aVocê avaliou o mapa &f%bw_map% &acom &e%bw_rating% &aestrela(s)!");
-        yml.addDefault(Messages.GAME_END_MAP_RATING_NOT_AVAILABLE, "%bw_lang_prefix%&cVocê só pode avaliar o mapa no fim da partida.");
-        yml.addDefault(Messages.GAME_END_MAP_RATING_INVALID, "%bw_lang_prefix%&cAvaliação inválida.");
-        yml.addDefault(Messages.BED_HOLOGRAM_DEFEND, "&c&lDefenda sua cama!");
-        yml.addDefault(Messages.BED_HOLOGRAM_DESTROYED, "&c&lSua cama foi destruída!");
-        yml.addDefault(Messages.TEAM_ELIMINATED_CHAT, "\n&f&lEQUIPE ELIMINADA > &cO time %bw_team_color%%bw_team_name% &cfoi eliminado!\n");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_QUESTION, "%bw_lang_prefix%&fPor favor, classifique esse mapa de acordo com sua experiência. &b(%bw_map%)");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_STAR, "&f✯");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_HOVER, "&bClique para avaliar com &b%bw_rating% &bestrela(s)");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_SUCCESS, "%bw_lang_prefix%&aVocê avaliou o mapa &f%bw_map% &acom &b%bw_rating% &aestrela(s)!");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_NOT_AVAILABLE, "%bw_lang_prefix%&bVocê só pode avaliar o mapa no fim da partida.");
+        yml.addDefault(Messages.GAME_END_MAP_RATING_INVALID, "%bw_lang_prefix%&bAvaliação inválida.");
+        yml.addDefault(Messages.BED_HOLOGRAM_DEFEND, "&b&lDefenda sua cama!");
+        yml.addDefault(Messages.BED_HOLOGRAM_DESTROYED, "&b&lSua cama foi destruída!");
+        yml.addDefault(Messages.TEAM_ELIMINATED_CHAT, "\n&f&lEQUIPE ELIMINADA > &bO time %bw_team_color%%bw_team_name% &bfoi eliminado!\n");
         yml.addDefault(Messages.NEXT_EVENT_BEDS_DESTROY, "&fDestruição de Camas");
         yml.addDefault(Messages.NEXT_EVENT_DIAMOND_UPGRADE_II, "&fDiamante II");
         yml.addDefault(Messages.NEXT_EVENT_DIAMOND_UPGRADE_III, "&fDiamante III");
         yml.addDefault(Messages.NEXT_EVENT_DRAGON_SPAWN, "&fMorte Súbita");
         yml.addDefault(Messages.NEXT_EVENT_EMERALD_UPGRADE_II, "&fEsmeraldas II");
         yml.addDefault(Messages.NEXT_EVENT_EMERALD_UPGRADE_III, "&fEsmeraldas III");
-        yml.addDefault(Messages.NEXT_EVENT_GAME_END, "&4Fim do jogo");
-        yml.addDefault(Messages.NEXT_EVENT_TITLE_ANNOUNCE_BEDS_DESTROYED, "&cCAMA DESTRUÍDA!");
+        yml.addDefault(Messages.NEXT_EVENT_GAME_END, "&bFim do jogo");
+        yml.addDefault(Messages.NEXT_EVENT_TITLE_ANNOUNCE_BEDS_DESTROYED, "&bCAMA DESTRUÍDA!");
         yml.addDefault(Messages.NEXT_EVENT_SUBTITLE_ANNOUNCE_BEDS_DESTROYED, "&fTodas as camas foram destruídas!");
-        yml.addDefault(Messages.NEXT_EVENT_CHAT_ANNOUNCE_BEDS_DESTROYED, "&c&lTodas as camas foram destruídas!");
-        yml.addDefault(Messages.NEXT_EVENT_TITLE_ANNOUNCE_SUDDEN_DEATH, "&cMorte Súbita");
+        yml.addDefault(Messages.NEXT_EVENT_CHAT_ANNOUNCE_BEDS_DESTROYED, "&b&lTodas as camas foram destruídas!");
+        yml.addDefault(Messages.NEXT_EVENT_TITLE_ANNOUNCE_SUDDEN_DEATH, "&bMorte Súbita");
         yml.addDefault(Messages.NEXT_EVENT_SUBTITLE_ANNOUNCE_SUDDEN_DEATH, "");
-        yml.addDefault(Messages.NEXT_EVENT_CHAT_ANNOUNCE_SUDDEN_DEATH, "&cMORTE SÚBITA: &6&b%bw_dragons_amount% dragões do %bw_team_color%%bw_team_name%");
-        yml.addDefault(Messages.XP_REWARD_PER_MINUTE, "%bw_lang_prefix%&6+%bw_xp% XP (Tempo de jogo).");
-        yml.addDefault(Messages.XP_REWARD_WIN, "%bw_lang_prefix%&6+%bw_xp% XP (Vencer o jogo).");
-        yml.addDefault(Messages.XP_REWARD_PER_TEAMMATE, "%bw_lang_prefix%&6+%bw_xp% XP (Suporte da equipe).");
-        yml.addDefault(Messages.XP_REWARD_BED_DESTROY, "%bw_lang_prefix%&6+%bw_xp% XP (Bed Destroyed).");
-        yml.addDefault(Messages.XP_REWARD_REGULAR_KILL, "%bw_lang_prefix%&6+%bw_xp% XP (Regular Kill).");
-        yml.addDefault(Messages.XP_REWARD_FINAL_KILL, "%bw_lang_prefix%&6+%bw_xp% XP (Final Kill).");
-        yml.addDefault(Messages.XP_REWARD_HALLOWEEN, "%bw_lang_prefix%&6+5 XP (Halloween).");
+        yml.addDefault(Messages.NEXT_EVENT_CHAT_ANNOUNCE_SUDDEN_DEATH, "&bMORTE SÚBITA: &b&b%bw_dragons_amount% dragões do %bw_team_color%%bw_team_name%");
+        yml.addDefault(Messages.XP_REWARD_PER_MINUTE, "%bw_lang_prefix%&b+%bw_xp% XP (Tempo de jogo).");
+        yml.addDefault(Messages.XP_REWARD_WIN, "%bw_lang_prefix%&b+%bw_xp% XP (Vencer o jogo).");
+        yml.addDefault(Messages.XP_REWARD_PER_TEAMMATE, "%bw_lang_prefix%&b+%bw_xp% XP (Suporte da equipe).");
+        yml.addDefault(Messages.XP_REWARD_BED_DESTROY, "%bw_lang_prefix%&b+%bw_xp% XP (Bed Destroyed).");
+        yml.addDefault(Messages.XP_REWARD_REGULAR_KILL, "%bw_lang_prefix%&b+%bw_xp% XP (Regular Kill).");
+        yml.addDefault(Messages.XP_REWARD_FINAL_KILL, "%bw_lang_prefix%&b+%bw_xp% XP (Final Kill).");
+        yml.addDefault(Messages.XP_REWARD_HALLOWEEN, "%bw_lang_prefix%&b+5 XP (Halloween).");
         yml.addDefault(Messages.PLAYER_LEVEL_UP, Collections.singletonList("&aParabéns! Você evoluiu seu nível para %bw_level%."));
 
-        yml.addDefault(Messages.MONEY_REWARD_PER_MINUTE, "%bw_lang_prefix%&6+%bw_money% Moedas (Tempo de jogo).");
-        yml.addDefault(Messages.MONEY_REWARD_WIN, "%bw_lang_prefix%&6+%bw_money% Moedas (Vencer o jogo).");
-        yml.addDefault(Messages.MONEY_REWARD_PER_TEAMMATE, "%bw_lang_prefix%&6+%bw_money% Moedas (Suporte da equipe).");
-        yml.addDefault(Messages.MONEY_REWARD_BED_DESTROYED, "%bw_lang_prefix%&6+%bw_money% Moedas (Bed Destroyed).");
-        yml.addDefault(Messages.MONEY_REWARD_FINAL_KILL, "%bw_lang_prefix%&6+%bw_money% Moedas (Final Kill).");
-        yml.addDefault(Messages.MONEY_REWARD_REGULAR_KILL, "%bw_lang_prefix%&6+%bw_money% Moedas (Regular Kill).");
+        yml.addDefault(Messages.MONEY_REWARD_PER_MINUTE, "%bw_lang_prefix%&b+%bw_money% Moedas (Tempo de jogo).");
+        yml.addDefault(Messages.MONEY_REWARD_WIN, "%bw_lang_prefix%&b+%bw_money% Moedas (Vencer o jogo).");
+        yml.addDefault(Messages.MONEY_REWARD_PER_TEAMMATE, "%bw_lang_prefix%&b+%bw_money% Moedas (Suporte da equipe).");
+        yml.addDefault(Messages.MONEY_REWARD_BED_DESTROYED, "%bw_lang_prefix%&b+%bw_money% Moedas (Bed Destroyed).");
+        yml.addDefault(Messages.MONEY_REWARD_FINAL_KILL, "%bw_lang_prefix%&b+%bw_money% Moedas (Final Kill).");
+        yml.addDefault(Messages.MONEY_REWARD_REGULAR_KILL, "%bw_lang_prefix%&b+%bw_money% Moedas (Regular Kill).");
 
-        yml.addDefault(Messages.HALLOWEEN_ITEM_NAME, "&6&lFeliz Halloween");
+        yml.addDefault(Messages.HALLOWEEN_ITEM_NAME, "&b&lFeliz Halloween");
         yml.addDefault(Messages.FORMATTING_HISTORY_DATE_FORMAT, "dd/MM HH:mm");
         yml.addDefault(Messages.HISTORY_RESULT_WIN, "&aVenceu");
-        yml.addDefault(Messages.HISTORY_RESULT_LOSE, "&cPerdeu");
-        yml.addDefault(Messages.PLAYER_HISTORY_NO_DATA, "%bw_lang_prefix%&cNao ha historico ainda.");
-        yml.addDefault(Messages.PLAYER_HISTORY_PLAYER_NOT_FOUND, "%bw_lang_prefix%&cJogador nao encontrado.");
-        yml.addDefault(Messages.PLAYER_HISTORY_VIEW_OTHER_DENIED, "%bw_lang_prefix%&cVoce nao tem permissao para ver outros jogadores.");
+        yml.addDefault(Messages.HISTORY_RESULT_LOSE, "&bPerdeu");
+        yml.addDefault(Messages.PLAYER_HISTORY_NO_DATA, "%bw_lang_prefix%&bNao ha historico ainda.");
+        yml.addDefault(Messages.PLAYER_HISTORY_PLAYER_NOT_FOUND, "%bw_lang_prefix%&bJogador nao encontrado.");
+        yml.addDefault(Messages.PLAYER_HISTORY_VIEW_OTHER_DENIED, "%bw_lang_prefix%&bVoce nao tem permissao para ver outros jogadores.");
+        yml.addDefault(Messages.PLAYER_STATS_PLAYER_NOT_FOUND, "%bw_lang_prefix%&bJogador nao encontrado.");
 
         /* Lobby Command Items */
-        yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_NAME.replace("%path%", "history"), "&eHistorico de Partidas");
+        yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_NAME.replace("%path%", "history"), "&bHistorico de Partidas");
         yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_LORE.replace("%path%", "history"), Collections.singletonList("&fBotao direito para ver o historico!"));
-        yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_NAME.replace("%path%", "stats"), "&eEstatísticas");
+        yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_NAME.replace("%path%", "stats"), "&bEstatísticas");
         yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_LORE.replace("%path%", "stats"), Collections.singletonList("&fBotão direito para ver estatísticas! "));
-        yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_NAME.replace("%path%", "arena-selector"), "&eSeletor de Arena");
+        yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_NAME.replace("%path%", "arena-selector"), "&bSeletor de Arena");
         yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_LORE.replace("%path%", "arena-selector"), Collections.singletonList("&fBotão direito para escolher arena."));
-        yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_NAME.replace("%path%", "leave"), "&eSair do BedWars");
+        yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_NAME.replace("%path%", "leave"), "&bSair do BedWars");
         yml.addDefault(Messages.GENERAL_CONFIGURATION_LOBBY_ITEMS_LORE.replace("%path%", "leave"), Collections.singletonList("&fBotão direito para sair do BedWars!"));
         /* Pre Game Command Items */
-        yml.addDefault(Messages.GENERAL_CONFIGURATION_WAITING_ITEMS_NAME.replace("%path%", "stats"), "&eEstatísticas");
+        yml.addDefault(Messages.GENERAL_CONFIGURATION_WAITING_ITEMS_NAME.replace("%path%", "stats"), "&bEstatísticas");
         yml.addDefault(Messages.GENERAL_CONFIGURATION_WAITING_ITEMS_LORE.replace("%path%", "stats"), Collections.singletonList("&fBotão direito para ver estatísticas!"));
-        yml.addDefault(Messages.GENERAL_CONFIGURATION_WAITING_ITEMS_NAME.replace("%path%", "leave"), "&eSair da Partida");
+        yml.addDefault(Messages.GENERAL_CONFIGURATION_WAITING_ITEMS_NAME.replace("%path%", "leave"), "&bSair da Partida");
         yml.addDefault(Messages.GENERAL_CONFIGURATION_WAITING_ITEMS_LORE.replace("%path%", "leave"), Collections.singletonList("&fBotão direito para sair da arena!"));
         /* Spectator Command Items */
-        yml.addDefault(Messages.GENERAL_CONFIGURATION_SPECTATOR_ITEMS_NAME.replace("%path%", "teleporter"), "&eTeletransportador");
-        yml.addDefault(Messages.GENERAL_CONFIGURATION_SPECTATOR_ITEMS_NAME.replace("%path%", "leave"), "&eSair da Partida");
+        yml.addDefault(Messages.GENERAL_CONFIGURATION_SPECTATOR_ITEMS_NAME.replace("%path%", "teleporter"), "&bTeletransportador");
+        yml.addDefault(Messages.GENERAL_CONFIGURATION_SPECTATOR_ITEMS_NAME.replace("%path%", "leave"), "&bSair da Partida");
         yml.addDefault(Messages.GENERAL_CONFIGURATION_SPECTATOR_ITEMS_LORE.replace("%path%", "leave"), Collections.singletonList("&fBotão direito para sair da arena!"));
 
         /* save default items messages for stats gui */
-        yml.addDefault(Messages.PLAYER_STATS_GUI_INV_NAME, "&8Estatísticas de %bw_player%");
-        addDefaultStatsMsg(yml, "wins", "&6Vitórias", "&f%bw_wins%");
-        addDefaultStatsMsg(yml, "losses", "&6Perdas", "&f%bw_losses%");
-        addDefaultStatsMsg(yml, "kills", "&6Abates", "&f%bw_kills%");
-        addDefaultStatsMsg(yml, "deaths", "&6Mortes", "&f%bw_deaths%");
-        addDefaultStatsMsg(yml, "final-kills", "&6Abates Finais", "&f%bw_final_kills%");
-        addDefaultStatsMsg(yml, "final-deaths", "&6Mortes Finais", "&f%bw_final_deaths%");
-        addDefaultStatsMsg(yml, "beds-destroyed", "&6Camas Destruidas", "&f%bw_beds%");
-        addDefaultStatsMsg(yml, "first-play", "&6Primeira Partida", "&f%bw_play_first%");
-        addDefaultStatsMsg(yml, "last-play", "&6Última Partida", "&f%bw_play_last%");
-        addDefaultStatsMsg(yml, "games-played", "&6Partidas", "&f%bw_games_played%");
+        yml.addDefault(Messages.PLAYER_STATS_GUI_INV_NAME, "&fEstatisticas de %bw_player%");
+        addDefaultStatsMsg(yml, "overall", "&aGeral",
+                "&fPartidas: &b%bw_games_played%",
+                "&fVitorias: &b%bw_wins%",
+                "&fDerrotas: &b%bw_losses%",
+                "&fKills: &b%bw_kills%",
+                "&fKills Finais: &b%bw_final_kills%",
+                "&fCamas Quebradas: &b%bw_beds%",
+                "&fFKDR: &b%bw_fkdr%",
+                "&fWLR: &b%bw_wlr%",
+                "",
+                "&fPrimeira Partida: &b%bw_play_first%",
+                "&fUltima Partida: &b%bw_play_last%");
+        addDefaultStatsMsg(yml, "solo", "&aSolo",
+                "&fPartidas: &b%bw_games_played%",
+                "&fVitorias: &b%bw_wins%",
+                "&fDerrotas: &b%bw_losses%",
+                "&fKills: &b%bw_kills%",
+                "&fMortes: &b%bw_deaths%",
+                "&fKills Finais: &b%bw_final_kills%",
+                "&fMortes Finais: &b%bw_final_deaths%",
+                "&fCamas Quebradas: &b%bw_beds%",
+                "&fFKDR: &b%bw_fkdr%");
+        addDefaultStatsMsg(yml, "doubles", "&aDuplas",
+                "&fPartidas: &b%bw_games_played%",
+                "&fVitorias: &b%bw_wins%",
+                "&fDerrotas: &b%bw_losses%",
+                "&fKills: &b%bw_kills%",
+                "&fMortes: &b%bw_deaths%",
+                "&fKills Finais: &b%bw_final_kills%",
+                "&fMortes Finais: &b%bw_final_deaths%",
+                "&fCamas Quebradas: &b%bw_beds%",
+                "&fFKDR: &b%bw_fkdr%");
+        addDefaultStatsMsg(yml, "triples", "&aTrios",
+                "&fPartidas: &b%bw_games_played%",
+                "&fVitorias: &b%bw_wins%",
+                "&fDerrotas: &b%bw_losses%",
+                "&fKills: &b%bw_kills%",
+                "&fMortes: &b%bw_deaths%",
+                "&fKills Finais: &b%bw_final_kills%",
+                "&fMortes Finais: &b%bw_final_deaths%",
+                "&fCamas Quebradas: &b%bw_beds%",
+                "&fFKDR: &b%bw_fkdr%");
+        addDefaultStatsMsg(yml, "quads", "&aQuartetos",
+                "&fPartidas: &b%bw_games_played%",
+                "&fVitorias: &b%bw_wins%",
+                "&fDerrotas: &b%bw_losses%",
+                "&fKills: &b%bw_kills%",
+                "&fMortes: &b%bw_deaths%",
+                "&fKills Finais: &b%bw_final_kills%",
+                "&fMortes Finais: &b%bw_final_deaths%",
+                "&fCamas Quebradas: &b%bw_beds%",
+                "&fFKDR: &b%bw_fkdr%");
+        addDefaultStatsMsg(yml, "one-vs-one", "&a1v1",
+                "&fPartidas: &b%bw_games_played%",
+                "&fVitorias: &b%bw_wins%",
+                "&fDerrotas: &b%bw_losses%",
+                "&fKills: &b%bw_kills%",
+                "&fMortes: &b%bw_deaths%",
+                "&fKills Finais: &b%bw_final_kills%",
+                "&fMortes Finais: &b%bw_final_deaths%",
+                "&fCamas Quebradas: &b%bw_beds%",
+                "&fFKDR: &b%bw_fkdr%");
+        addDefaultStatsMsg(yml, "two-vs-two", "&a2v2",
+                "&fPartidas: &b%bw_games_played%",
+                "&fVitorias: &b%bw_wins%",
+                "&fDerrotas: &b%bw_losses%",
+                "&fKills: &b%bw_kills%",
+                "&fMortes: &b%bw_deaths%",
+                "&fKills Finais: &b%bw_final_kills%",
+                "&fMortes Finais: &b%bw_final_deaths%",
+                "&fCamas Quebradas: &b%bw_beds%",
+                "&fFKDR: &b%bw_fkdr%");
+        addDefaultStatsMsg(yml, "three-vs-three", "&a3v3",
+                "&fPartidas: &b%bw_games_played%",
+                "&fVitorias: &b%bw_wins%",
+                "&fDerrotas: &b%bw_losses%",
+                "&fKills: &b%bw_kills%",
+                "&fMortes: &b%bw_deaths%",
+                "&fKills Finais: &b%bw_final_kills%",
+                "&fMortes Finais: &b%bw_final_deaths%",
+                "&fCamas Quebradas: &b%bw_beds%",
+                "&fFKDR: &b%bw_fkdr%");
+        addDefaultStatsMsg(yml, "four-vs-four", "&a4v4",
+                "&fPartidas: &b%bw_games_played%",
+                "&fVitorias: &b%bw_wins%",
+                "&fDerrotas: &b%bw_losses%",
+                "&fKills: &b%bw_kills%",
+                "&fMortes: &b%bw_deaths%",
+                "&fKills Finais: &b%bw_final_kills%",
+                "&fMortes Finais: &b%bw_final_deaths%",
+                "&fCamas Quebradas: &b%bw_beds%",
+                "&fFKDR: &b%bw_fkdr%");
 
         /* history gui */
-        yml.addDefault(Messages.PLAYER_HISTORY_GUI_INV_NAME, "&8Historico: %bw_target%");
-        yml.addDefault(Messages.PLAYER_HISTORY_GUI_ENTRY_NAME, "&ePartida #%bw_history_index%");
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_INV_NAME, "&fHistorico: %bw_target%");
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_ENTRY_NAME, "&bPartida #%bw_history_index%");
         yml.addDefault(Messages.PLAYER_HISTORY_GUI_ENTRY_LORE, Arrays.asList(
-                "&7Mapa: &f%bw_history_map%",
-                "&7Modo: &f%bw_history_mode%",
-                "&7Colocacao: &f%bw_history_placement%",
-                "&7Resultado: %bw_history_result%",
-                "&7Kills: &f%bw_history_kills%",
-                "&7Final Kills: &f%bw_history_final_kills%",
-                "&7Total Kills: &f%bw_history_total_kills%",
-                "&7Mortes: &f%bw_history_deaths%",
-                "&7Mortes Finais: &f%bw_history_final_deaths%",
-                "&7Camas: &f%bw_history_beds_destroyed%",
-                "&7Duracao: &f%bw_history_duration%",
-                "&7Data: &f%bw_history_datetime%",
+                "&fMapa: &f%bw_history_map%",
+                "&fModo: &f%bw_history_mode%",
+                "&fColocacao: &f%bw_history_placement%",
+                "&fResultado: %bw_history_result%",
+                "&fKills: &f%bw_history_kills%",
+                "&fFinal Kills: &f%bw_history_final_kills%",
+                "&fTotal Kills: &f%bw_history_total_kills%",
+                "&fMortes: &f%bw_history_deaths%",
+                "&fMortes Finais: &f%bw_history_final_deaths%",
+                "&fCamas: &f%bw_history_beds_destroyed%",
+                "&fDuracao: &f%bw_history_duration%",
+                "&fData: &f%bw_history_datetime%",
                 "",
                 "&aClique para ver eventos."
         ));
-        yml.addDefault(Messages.PLAYER_HISTORY_GUI_EMPTY_NAME, "&cSem partidas");
-        yml.addDefault(Messages.PLAYER_HISTORY_GUI_EMPTY_LORE, Collections.singletonList("&7Jogue uma partida para ver aqui."));
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_EMPTY_NAME, "&bSem partidas");
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_EMPTY_LORE, Collections.singletonList("&fJogue uma partida para ver aqui."));
         yml.addDefault(Messages.PLAYER_HISTORY_GUI_NEXT_NAME, "&aProxima pagina");
-        yml.addDefault(Messages.PLAYER_HISTORY_GUI_NEXT_LORE, Collections.singletonList("&7Pagina %bw_history_page%/%bw_history_pages%"));
-        yml.addDefault(Messages.PLAYER_HISTORY_GUI_PREV_NAME, "&cPagina anterior");
-        yml.addDefault(Messages.PLAYER_HISTORY_GUI_PREV_LORE, Collections.singletonList("&7Pagina %bw_history_page%/%bw_history_pages%"));
-        yml.addDefault(Messages.PLAYER_HISTORY_GUI_PAGE_NAME, "&ePagina %bw_history_page%/%bw_history_pages%");
-        yml.addDefault(Messages.PLAYER_HISTORY_GUI_PAGE_LORE, Collections.singletonList("&7Total de partidas: &f%bw_history_total%"));
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_NEXT_LORE, Collections.singletonList("&fPagina %bw_history_page%/%bw_history_pages%"));
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_PREV_NAME, "&bPagina anterior");
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_PREV_LORE, Collections.singletonList("&fPagina %bw_history_page%/%bw_history_pages%"));
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_PAGE_NAME, "&bPagina %bw_history_page%/%bw_history_pages%");
+        yml.addDefault(Messages.PLAYER_HISTORY_GUI_PAGE_LORE, Collections.singletonList("&fTotal de partidas: &f%bw_history_total%"));
         yml.addDefault(Messages.PLAYER_HISTORY_GUI_FILLER_NAME, " ");
         yml.addDefault(Messages.PLAYER_HISTORY_GUI_FILLER_LORE, Collections.emptyList());
 
         /* history events gui */
-        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_NO_DATA, "%bw_lang_prefix%&cNenhum evento encontrado.");
-        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_NO_PERMISSION, "%bw_lang_prefix%&cVoce nao tem permissao para ver os eventos avancados da partida.");
-        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_INV_NAME, "&8Eventos da Partida");
-        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_EMPTY_NAME, "&cSem eventos");
-        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_EMPTY_LORE, Collections.singletonList("&7Nenhum evento registrado."));
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_NO_DATA, "%bw_lang_prefix%&bNenhum evento encontrado.");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_NO_PERMISSION, "%bw_lang_prefix%&bVoce nao tem permissao para ver os eventos avancados da partida.");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_INV_NAME, "&fEventos da Partida");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_EMPTY_NAME, "&bSem eventos");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_EMPTY_LORE, Collections.singletonList("&fNenhum evento registrado."));
         yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_NEXT_NAME, "&aProxima pagina");
-        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_NEXT_LORE, Collections.singletonList("&7Pagina %bw_history_page%/%bw_history_pages%"));
-        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_PREV_NAME, "&cPagina anterior");
-        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_PREV_LORE, Collections.singletonList("&7Pagina %bw_history_page%/%bw_history_pages%"));
-        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_PAGE_NAME, "&ePagina %bw_history_page%/%bw_history_pages%");
-        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_PAGE_LORE, Collections.singletonList("&7Total de eventos: &f%bw_history_total%"));
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_NEXT_LORE, Collections.singletonList("&fPagina %bw_history_page%/%bw_history_pages%"));
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_PREV_NAME, "&bPagina anterior");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_PREV_LORE, Collections.singletonList("&fPagina %bw_history_page%/%bw_history_pages%"));
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_PAGE_NAME, "&bPagina %bw_history_page%/%bw_history_pages%");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_PAGE_LORE, Collections.singletonList("&fTotal de eventos: &f%bw_history_total%"));
         yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_BACK_NAME, "&aVoltar");
-        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_BACK_LORE, Collections.singletonList("&7Voltar para a lista."));
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_BACK_LORE, Collections.singletonList("&fVoltar para a lista."));
         yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_FILLER_NAME, " ");
         yml.addDefault(Messages.PLAYER_HISTORY_EVENTS_GUI_FILLER_LORE, Collections.emptyList());
-        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_DEFAULT_NAME, "&eEvento #%bw_history_event_index%");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_DEFAULT_NAME, "&bEvento #%bw_history_event_index%");
         yml.addDefault(Messages.PLAYER_HISTORY_EVENT_DEFAULT_LORE, Arrays.asList(
-                "&7Tipo: &f%bw_event_type%",
-                "&7Hora: &f%bw_event_time%",
-                "&7Ator: &f%bw_event_actor%",
-                "&7Alvo: &f%bw_event_target%",
-                "&7Time: %bw_event_team_color%%bw_event_team%",
-                "&7Meta: &f%bw_event_meta%"
+                "&fTipo: &f%bw_event_type%",
+                "&fHora: &f%bw_event_time%",
+                "&fAtor: &f%bw_event_actor%",
+                "&fAlvo: &f%bw_event_target%",
+                "&fTime: %bw_event_team_color%%bw_event_team%",
+                "&fMeta: &f%bw_event_meta%"
         ));
 
-        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_NAME.replace("%type%", "player-kill"), "&cAbate");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_NAME.replace("%type%", "player-kill"), "&bAbate");
         yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_LORE.replace("%type%", "player-kill"), Arrays.asList(
-                "&7Hora: &f%bw_event_time%",
-                "&7Killer: &f%bw_event_actor%",
-                "&7Vitima: &f%bw_event_target%",
-                "&7Causa: &f%bw_event_meta_cause%",
-                "&7Final: &f%bw_event_meta_final_kill%"
+                "&fHora: &f%bw_event_time%",
+                "&fKiller: &f%bw_event_actor%",
+                "&fVitima: &f%bw_event_target%",
+                "&fCausa: &f%bw_event_meta_cause%",
+                "&fFinal: &f%bw_event_meta_final_kill%"
         ));
-        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_NAME.replace("%type%", "bed-break"), "&cCama destruida");
+        yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_NAME.replace("%type%", "bed-break"), "&bCama destruida");
         yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_LORE.replace("%type%", "bed-break"), Arrays.asList(
-                "&7Hora: &f%bw_event_time%",
-                "&7Jogador: &f%bw_event_actor%",
-                "&7Time alvo: &f%bw_event_meta_victim_team%"
+                "&fHora: &f%bw_event_time%",
+                "&fJogador: &f%bw_event_actor%",
+                "&fTime alvo: &f%bw_event_meta_victim_team%"
         ));
         yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_NAME.replace("%type%", "shop-buy"), "&aCompra");
         yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_LORE.replace("%type%", "shop-buy"), Arrays.asList(
-                "&7Hora: &f%bw_event_time%",
-                "&7Jogador: &f%bw_event_actor%",
-                "&7Item: &f%bw_event_meta_item%",
-                "&7Categoria: &f%bw_event_meta_category%"
+                "&fHora: &f%bw_event_time%",
+                "&fJogador: &f%bw_event_actor%",
+                "&fItem: &f%bw_event_meta_item%",
+                "&fCategoria: &f%bw_event_meta_category%"
         ));
         yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_NAME.replace("%type%", "upgrade-buy"), "&bUpgrade");
         yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TEMPLATE_LORE.replace("%type%", "upgrade-buy"), Arrays.asList(
-                "&7Hora: &f%bw_event_time%",
-                "&7Jogador: &f%bw_event_actor%",
-                "&7Upgrade: &f%bw_event_meta_upgrade%"
+                "&fHora: &f%bw_event_time%",
+                "&fJogador: &f%bw_event_actor%",
+                "&fUpgrade: &f%bw_event_meta_upgrade%"
         ));
 
         yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "game-start"), "Inicio");
@@ -493,148 +576,148 @@ public class Portuguese extends Language {
         yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "money-gain"), "Moedas");
         yml.addDefault(Messages.PLAYER_HISTORY_EVENT_TYPE_NAME.replace("%type%", "level-up"), "Level");
 
-        yml.addDefault(Messages.SCOREBOARD_DEFAULT_WAITING, Arrays.asList("&f&lBED WARS", "&7%bw_date% &8%bw_server_id%", "", "&fMapa: &a%bw_map%", "", "&fJogadores: &a%bw_on%/%bw_max%", "", "&fEsperando...", "", "§fModo: &a%bw_group%", "&fVersão: &7%bw_version%", "", "&e%bw_server_ip%"));
-        yml.addDefault(Messages.SCOREBOARD_DEFAULT_STARTING, Arrays.asList("&f&lBED WARS", "&7%bw_date% &8%bw_server_id%", "", "&fMapa: &a%bw_map%", "", "&fJogadores: &a%bw_on%/%bw_max%", "", "&fInicio em &a%bw_time%s", "", "§fModo: &a%bw_group%", "&fVersão: &7%bw_version%", "", "&e%bw_server_ip%"));
-        yml.addDefault(Messages.SCOREBOARD_DEFAULT_PLAYING, Arrays.asList("&e&lBED WARS", "&7%bw_date%", "", "&f%bw_next_event% em &a%bw_time%", "",
-                "%bw_team_1%", "%bw_team_2%", "%bw_team_3%", "%bw_team_4%", "%bw_team_5%", "%bw_team_6%", "%bw_team_7%", "%bw_team_8%", "", "&e%bw_server_ip%"));
+        yml.addDefault(Messages.SCOREBOARD_DEFAULT_WAITING, Arrays.asList("&f&lBED WARS", "&f%bw_date% &f%bw_server_id%", "", "&fMapa: &a%bw_map%", "", "&fJogadores: &a%bw_on%/%bw_max%", "", "&fEsperando...", "", "§fModo: &a%bw_group%", "&fVersão: &f%bw_version%", "", "&b%bw_server_ip%"));
+        yml.addDefault(Messages.SCOREBOARD_DEFAULT_STARTING, Arrays.asList("&f&lBED WARS", "&f%bw_date% &f%bw_server_id%", "", "&fMapa: &a%bw_map%", "", "&fJogadores: &a%bw_on%/%bw_max%", "", "&fInicio em &a%bw_time%s", "", "§fModo: &a%bw_group%", "&fVersão: &f%bw_version%", "", "&b%bw_server_ip%"));
+        yml.addDefault(Messages.SCOREBOARD_DEFAULT_PLAYING, Arrays.asList("&b&lBED WARS", "&f%bw_date%", "", "&f%bw_next_event% em &a%bw_time%", "",
+                "%bw_team_1%", "%bw_team_2%", "%bw_team_3%", "%bw_team_4%", "%bw_team_5%", "%bw_team_6%", "%bw_team_7%", "%bw_team_8%", "", "&b%bw_server_ip%"));
 
-        yml.addDefault("scoreboard.Doubles.playing", Arrays.asList("&e&lBED WARS", "&7%bw_date%", "", "&f%bw_next_event% em &a%bw_time%", "",
-                "%bw_team_1%", "%bw_team_2%", "%bw_team_3%", "%bw_team_4%", "%bw_team_5%", "%bw_team_6%", "%bw_team_7%", "%bw_team_8%", "", "&e%bw_server_ip%"));
+        yml.addDefault("scoreboard.Doubles.playing", Arrays.asList("&b&lBED WARS", "&f%bw_date%", "", "&f%bw_next_event% em &a%bw_time%", "",
+                "%bw_team_1%", "%bw_team_2%", "%bw_team_3%", "%bw_team_4%", "%bw_team_5%", "%bw_team_6%", "%bw_team_7%", "%bw_team_8%", "", "&b%bw_server_ip%"));
 
-        yml.addDefault("scoreboard.3v3v3v3.playing", Arrays.asList("&e&lBED WARS", "&7%bw_date%", "", "&f%bw_next_event% em &a%bw_time%", "",
-                "%bw_team_1%", "%bw_team_2%", "%bw_team_3%", "%bw_team_4%", "", "&fKills: &a%bw_kills%", "&fFinal Kills: &a%bw_final_kills%", "&fBeds Broken: &a%bw_beds%", "", "&e%bw_server_ip%"));
+        yml.addDefault("scoreboard.3v3v3v3.playing", Arrays.asList("&b&lBED WARS", "&f%bw_date%", "", "&f%bw_next_event% em &a%bw_time%", "",
+                "%bw_team_1%", "%bw_team_2%", "%bw_team_3%", "%bw_team_4%", "", "&fKills: &a%bw_kills%", "&fFinal Kills: &a%bw_final_kills%", "&fBeds Broken: &a%bw_beds%", "", "&b%bw_server_ip%"));
 
-        yml.addDefault("scoreboard.4v4v4v4.playing", Arrays.asList("&e&lBED WARS", "&7%bw_date%", "", "&f%bw_next_event% em &a%bw_time%", "",
-                "%bw_team_1%", "%bw_team_2%", "%bw_team_3%", "%bw_team_4%", "", "&fKills: &a%bw_kills%", "&fFinal Kills: &a%bw_final_kills%", "&fBeds Broken: &a%bw_beds%", "", "&e%bw_server_ip%"));
+        yml.addDefault("scoreboard.4v4v4v4.playing", Arrays.asList("&b&lBED WARS", "&f%bw_date%", "", "&f%bw_next_event% em &a%bw_time%", "",
+                "%bw_team_1%", "%bw_team_2%", "%bw_team_3%", "%bw_team_4%", "", "&fKills: &a%bw_kills%", "&fFinal Kills: &a%bw_final_kills%", "&fBeds Broken: &a%bw_beds%", "", "&b%bw_server_ip%"));
 
-        yml.addDefault(Messages.SCOREBOARD_LOBBY, Arrays.asList("&6&lBedWars,&4&lB&6&ledWars,&c&lB&4&le&6&ldWars,&6&lB&c&le&4&ld&6&lWars,&6&lBe&c&ld&4&lW&6&lars,&6&lBed&c&lW&4&la&6&lrs,&6&lBedW&c&la&4&lr&6&ls,&6&lBedWa&c&lr&4&ls,&6&lBedWar&c&ls,&6&lBedWars",
-                "&fSeu nivel: %bw_level%", "", "&fProgresso: &a%bw_current_xp%&7/&b%bw_required_xp%", "%bw_progress%", "", "&7%bw_player%", "", "&fMoedas: &a%bw_money%", "", "&fTotal de vitórias: &a%bw_wins%", "&fTotal de abates: &a%bw_kills%", "", "&e%bw_server_ip%"));
+        yml.addDefault(Messages.SCOREBOARD_LOBBY, Arrays.asList("&b&lBedWars,&b&lB&b&ledWars,&b&lB&b&le&b&ldWars,&b&lB&b&le&b&ld&b&lWars,&b&lBe&b&ld&b&lW&b&lars,&b&lBed&b&lW&b&la&b&lrs,&b&lBedW&b&la&b&lr&b&ls,&b&lBedWa&b&lr&b&ls,&b&lBedWar&b&ls,&b&lBedWars",
+                "&fSeu nivel: %bw_level%", "", "&fProgresso: &a%bw_current_xp%&f/&b%bw_required_xp%", "%bw_progress%", "", "&f%bw_player%", "", "&fMoedas: &a%bw_money%", "", "&fTotal de vitórias: &a%bw_wins%", "&fTotal de abates: &a%bw_kills%", "", "&b%bw_server_ip%"));
 
-        yml.addDefault(Messages.SHOP_INDEX_NAME, "&8Compra rápida");
-        yml.addDefault(Messages.SHOP_QUICK_ADD_NAME, "&8Adicionando à compra rápida...");
-        yml.addDefault(Messages.SHOP_INSUFFICIENT_MONEY, "%bw_lang_prefix%&cVocê não tem %bw_currency% suficiente! Precisa de mais %bw_amount%!");
-        yml.addDefault(Messages.SHOP_NEW_PURCHASE, "%bw_lang_prefix%&aVocê comprou &6%bw_item%");
-        yml.addDefault(Messages.SHOP_ALREADY_BOUGHT, "%bw_lang_prefix%&cVocê já comprou isso!");
-        yml.addDefault(Messages.SHOP_ALREADY_HIGHER_TIER, "%bw_lang_prefix%&cYou already have a higher tier item.");
+        yml.addDefault(Messages.SHOP_INDEX_NAME, "&fCompra rápida");
+        yml.addDefault(Messages.SHOP_QUICK_ADD_NAME, "&fAdicionando à compra rápida...");
+        yml.addDefault(Messages.SHOP_INSUFFICIENT_MONEY, "%bw_lang_prefix%&bVocê não tem %bw_currency% suficiente! Precisa de mais %bw_amount%!");
+        yml.addDefault(Messages.SHOP_NEW_PURCHASE, "%bw_lang_prefix%&aVocê comprou &b%bw_item%");
+        yml.addDefault(Messages.SHOP_ALREADY_BOUGHT, "%bw_lang_prefix%&bVocê já comprou isso!");
+        yml.addDefault(Messages.SHOP_ALREADY_HIGHER_TIER, "%bw_lang_prefix%&bYou already have a higher tier item.");
         yml.addDefault(Messages.SHOP_UTILITY_NPC_SILVERFISH_NAME, "%bw_time_bar%");
-        yml.addDefault(Messages.SHOP_UTILITY_NPC_IRON_GOLEM_NAME, "%bw_team_color%%bw_despawn_time%s &8[ %bw_team_color%%bw_health%&8]");
-        yml.addDefault(Messages.SHOP_SEPARATOR_NAME, "&8⇧ Categorias");
-        yml.addDefault(Messages.SHOP_SEPARATOR_LORE, Collections.singletonList("&8⇩ Itens"));
+        yml.addDefault(Messages.SHOP_UTILITY_NPC_IRON_GOLEM_NAME, "%bw_team_color%%bw_despawn_time%s &f[ %bw_team_color%%bw_health%&f]");
+        yml.addDefault(Messages.SHOP_SEPARATOR_NAME, "&f⇧ Categorias");
+        yml.addDefault(Messages.SHOP_SEPARATOR_LORE, Collections.singletonList("&f⇩ Itens"));
         yml.addDefault(Messages.SHOP_QUICK_BUY_NAME, "&bCompra rápida");
         yml.addDefault(Messages.SHOP_QUICK_BUY_LORE, new ArrayList<>());
-        yml.addDefault(Messages.SHOP_QUICK_EMPTY_NAME, "&cEspaço vazio!");
-        yml.addDefault(Messages.SHOP_QUICK_EMPTY_LORE, Arrays.asList("&7Este é um slot de compra rápida!", "&7Clique em um item segurando o", "&7shift para adicionar neste slot."));
+        yml.addDefault(Messages.SHOP_QUICK_EMPTY_NAME, "&bEspaço vazio!");
+        yml.addDefault(Messages.SHOP_QUICK_EMPTY_LORE, Arrays.asList("&fEste é um slot de compra rápida!", "&fClique em um item segurando o", "&fshift para adicionar neste slot."));
         yml.addDefault(Messages.SHOP_CAN_BUY_COLOR, "&a");
-        yml.addDefault(Messages.SHOP_CANT_BUY_COLOR, "&c");
-        yml.addDefault(Messages.SHOP_LORE_STATUS_CAN_BUY, "&eClique para comprar!");
-        yml.addDefault(Messages.SHOP_LORE_STATUS_CANT_AFFORD, "&cVocê não tem o suficiente de %bw_currency%!");
+        yml.addDefault(Messages.SHOP_CANT_BUY_COLOR, "&b");
+        yml.addDefault(Messages.SHOP_LORE_STATUS_CAN_BUY, "&bClique para comprar!");
+        yml.addDefault(Messages.SHOP_LORE_STATUS_CANT_AFFORD, "&bVocê não tem o suficiente de %bw_currency%!");
         yml.addDefault(Messages.SHOP_LORE_STATUS_MAXED, "&aMÁXIMO!");
         yml.addDefault(Messages.SHOP_LORE_STATUS_ARMOR, "&aEQUIPADO!");
         yml.addDefault(Messages.SHOP_LORE_QUICK_ADD, "&bClique + shift para por na Compra Rápida");
         yml.addDefault(Messages.SHOP_LORE_QUICK_REMOVE, "&bClique + shift para tirar da Compra Rápida");
 
-        addCategoryMessages(yml, ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "&8Blocos", "&aBlocos", Collections.singletonList("&eClique para ver!"));
+        addCategoryMessages(yml, ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "&fBlocos", "&aBlocos", Collections.singletonList("&bClique para ver!"));
 
-        addContentMessages(yml, "wool", ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "%bw_color%Lã", Arrays.asList("&7Preço: &f%bw_cost% %bw_currency%", "", "&7Ótimo para atravessar ilhas.", "&7Transforma-se na cor do seu time.",
-                "&7color.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "clay", ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "%bw_color%Argila Endurecida", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7Bloco básico para defender sua cama.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "glass", ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "%bw_color%Vidro à prova de explosão", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7Imune a explosões.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "stone", ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "%bw_color%Pedra do Fim", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7Bloco sólido para defender sua cama.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "ladder", ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "%bw_color%Escada", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7Útil para salvar gatos presos", "&7de arvores.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "obsidian", ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "%bw_color%Obsidiana", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7Proteção extrema para sua cama.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "wood", ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "%bw_color%Madeira", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7Bloco sólido para defender sua cama.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "wool", ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "%bw_color%Lã", Arrays.asList("&fPreço: &f%bw_cost% %bw_currency%", "", "&fÓtimo para atravessar ilhas.", "&fTransforma-se na cor do seu time.",
+                "&fcolor.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "clay", ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "%bw_color%Argila Endurecida", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fBloco básico para defender sua cama.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "glass", ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "%bw_color%Vidro à prova de explosão", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fImune a explosões.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "stone", ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "%bw_color%Pedra do Fim", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fBloco sólido para defender sua cama.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "ladder", ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "%bw_color%Escada", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fÚtil para salvar gatos presos", "&fde arvores.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "obsidian", ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "%bw_color%Obsidiana", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fProteção extrema para sua cama.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "wood", ConfigPath.SHOP_PATH_CATEGORY_BLOCKS, "%bw_color%Madeira", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fBloco sólido para defender sua cama.", "", "%bw_quick_buy%", "%bw_buy_status%"));
 
-        addCategoryMessages(yml, ConfigPath.SHOP_PATH_CATEGORY_MELEE, "&8Corpo a corpo", "&aCorpo a corpo", Collections.singletonList("&eClique para ver!"));
+        addCategoryMessages(yml, ConfigPath.SHOP_PATH_CATEGORY_MELEE, "&fCorpo a corpo", "&aCorpo a corpo", Collections.singletonList("&bClique para ver!"));
 
-        addContentMessages(yml, "stone-sword", ConfigPath.SHOP_PATH_CATEGORY_MELEE, "%bw_color%Espada de Pedra", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "iron-sword", ConfigPath.SHOP_PATH_CATEGORY_MELEE, "%bw_color%Espada de Ferro", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "diamond-sword", ConfigPath.SHOP_PATH_CATEGORY_MELEE, "%bw_color%Espada de Diamante", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "stick", ConfigPath.SHOP_PATH_CATEGORY_MELEE, "%bw_color%Graveto (Repulsão I)", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "stone-sword", ConfigPath.SHOP_PATH_CATEGORY_MELEE, "%bw_color%Espada de Pedra", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "iron-sword", ConfigPath.SHOP_PATH_CATEGORY_MELEE, "%bw_color%Espada de Ferro", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "diamond-sword", ConfigPath.SHOP_PATH_CATEGORY_MELEE, "%bw_color%Espada de Diamante", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "stick", ConfigPath.SHOP_PATH_CATEGORY_MELEE, "%bw_color%Graveto (Repulsão I)", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
 
-        addCategoryMessages(yml, ConfigPath.SHOP_PATH_CATEGORY_ARMOR, "&aArmadura", "&aArmadura", Collections.singletonList("&eClique para ver!"));
+        addCategoryMessages(yml, ConfigPath.SHOP_PATH_CATEGORY_ARMOR, "&aArmadura", "&aArmadura", Collections.singletonList("&bClique para ver!"));
 
-        addContentMessages(yml, "chainmail", ConfigPath.SHOP_PATH_CATEGORY_ARMOR, "%bw_color%Armadura de Malha Permanente", Arrays.asList("&7Preço: %bw_cost% %bw_currency%",
-                "", "&7Calças e botas de malha", "&7que você sempre irá renascer", "&7com elas.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "iron-armor", ConfigPath.SHOP_PATH_CATEGORY_ARMOR, "%bw_color%Armadura de Ferro Permanente", Arrays.asList("&7Preço: %bw_cost% %bw_currency%",
-                "", "&7Calças e botas de ferro", "&7que você sempre irá renascer", "&7com elas.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "diamond-armor", ConfigPath.SHOP_PATH_CATEGORY_ARMOR, "%bw_color%Armadura de Diamante Permanente", Arrays.asList("&7Preço: %bw_cost% %bw_currency%",
-                "", "&7Calças e botas de diamante", "&7que você sempre irá renascer", "&7com elas.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "chainmail", ConfigPath.SHOP_PATH_CATEGORY_ARMOR, "%bw_color%Armadura de Malha Permanente", Arrays.asList("&fPreço: %bw_cost% %bw_currency%",
+                "", "&fCalças e botas de malha", "&fque você sempre irá renascer", "&fcom elas.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "iron-armor", ConfigPath.SHOP_PATH_CATEGORY_ARMOR, "%bw_color%Armadura de Ferro Permanente", Arrays.asList("&fPreço: %bw_cost% %bw_currency%",
+                "", "&fCalças e botas de ferro", "&fque você sempre irá renascer", "&fcom elas.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "diamond-armor", ConfigPath.SHOP_PATH_CATEGORY_ARMOR, "%bw_color%Armadura de Diamante Permanente", Arrays.asList("&fPreço: %bw_cost% %bw_currency%",
+                "", "&fCalças e botas de diamante", "&fque você sempre irá renascer", "&fcom elas.", "", "%bw_quick_buy%", "%bw_buy_status%"));
 
-        addCategoryMessages(yml, ConfigPath.SHOP_PATH_CATEGORY_TOOLS, "&8Ferramentas", "&aFerramentas", Collections.singletonList("&eClique para ver!"));
+        addCategoryMessages(yml, ConfigPath.SHOP_PATH_CATEGORY_TOOLS, "&fFerramentas", "&aFerramentas", Collections.singletonList("&bClique para ver!"));
 
-        addContentMessages(yml, "shears", ConfigPath.SHOP_PATH_CATEGORY_TOOLS, "%bw_color%Tesouras Permanentes", Arrays.asList("&7Preço: %bw_cost% %bw_currency%",
-                "", "&7Ótimo para se livrar da lã. Você", "&7sempre irá nascer com as tesouras.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "pickaxe", ConfigPath.SHOP_PATH_CATEGORY_TOOLS, "%bw_color%Picareta %bw_tier%", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "&7Nível: &e%bw_tier%",
-                "", "&7Este é um item melhorável.", "&7Ele perderá 1 nível após.", "&7você morer!", "", "&7Você vai permanentemente", "&7renascer com pelo menos o", "&7nível mais baixo.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "axe", ConfigPath.SHOP_PATH_CATEGORY_TOOLS, "%bw_color%Machado %bw_tier%", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "&7Nível: &e%bw_tier%",
-                "", "&7Este é um item melhorável.", "&7Ele perderá 1 nível após.", "&7você morer!", "", "&7Você vai permanentemente", "&7renascer com pelo menos o", "&7nível mais baixo.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "shears", ConfigPath.SHOP_PATH_CATEGORY_TOOLS, "%bw_color%Tesouras Permanentes", Arrays.asList("&fPreço: %bw_cost% %bw_currency%",
+                "", "&fÓtimo para se livrar da lã. Você", "&fsempre irá nascer com as tesouras.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "pickaxe", ConfigPath.SHOP_PATH_CATEGORY_TOOLS, "%bw_color%Picareta %bw_tier%", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "&fNível: &b%bw_tier%",
+                "", "&fEste é um item melhorável.", "&fEle perderá 1 nível após.", "&fvocê morer!", "", "&fVocê vai permanentemente", "&frenascer com pelo menos o", "&fnível mais baixo.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "axe", ConfigPath.SHOP_PATH_CATEGORY_TOOLS, "%bw_color%Machado %bw_tier%", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "&fNível: &b%bw_tier%",
+                "", "&fEste é um item melhorável.", "&fEle perderá 1 nível após.", "&fvocê morer!", "", "&fVocê vai permanentemente", "&frenascer com pelo menos o", "&fnível mais baixo.", "", "%bw_quick_buy%", "%bw_buy_status%"));
 
-        addCategoryMessages(yml, ConfigPath.SHOP_PATH_CATEGORY_RANGED, "&8Arcos", "&aArcos", Collections.singletonList("&eClique para ver!"));
+        addCategoryMessages(yml, ConfigPath.SHOP_PATH_CATEGORY_RANGED, "&fArcos", "&aArcos", Collections.singletonList("&bClique para ver!"));
 
-        addContentMessages(yml, "arrow", ConfigPath.SHOP_PATH_CATEGORY_RANGED, "%bw_color%Flecha", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "bow1", ConfigPath.SHOP_PATH_CATEGORY_RANGED, "%bw_color%Arco", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "bow2", ConfigPath.SHOP_PATH_CATEGORY_RANGED, "%bw_color%Arco (Força I)", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "bow3", ConfigPath.SHOP_PATH_CATEGORY_RANGED, "%bw_color%Arco (Força I, Impacto I)", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "arrow", ConfigPath.SHOP_PATH_CATEGORY_RANGED, "%bw_color%Flecha", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "bow1", ConfigPath.SHOP_PATH_CATEGORY_RANGED, "%bw_color%Arco", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "bow2", ConfigPath.SHOP_PATH_CATEGORY_RANGED, "%bw_color%Arco (Força I)", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "bow3", ConfigPath.SHOP_PATH_CATEGORY_RANGED, "%bw_color%Arco (Força I, Impacto I)", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
 
-        addCategoryMessages(yml, ConfigPath.SHOP_PATH_CATEGORY_POTIONS, "&8Poções", "&aPoções", Collections.singletonList("&eClique para ver!"));
+        addCategoryMessages(yml, ConfigPath.SHOP_PATH_CATEGORY_POTIONS, "&fPoções", "&aPoções", Collections.singletonList("&bClique para ver!"));
 
-        addContentMessages(yml, "speed-potion", ConfigPath.SHOP_PATH_CATEGORY_POTIONS, "%bw_color%Poção de Agilidade II (45 segundos)", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "jump-potion", ConfigPath.SHOP_PATH_CATEGORY_POTIONS, "%bw_color%Poção de Super Pulo V (45 segundos)", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "invisibility", ConfigPath.SHOP_PATH_CATEGORY_POTIONS, "%bw_color%Poção de Invisibilidade (30 segundos)", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "speed-potion", ConfigPath.SHOP_PATH_CATEGORY_POTIONS, "%bw_color%Poção de Agilidade II (45 segundos)", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "jump-potion", ConfigPath.SHOP_PATH_CATEGORY_POTIONS, "%bw_color%Poção de Super Pulo V (45 segundos)", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "invisibility", ConfigPath.SHOP_PATH_CATEGORY_POTIONS, "%bw_color%Poção de Invisibilidade (30 segundos)", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "%bw_quick_buy%", "%bw_buy_status%"));
 
-        addCategoryMessages(yml, ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "&8Utilidades", "&aUtilidades", Collections.singletonList("&eClique para ver!"));
+        addCategoryMessages(yml, ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "&fUtilidades", "&aUtilidades", Collections.singletonList("&bClique para ver!"));
 
-        addContentMessages(yml, "golden-apple", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Maça Dourada", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7Cura completa.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "bedbug", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Traça", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7Gera traças onde a bola",
-                "&7de neve cai para distrair seus", "&7inimigos. Dura 15 segundos.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "dream-defender", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Defesa dos Sonhos", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7Golem de Ferro para defender sua",
-                "&7base. Dura 4 minutos.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "fireball", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Bola de Fogo", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7Botão direito para atirar! Ótimo para",
-                "&7repelir os inimigos andando", "&7por pontes.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "tnt", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%TNT", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7Explode instantaneamente, apropriado",
-                "&7para explodir coisas!", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "ender-pearl", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Pérola do Fim", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7A maneira mais rápida de invadir",
-                "&7a base do inimigo.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "water-bucket", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Balde de Água", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7Ótimo para atrasar inimigos. Também",
-                "&7protege contra TNT.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "bridge-egg", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Ovo das Pontes", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7Este ovo cria uma ponte na",
-                "&7direção que for jogada.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "magic-milk", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Leite Mágico", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7Evite acionar armadilhas por 60",
-                "&7segundos após o consumo.", "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "sponge", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Esponja", Arrays.asList("&7Preço: %bw_cost% %bw_currency%", "", "&7Ótimo para absorver a água.",
+        addContentMessages(yml, "golden-apple", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Maça Dourada", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fCura completa.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "bedbug", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Traça", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fGera traças onde a bola",
+                "&fde neve cai para distrair seus", "&finimigos. Dura 15 segundos.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "dream-defender", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Defesa dos Sonhos", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fGolem de Ferro para defender sua",
+                "&fbase. Dura 4 minutos.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "fireball", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Bola de Fogo", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fBotão direito para atirar! Ótimo para",
+                "&frepelir os inimigos andando", "&fpor pontes.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "tnt", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%TNT", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fExplode instantaneamente, apropriado",
+                "&fpara explodir coisas!", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "ender-pearl", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Pérola do Fim", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fA maneira mais rápida de invadir",
+                "&fa base do inimigo.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "water-bucket", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Balde de Água", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fÓtimo para atrasar inimigos. Também",
+                "&fprotege contra TNT.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "bridge-egg", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Ovo das Pontes", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fEste ovo cria uma ponte na",
+                "&fdireção que for jogada.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "magic-milk", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Leite Mágico", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fEvite acionar armadilhas por 60",
+                "&fsegundos após o consumo.", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "sponge", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Esponja", Arrays.asList("&fPreço: %bw_cost% %bw_currency%", "", "&fÓtimo para absorver a água.",
                 "", "%bw_quick_buy%", "%bw_buy_status%"));
-        addContentMessages(yml, "tower", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Torre Pop-up Compacta", Arrays.asList("&7Custo: %bw_cost% %bw_currency%", "", "&7Coloque uma torre pop-up compacta", "&7de defesa de torre!", "", "%bw_quick_buy%", "%bw_buy_status%"));
+        addContentMessages(yml, "tower", ConfigPath.SHOP_PATH_CATEGORY_UTILITY, "%bw_color%Torre Pop-up Compacta", Arrays.asList("&fCusto: %bw_cost% %bw_currency%", "", "&fColoque uma torre pop-up compacta", "&fde defesa de torre!", "", "%bw_quick_buy%", "%bw_buy_status%"));
 
         yml.addDefault(Messages.MEANING_NO_TRAP, "Sem armadilha!");
-        yml.addDefault(Messages.FORMAT_UPGRADE_TRAP_COST, "&7Preço: %bw_currency_color%%bw_cost% %bw_currency%");
-        yml.addDefault(Messages.FORMAT_UPGRADE_COLOR_CAN_AFFORD, "&e");
-        yml.addDefault(Messages.FORMAT_UPGRADE_COLOR_CANT_AFFORD, "&c");
+        yml.addDefault(Messages.FORMAT_UPGRADE_TRAP_COST, "&fPreço: %bw_currency_color%%bw_cost% %bw_currency%");
+        yml.addDefault(Messages.FORMAT_UPGRADE_COLOR_CAN_AFFORD, "&b");
+        yml.addDefault(Messages.FORMAT_UPGRADE_COLOR_CANT_AFFORD, "&b");
         yml.addDefault(Messages.FORMAT_UPGRADE_COLOR_UNLOCKED, "&a");
-        yml.addDefault(Messages.FORMAT_UPGRADE_TIER_LOCKED, "&7");
+        yml.addDefault(Messages.FORMAT_UPGRADE_TIER_LOCKED, "&f");
         yml.addDefault(Messages.FORMAT_UPGRADE_TIER_UNLOCKED, "&a");
         yml.addDefault(Messages.UPGRADES_LORE_REPLACEMENT_CLICK_TO_BUY, "%bw_color%Clique para comprar!");
         yml.addDefault(Messages.UPGRADES_LORE_REPLACEMENT_INSUFFICIENT_MONEY, "%bw_color%Você não tem o suficiente de %bw_currency%.");
-        yml.addDefault(Messages.UPGRADES_LORE_REPLACEMENT_INSUFFICIENT_SPACE, "&cVocê não tem espaço livre no inventário!");
-        yml.addDefault(Messages.UPGRADES_LORE_REPLACEMENT_LOCKED, "&cBLOQUEADO");
+        yml.addDefault(Messages.UPGRADES_LORE_REPLACEMENT_INSUFFICIENT_SPACE, "&bVocê não tem espaço livre no inventário!");
+        yml.addDefault(Messages.UPGRADES_LORE_REPLACEMENT_LOCKED, "&bBLOQUEADO");
         yml.addDefault(Messages.UPGRADES_LORE_REPLACEMENT_UNLOCKED, "%bw_color%DESBLOQUEADO");
-        yml.addDefault(Messages.UPGRADES_UPGRADE_BOUGHT_CHAT, "&a%bw_player% compro &6%bw_item%");
+        yml.addDefault(Messages.UPGRADES_UPGRADE_BOUGHT_CHAT, "&a%bw_player% compro &b%bw_item%");
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_NAME.replace("%bw_name%", "forge").replace("%bw_tier%", "tier-1"), "%bw_color%Forja de Ferro");
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_LORE.replace("%bw_name%", "forge"),
-                Arrays.asList("&7Melhore a geração de recursos", "&7na sua base.", "", "{tier_1_color}Nível 1: +50% de recursos, &b{tier_1_cost} {tier_1_currency}",
+                Arrays.asList("&fMelhore a geração de recursos", "&fna sua base.", "", "{tier_1_color}Nível 1: +50% de recursos, &b{tier_1_cost} {tier_1_currency}",
                         "{tier_2_color}Nível 2: +100% de recursos, &b{tier_2_cost} {tier_2_currency}",
                         "{tier_3_color}Nível 3: Gerar esmeraldas, &b{tier_3_cost} {tier_3_currency}",
                         "{tier_4_color}Nível 4: +200% de recursos, &b{tier_4_cost} {tier_4_currency}", ""));
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_NAME.replace("%bw_name%", "forge").replace("%bw_tier%", "tier-2"), "%bw_color%Forja de Ouro");
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_NAME.replace("%bw_name%", "forge").replace("%bw_tier%", "tier-3"), "%bw_color%Forja de Esmeralda");
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_NAME.replace("%bw_name%", "forge").replace("%bw_tier%", "tier-4"), "%bw_color%Forja Melhorada");
-        yml.addDefault(Messages.UPGRADES_CATEGORY_ITEM_NAME_PATH + "traps", "&eCompre uma armadilha");
-        yml.addDefault(Messages.UPGRADES_CATEGORY_ITEM_LORE_PATH + "traps", Arrays.asList("&7As armadilhas compradas serão", "&7enfileiradas abaixo.", "", "&eClique para navegar!"));
+        yml.addDefault(Messages.UPGRADES_CATEGORY_ITEM_NAME_PATH + "traps", "&bCompre uma armadilha");
+        yml.addDefault(Messages.UPGRADES_CATEGORY_ITEM_LORE_PATH + "traps", Arrays.asList("&fAs armadilhas compradas serão", "&fenfileiradas abaixo.", "", "&bClique para navegar!"));
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_NAME.replace("%bw_name%", "swords").replace("%bw_tier%", "tier-1"), "%bw_color%Espadas Afiadas");
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_LORE.replace("%bw_name%", "swords"),
-                Arrays.asList("&7Todas as espadas do seu time irão ter o", "&7encantamento Afiação I permanentemente.", "", "{tier_1_color}Preço: &b{tier_1_cost} {tier_1_currency}", ""));
+                Arrays.asList("&fTodas as espadas do seu time irão ter o", "&fencantamento Afiação I permanentemente.", "", "{tier_1_color}Preço: &b{tier_1_cost} {tier_1_currency}", ""));
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_NAME.replace("%bw_name%", "armor").replace("%bw_tier%", "tier-1"), "%bw_color%Armadura Reforçada I");
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_LORE.replace("%bw_name%", "armor"),
-                Arrays.asList("&7Sua equipe ganha permanentemente", "&7proteção em toda a armadura!", "", "{tier_1_color}Nível 1: Proteção I, &b{tier_1_cost} {tier_1_currency}",
+                Arrays.asList("&fSua equipe ganha permanentemente", "&fproteção em toda a armadura!", "", "{tier_1_color}Nível 1: Proteção I, &b{tier_1_cost} {tier_1_currency}",
                         "{tier_2_color}Nível 2: Proteção II, &b{tier_2_cost} {tier_2_currency}",
                         "{tier_3_color}Nível 3: Proteção III, &b{tier_3_cost} {tier_3_currency}",
                         "{tier_4_color}Nível 4: Proteção IV, &b{tier_4_cost} {tier_4_currency}", ""));
@@ -643,50 +726,61 @@ public class Portuguese extends Language {
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_NAME.replace("%bw_name%", "armor").replace("%bw_tier%", "tier-4"), "%bw_color%Armadura Reforçada IV");
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_NAME.replace("%bw_name%", "miner").replace("%bw_tier%", "tier-1"), "%bw_color%Minerador Maníaco I");
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_LORE.replace("%bw_name%", "miner"),
-                Arrays.asList("&7Todos os jogadores do seu time irão", "&7ganhar permanentemente Pressa.", "", "{tier_1_color}Nível 1: Pressa I, &b{tier_1_cost} {tier_1_currency}",
+                Arrays.asList("&fTodos os jogadores do seu time irão", "&fganhar permanentemente Pressa.", "", "{tier_1_color}Nível 1: Pressa I, &b{tier_1_cost} {tier_1_currency}",
                         "{tier_2_color}Nível 2: Pressa II, &b{tier_2_cost} {tier_2_currency}", ""));
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_NAME.replace("%bw_name%", "miner").replace("%bw_tier%", "tier-2"), "%bw_color%Minerador Maníaco II");
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_NAME.replace("%bw_name%", "heal-pool").replace("%bw_tier%", "tier-1"), "%bw_color%Regeneração na Ilha");
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_LORE.replace("%bw_name%", "heal-pool"),
-                Arrays.asList("&7Cria um campo de regeneração", "&7em torno de sua base!", "", "{tier_1_color}Preço: &b{tier_1_cost} {tier_1_currency}", ""));
+                Arrays.asList("&fCria um campo de regeneração", "&fem torno de sua base!", "", "{tier_1_color}Preço: &b{tier_1_cost} {tier_1_currency}", ""));
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_NAME.replace("%bw_name%", "dragon").replace("%bw_tier%", "tier-1"), "%bw_color%Buffar Dragões");
         yml.addDefault(Messages.UPGRADES_UPGRADE_TIER_ITEM_LORE.replace("%bw_name%", "dragon"),
-                Arrays.asList("&7Sua equipe terá 2 dragões", "&7em vez de 1 durante o deathmatch!", "", "{tier_1_color}Preço: &b{tier_1_cost} {tier_1_currency}", ""));
-        yml.addDefault(Messages.UPGRADES_SEPARATOR_ITEM_NAME_PATH + "glass", "&8⬆&7Adquirível");
-        yml.addDefault(Messages.UPGRADES_SEPARATOR_ITEM_LORE_PATH + "glass", Collections.singletonList("&8⬇&7Fila de armadilhas"));
+                Arrays.asList("&fSua equipe terá 2 dragões", "&fem vez de 1 durante o deathmatch!", "", "{tier_1_color}Preço: &b{tier_1_cost} {tier_1_currency}", ""));
+        yml.addDefault(Messages.UPGRADES_SEPARATOR_ITEM_NAME_PATH + "glass", "&f⬆&fAdquirível");
+        yml.addDefault(Messages.UPGRADES_SEPARATOR_ITEM_LORE_PATH + "glass", Collections.singletonList("&f⬇&fFila de armadilhas"));
         yml.addDefault(Messages.UPGRADES_TRAP_SLOT_ITEM_NAME_PATH + "first", "%bw_color%Armadilha #1: %bw_name%");
-        yml.addDefault(Messages.UPGRADES_TRAP_SLOT_ITEM_LORE1_PATH + "first", Arrays.asList("&7O primeiro inimigo a andar", "&7em sua base irá acionar", "&7esta armadilha!"));
+        yml.addDefault(Messages.UPGRADES_TRAP_SLOT_ITEM_LORE1_PATH + "first", Arrays.asList("&fO primeiro inimigo a andar", "&fem sua base irá acionar", "&festa armadilha!"));
         yml.addDefault(Messages.UPGRADES_TRAP_SLOT_ITEM_LORE2_PATH + "first",
-                Arrays.asList("", "&7A compra de uma armadilha", "&7fica nesta fila. Seu custo", "&7será com base no número", "&7de armadilhas enfileiradas.", "", "&7Próxima armadilha: &b%bw_cost% %bw_currency%"));
+                Arrays.asList("", "&fA compra de uma armadilha", "&ffica nesta fila. Seu custo", "&fserá com base no número", "&fde armadilhas enfileiradas.", "", "&fPróxima armadilha: &b%bw_cost% %bw_currency%"));
         yml.addDefault(Messages.UPGRADES_TRAP_SLOT_ITEM_NAME_PATH + "second", "%bw_color%Armadilha #2: %bw_name%");
-        yml.addDefault(Messages.UPGRADES_TRAP_SLOT_ITEM_LORE1_PATH + "second", Arrays.asList("&7O segundo inimigo a andar", "&7em sua base irá acionar", "&7esta armadilha!"));
+        yml.addDefault(Messages.UPGRADES_TRAP_SLOT_ITEM_LORE1_PATH + "second", Arrays.asList("&fO segundo inimigo a andar", "&fem sua base irá acionar", "&festa armadilha!"));
         yml.addDefault(Messages.UPGRADES_TRAP_SLOT_ITEM_LORE2_PATH + "second",
-                Arrays.asList("", "&7A compra de uma armadilha", "&7fica nesta fila. Seu custo", "&7será com base no número", "&7de armadilhas enfileiradas.", "", "&7Próxima armadilha: &b%bw_cost% %bw_currency%"));
+                Arrays.asList("", "&fA compra de uma armadilha", "&ffica nesta fila. Seu custo", "&fserá com base no número", "&fde armadilhas enfileiradas.", "", "&fPróxima armadilha: &b%bw_cost% %bw_currency%"));
         yml.addDefault(Messages.UPGRADES_TRAP_SLOT_ITEM_NAME_PATH + "third", "%bw_color%Armadilha #3: %bw_name%");
-        yml.addDefault(Messages.UPGRADES_TRAP_SLOT_ITEM_LORE1_PATH + "third", Arrays.asList("&7O terceiro inimigo a andar", "&7em sua base irá acionar", "&7esta armadilha!"));
+        yml.addDefault(Messages.UPGRADES_TRAP_SLOT_ITEM_LORE1_PATH + "third", Arrays.asList("&fO terceiro inimigo a andar", "&fem sua base irá acionar", "&festa armadilha!"));
         yml.addDefault(Messages.UPGRADES_TRAP_SLOT_ITEM_LORE2_PATH + "third",
-                Arrays.asList("", "&7A compra de uma armadilha", "&7fica nesta fila. Seu custo", "&7será com base no número", "&7de armadilhas enfileiradas.", "", "&7Próxima armadilha: &b%bw_cost% %bw_currency%"));
+                Arrays.asList("", "&fA compra de uma armadilha", "&ffica nesta fila. Seu custo", "&fserá com base no número", "&fde armadilhas enfileiradas.", "", "&fPróxima armadilha: &b%bw_cost% %bw_currency%"));
         yml.addDefault(Messages.UPGRADES_BASE_TRAP_ITEM_NAME_PATH + "1", "%bw_color%É uma armadilha!");
-        yml.addDefault(Messages.UPGRADES_BASE_TRAP_ITEM_LORE_PATH + "1", Arrays.asList("&7Isso irá causar cegueira e lentidão", "&7durante 5 segundos nos invasores.", ""));
+        yml.addDefault(Messages.UPGRADES_BASE_TRAP_ITEM_LORE_PATH + "1", Arrays.asList("&fIsso irá causar cegueira e lentidão", "&fdurante 5 segundos nos invasores.", ""));
         yml.addDefault(Messages.UPGRADES_BASE_TRAP_ITEM_NAME_PATH + "2", "%bw_color%Armadilha Contra-ofensiva");
-        yml.addDefault(Messages.UPGRADES_BASE_TRAP_ITEM_LORE_PATH + "2", Arrays.asList("&7Concede Velocidade I por 15 segundos a", "&7jogadores aliados próximos à sua base.", ""));
+        yml.addDefault(Messages.UPGRADES_BASE_TRAP_ITEM_LORE_PATH + "2", Arrays.asList("&fConcede Velocidade I por 15 segundos a", "&fjogadores aliados próximos à sua base.", ""));
         yml.addDefault(Messages.UPGRADES_BASE_TRAP_ITEM_NAME_PATH + "3", "%bw_color%Alarme");
-        yml.addDefault(Messages.UPGRADES_BASE_TRAP_ITEM_LORE_PATH + "3", Arrays.asList("&7Irá revelar jogadores invisíveis,", "&7bem como seu nome e time.", ""));
+        yml.addDefault(Messages.UPGRADES_BASE_TRAP_ITEM_LORE_PATH + "3", Arrays.asList("&fIrá revelar jogadores invisíveis,", "&fbem como seu nome e time.", ""));
         yml.addDefault(Messages.UPGRADES_BASE_TRAP_ITEM_NAME_PATH + "4", "%bw_color%Cansaço");
-        yml.addDefault(Messages.UPGRADES_BASE_TRAP_ITEM_LORE_PATH + "4", Arrays.asList("&7Os inimigos irão receber fadiga I ao entrar", "&7na sua base com duração de 10 segundos.", ""));
+        yml.addDefault(Messages.UPGRADES_BASE_TRAP_ITEM_LORE_PATH + "4", Arrays.asList("&fOs inimigos irão receber fadiga I ao entrar", "&fna sua base com duração de 10 segundos.", ""));
         yml.addDefault(Messages.UPGRADES_SEPARATOR_ITEM_NAME_PATH + "back", "&aVoltar");
-        yml.addDefault(Messages.UPGRADES_SEPARATOR_ITEM_LORE_PATH + "back", Collections.singletonList("&7Para Melhorias & Traps"));
-        yml.addDefault(Messages.UPGRADES_CATEGORY_GUI_NAME_PATH + "traps", "&8Enfileirar uma armadilha");
-        yml.addDefault(Messages.UPGRADES_TRAP_QUEUE_LIMIT, "&cFila de armadilhas cheia!");
-        yml.addDefault(Messages.UPGRADES_TRAP_DEFAULT_MSG, "&c&lA armadilha %bw_trap% foi acionada!");
-        yml.addDefault(Messages.UPGRADES_TRAP_DEFAULT_TITLE, "&cARMADILHA ACIONADA!");
+        yml.addDefault(Messages.UPGRADES_SEPARATOR_ITEM_LORE_PATH + "back", Collections.singletonList("&fPara Melhorias & Traps"));
+        yml.addDefault(Messages.UPGRADES_CATEGORY_GUI_NAME_PATH + "traps", "&fEnfileirar uma armadilha");
+        yml.addDefault(Messages.UPGRADES_TRAP_QUEUE_LIMIT, "&bFila de armadilhas cheia!");
+        yml.addDefault(Messages.UPGRADES_TRAP_DEFAULT_MSG, "&b&lA armadilha %bw_trap% foi acionada!");
+        yml.addDefault(Messages.UPGRADES_TRAP_DEFAULT_TITLE, "&bARMADILHA ACIONADA!");
         yml.addDefault(Messages.UPGRADES_TRAP_DEFAULT_SUBTITLE, "&fSua %bw_trap% foi acionada!");
-        yml.addDefault(Messages.UPGRADES_TRAP_CUSTOM_MSG + "3", "&c&lArmadilha de alarme acionada por &7&l%bw_player% &c&ldo time %bw_color%&l%bw_team%&c&l!");
-        yml.addDefault(Messages.UPGRADES_TRAP_CUSTOM_TITLE + "3", "&c&lALARME!!!");
+        yml.addDefault(Messages.UPGRADES_TRAP_CUSTOM_MSG + "3", "&b&lArmadilha de alarme acionada por &f&l%bw_player% &b&ldo time %bw_color%&l%bw_team%&b&l!");
+        yml.addDefault(Messages.UPGRADES_TRAP_CUSTOM_TITLE + "3", "&b&lALARME!!!");
         yml.addDefault(Messages.UPGRADES_TRAP_CUSTOM_SUBTITLE + "3", "&fAlarme acionado pelo time %bw_color%%bw_team%&f!");
-        yml.addDefault(Messages.UPGRADES_UPGRADE_ALREADY_CHAT, "&cVocê já comprou essa melhoria!");
-        yml.addDefault(Messages.DRAW_TITLE, "&e&lO JOGO ACABOU!");
+        yml.addDefault(Messages.UPGRADES_UPGRADE_ALREADY_CHAT, "&bVocê já comprou essa melhoria!");
+        yml.addDefault(Messages.DRAW_TITLE, "&b&lO JOGO ACABOU!");
         yml.addDefault(Messages.DRAW_SUBTITLE, "&fNinguém venceu.");
+        yml.set(Messages.COMMAND_MAIN, Arrays.asList(
+                "",
+                "&a- &f/stats",
+                "&a- &f/historico",
+                "&a- &f/" + BedWars.mainCmd + " join &o<arena/grupo>",
+                "&a- &f/" + BedWars.mainCmd + " leave",
+                "&a- &f/" + BedWars.mainCmd + " lang",
+                "&a- &f/" + BedWars.mainCmd + " gui",
+                "&a- &f/" + BedWars.mainCmd + " start &b(vip)"
+        ));
+        LanguageEncodingRepair.repair(yml);
         generateNPCMessages(yml, "default");
         save();
         setPrefix(m(Messages.PREFIX));
@@ -695,9 +789,10 @@ public class Portuguese extends Language {
 
     @Override
     public void generateNPCMessages(YamlConfiguration yml, String group) {
-        yml.addDefault(Messages.NPC_NAME_TEAM_UPGRADES.replace("%group%", group), Arrays.asList("&bMELHORIAS DA EQUIPE", "&e&lCLIQUE DIREITO"));
-        yml.addDefault(Messages.NPC_NAME_SOLO_UPGRADES.replace("%group%", group), Arrays.asList("&bMELHORIAS", "&e&lCLIQUE DIREITO"));
-        yml.addDefault(Messages.NPC_NAME_TEAM_SHOP.replace("%group%", group), Arrays.asList("&bLOJA DA EQUIPE", "&e&lCLIQUE DIREITO"));
-        yml.addDefault(Messages.NPC_NAME_SOLO_SHOP.replace("%group%", group), Arrays.asList("&bLOJA", "&e&lCLIQUE DIREITO"));
+        yml.addDefault(Messages.NPC_NAME_TEAM_UPGRADES.replace("%group%", group), Arrays.asList("&bMELHORIAS DA EQUIPE", "&b&lCLIQUE DIREITO"));
+        yml.addDefault(Messages.NPC_NAME_SOLO_UPGRADES.replace("%group%", group), Arrays.asList("&bMELHORIAS", "&b&lCLIQUE DIREITO"));
+        yml.addDefault(Messages.NPC_NAME_TEAM_SHOP.replace("%group%", group), Arrays.asList("&bLOJA DA EQUIPE", "&b&lCLIQUE DIREITO"));
+        yml.addDefault(Messages.NPC_NAME_SOLO_SHOP.replace("%group%", group), Arrays.asList("&bLOJA", "&b&lCLIQUE DIREITO"));
     }
 }
+
