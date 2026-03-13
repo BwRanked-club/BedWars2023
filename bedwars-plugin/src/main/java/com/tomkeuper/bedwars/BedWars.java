@@ -58,6 +58,7 @@ import com.tomkeuper.bedwars.commands.party.PartyCommand;
 import com.tomkeuper.bedwars.commands.rejoin.RejoinCommand;
 import com.tomkeuper.bedwars.commands.shout.ShoutCommand;
 import com.tomkeuper.bedwars.commands.history.HistoryCommand;
+import com.tomkeuper.bedwars.commands.stats.StatsCommand;
 import com.tomkeuper.bedwars.configuration.*;
 import com.tomkeuper.bedwars.connectionmanager.redis.RedisConnection;
 import com.tomkeuper.bedwars.database.H2;
@@ -90,7 +91,6 @@ import com.tomkeuper.bedwars.listeners.joinhandler.JoinListenerMultiArena;
 import com.tomkeuper.bedwars.maprestore.internal.InternalAdapter;
 import com.tomkeuper.bedwars.money.internal.MoneyListeners;
 import com.tomkeuper.bedwars.shop.ShopCache;
-import com.tomkeuper.bedwars.shop.ShopDataMigrator;
 import com.tomkeuper.bedwars.shop.ShopManager;
 import com.tomkeuper.bedwars.shop.quickbuy.PlayerQuickBuyCache;
 import com.tomkeuper.bedwars.sidebar.BoardManager;
@@ -535,8 +535,6 @@ public class BedWars extends JavaPlugin {
         shop.loadShop();
         shop.loadOverrides();
 
-        ShopDataMigrator.runIfNeeded();
-
         registerItemHandlers(new StatsItemHandler("stats", this, api), new HistoryItemHandler("history", this, api), new CommandItemHandler("command", this, api), new LeaveItemHandler("leave", this, api));
         shopCache = new ShopCache();
         playerQuickBuyCache = new PlayerQuickBuyCache();
@@ -941,6 +939,7 @@ public class BedWars extends JavaPlugin {
         nms.registerCommand("l", new LeaveCommand("l"));
         nms.registerCommand("party", new PartyCommand("party"));
         nms.registerCommand("historico", new HistoryCommand("historico"));
+        nms.registerCommand("stats", new StatsCommand("stats"));
     }
 
     @FunctionalInterface

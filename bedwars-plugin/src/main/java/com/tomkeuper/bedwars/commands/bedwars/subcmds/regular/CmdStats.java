@@ -1,62 +1,31 @@
 package com.tomkeuper.bedwars.commands.bedwars.subcmds.regular;
 
 import com.tomkeuper.bedwars.api.BedWars;
-import com.tomkeuper.bedwars.api.arena.GameState;
-import com.tomkeuper.bedwars.api.arena.IArena;
 import com.tomkeuper.bedwars.api.command.ParentCommand;
 import com.tomkeuper.bedwars.api.command.SubCommand;
 import com.tomkeuper.bedwars.arena.Arena;
-import com.tomkeuper.bedwars.arena.Misc;
 import com.tomkeuper.bedwars.arena.SetupSession;
 import com.tomkeuper.bedwars.commands.bedwars.MainCommand;
+import com.tomkeuper.bedwars.commands.stats.StatsCommandSupport;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class CmdStats extends SubCommand {
-
-    private static final ConcurrentHashMap<UUID, Long> statsCoolDown = new ConcurrentHashMap<>();
 
     public CmdStats(ParentCommand parent, String name) {
         super(parent, name);
         setPriority(16);
         showInList(false);
-        setDisplayInfo(MainCommand.createTC("§6 ▪ §7/" + MainCommand.getInstance().getName() + " " + getSubCommandName(), "/" + getParent().getName() + " " + getSubCommandName(), "§fOpens the stats GUI."));
-    }
-
-    public static ConcurrentHashMap<UUID, Long> getStatsCoolDown() {
-        return statsCoolDown;
+        setDisplayInfo(MainCommand.createTC("&a- &f/stats", "/stats", "&fOpens the stats GUI."));
     }
 
     @Override
-    public boolean execute(String[] args, CommandSender s) {
-        if (s instanceof ConsoleCommandSender) return false;
-        Player p = (Player) s;
-        IArena a = Arena.getArenaByPlayer(p);
-        if (a != null) {
-            if (!(a.getStatus() == GameState.starting || a.getStatus() == GameState.waiting)) {
-                if (!a.isSpectator(p)) {
-                    return false;
-                }
-            }
-        }
-        if (statsCoolDown.containsKey(p.getUniqueId())) {
-            if (System.currentTimeMillis() - 3000 >= statsCoolDown.get(p.getUniqueId())) {
-                statsCoolDown.replace(p.getUniqueId(), System.currentTimeMillis());
-            } else {
-                //wait 3 seconds
-                return true;
-            }
-        } else {
-            statsCoolDown.put(p.getUniqueId(), System.currentTimeMillis());
-        }
-        Misc.openStatsGUI(p);
-        return true;
+    public boolean execute(String[] args, CommandSender sender) {
+        return StatsCommandSupport.execute(sender, args);
     }
 
     @Override
@@ -65,13 +34,13 @@ public class CmdStats extends SubCommand {
     }
 
     @Override
-    public boolean canSee(CommandSender s, BedWars api) {
-        if (s instanceof ConsoleCommandSender) return false;
+    public boolean canSee(CommandSender sender, BedWars api) {
+        if (sender instanceof ConsoleCommandSender) return false;
 
-        Player p = (Player) s;
-        if (Arena.isInArena(p)) return false;
+        Player player = (Player) sender;
+        if (Arena.isInArena(player)) return false;
 
-        if (SetupSession.isInSetupSession(p.getUniqueId())) return false;
-        return hasPermission(s);
+        if (SetupSession.isInSetupSession(player.getUniqueId())) return false;
+        return hasPermission(sender);
     }
 }

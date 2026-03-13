@@ -10,7 +10,7 @@ import com.tomkeuper.bedwars.arena.Arena;
 import com.tomkeuper.bedwars.arena.LastHit;
 import com.tomkeuper.bedwars.arena.SetupSession;
 import com.tomkeuper.bedwars.arena.team.BedWarsTeam;
-import com.tomkeuper.bedwars.commands.bedwars.subcmds.regular.CmdStats;
+import com.tomkeuper.bedwars.commands.stats.StatsCommandSupport;
 import com.tomkeuper.bedwars.sidebar.BoardManager;
 import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
@@ -93,7 +93,7 @@ public class QuitAndTeleportListener implements Listener {
         BedWarsTeam.reSpawnInvulnerability.remove(uuid);
 
         Optional.ofNullable(LastHit.getLastHit(p)).ifPresent(LastHit::remove);
-        CmdStats.getStatsCoolDown().remove(uuid);
+        StatsCommandSupport.clearCooldown(uuid);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
