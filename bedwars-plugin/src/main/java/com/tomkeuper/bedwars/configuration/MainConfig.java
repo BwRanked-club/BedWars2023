@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class MainConfig extends ConfigManager {
@@ -152,6 +153,15 @@ public class MainConfig extends ConfigManager {
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_DATABASE_MAX_LIFETIME, 1800);
         //
 
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_MODES_ALIAS_PATH.replace("%mode%", "solo"), Arrays.asList("solo", "solos"));
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_MODES_ALIAS_PATH.replace("%mode%", "doubles"), Arrays.asList("duplas", "double", "doubles", "duo", "duos"));
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_MODES_ALIAS_PATH.replace("%mode%", "triples"), Arrays.asList("trios", "triple", "triples", "trio"));
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_MODES_ALIAS_PATH.replace("%mode%", "quads"), Arrays.asList("quartetos", "quad", "quads", "squad", "squads"));
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_MODES_ALIAS_PATH.replace("%mode%", "one_vs_one"), Collections.singletonList("1v1"));
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_MODES_ALIAS_PATH.replace("%mode%", "two_vs_two"), Collections.singletonList("2v2"));
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_MODES_ALIAS_PATH.replace("%mode%", "three_vs_three"), Collections.singletonList("3v3"));
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_MODES_ALIAS_PATH.replace("%mode%", "four_vs_four"), Collections.singletonList("4v4"));
+
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_PERFORMANCE_ROTATE_GEN, true);
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_PERFORMANCE_HOLOGRAM_UPDATE_RATE, 5);
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_PERFORMANCE_SPOIL_TNT_PLAYERS, true);
@@ -282,19 +292,24 @@ public class MainConfig extends ConfigManager {
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_HISTORY_EVENTS_FILLER_ENCHANTED, false);
 
         /* default stats GUI items */
-        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_GUI_SIZE, 27);
-        if (isFirstTime()) {
-            Misc.addDefaultStatsItem(yml, 10, Material.DIAMOND, 0, "wins");
-            Misc.addDefaultStatsItem(yml, 11, Material.REDSTONE, 0, "losses");
-            Misc.addDefaultStatsItem(yml, 12, Material.IRON_SWORD, 0, "kills");
-            Misc.addDefaultStatsItem(yml, 13, Material.valueOf(BedWars.getForCurrentVersion("SKULL_ITEM", "SKULL_ITEM", "SKELETON_SKULL")), 0, "deaths");
-            Misc.addDefaultStatsItem(yml, 14, Material.DIAMOND_SWORD, 0, "final-kills");
-            Misc.addDefaultStatsItem(yml, 15, Material.valueOf(BedWars.getForCurrentVersion("SKULL_ITEM", "SKULL_ITEM", "SKELETON_SKULL")), 1, "final-deaths");
-            Misc.addDefaultStatsItem(yml, 16, Material.valueOf(BedWars.getForCurrentVersion("BED", "BED", "RED_BED")), 0, "beds-destroyed");
-            Misc.addDefaultStatsItem(yml, 21, Material.valueOf(BedWars.getForCurrentVersion("STAINED_GLASS_PANE", "STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE")), 0, "first-play");
-            Misc.addDefaultStatsItem(yml, 22, Material.CHEST, 0, "games-played");
-            Misc.addDefaultStatsItem(yml, 23, Material.valueOf(BedWars.getForCurrentVersion("STAINED_GLASS_PANE", "STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE")), 0, "last-play");
+        if (yml.getString(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_MODE.replace("%path%", "overall")) == null
+                && yml.getInt(ConfigPath.GENERAL_CONFIGURATION_STATS_GUI_SIZE) < 54) {
+            yml.set(ConfigPath.GENERAL_CONFIGURATION_STATS_GUI_SIZE, 54);
         }
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_GUI_SIZE, 54);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_FILLER_ENABLED, true);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_FILLER_MATERIAL, BedWars.getForCurrentVersion("STAINED_GLASS_PANE", "STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE"));
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_FILLER_DATA, 15);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_FILLER_ENCHANTED, false);
+        saveStatsGuiItem(yml, "overall", 4, Material.PAPER, 0, 1, false, "overall");
+        saveStatsGuiItem(yml, "solo", 10, Material.valueOf(BedWars.getForCurrentVersion("BED", "BED", "RED_BED")), 0, 1, false, "solo");
+        saveStatsGuiItem(yml, "doubles", 12, Material.valueOf(BedWars.getForCurrentVersion("BED", "BED", "RED_BED")), 0, 2, false, "doubles");
+        saveStatsGuiItem(yml, "triples", 14, Material.valueOf(BedWars.getForCurrentVersion("BED", "BED", "RED_BED")), 0, 3, false, "triples");
+        saveStatsGuiItem(yml, "quads", 16, Material.valueOf(BedWars.getForCurrentVersion("BED", "BED", "RED_BED")), 0, 4, false, "quads");
+        saveStatsGuiItem(yml, "one-vs-one", 28, Material.valueOf(BedWars.getForCurrentVersion("BED", "BED", "RED_BED")), 0, 1, false, "one_vs_one");
+        saveStatsGuiItem(yml, "two-vs-two", 30, Material.valueOf(BedWars.getForCurrentVersion("BED", "BED", "RED_BED")), 0, 2, false, "two_vs_two");
+        saveStatsGuiItem(yml, "three-vs-three", 32, Material.valueOf(BedWars.getForCurrentVersion("BED", "BED", "RED_BED")), 0, 3, false, "three_vs_three");
+        saveStatsGuiItem(yml, "four-vs-four", 34, Material.valueOf(BedWars.getForCurrentVersion("BED", "BED", "RED_BED")), 0, 4, false, "four_vs_four");
 
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_DEFAULT_ITEMS + ".Default", Collections.singletonList(BedWars.getForCurrentVersion("WOOD_SWORD", "WOOD_SWORD", "WOODEN_SWORD")));
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_ALLOWED_COMMANDS, Arrays.asList("shout", "bw", "leave"));
@@ -426,6 +441,23 @@ public class MainConfig extends ConfigManager {
             getYml().addDefault(ConfigPath.GENERAL_CONFIGURATION_SPECTATOR_ITEMS_SLOT.replace("%path%", name), slot);
             getYml().options().copyDefaults(true);
             save();
+        }
+    }
+
+    private void saveStatsGuiItem(YamlConfiguration yml,
+                                  String path,
+                                  int slot,
+                                  Material material,
+                                  int data,
+                                  int amount,
+                                  boolean enchanted,
+                                  String mode) {
+        String modePath = ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_MODE.replace("%path%", path);
+        if (yml.get(modePath) == null) {
+            yml.set(modePath, mode.toLowerCase(Locale.ROOT));
+        }
+        if (yml.get(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_MATERIAL.replace("%path%", path)) == null) {
+            Misc.addDefaultStatsItem(yml, slot, material, data, amount, enchanted, path, mode);
         }
     }
 }

@@ -10,7 +10,6 @@ import com.tomkeuper.bedwars.api.events.player.PlayerKillEvent;
 import com.tomkeuper.bedwars.api.events.player.PlayerLeaveArenaEvent;
 import com.tomkeuper.bedwars.api.events.player.PlayerStatChangeEvent;
 import com.tomkeuper.bedwars.api.party.Party;
-import com.tomkeuper.bedwars.api.stats.IPlayerStats;
 import com.tomkeuper.bedwars.arena.Arena;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -23,15 +22,20 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.time.Instant;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class StatsListener implements Listener {
 
-    private IPlayerStats getCachedStats(UUID uuid, String context) {
-        IPlayerStats stats = BedWars.getStatsManager().getUnsafe(uuid);
+    private PlayerStats getCachedStats(UUID uuid, String context) {
+        PlayerStats stats = BedWars.getStatsManager().getMutable(uuid);
         if (stats == null) {
             BedWars.debug("Skipping stats update (" + context + ") for unloaded player: " + uuid);
         }
         return stats;
+    }
+
+    private void apply(PlayerStats stats, IArena arena, Consumer<ModeStats> updater) {
+        stats.applyToOverallAndMode(StatsModeResolver.resolve(arena), updater);
     }
 
     private boolean sameParty(Player a, Player b) {
@@ -58,7 +62,7 @@ public class StatsListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onAsyncPreLoginEvent(AsyncPlayerPreLoginEvent event) {
         if (event.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) return;
-        IPlayerStats stats = BedWars.getRemoteDatabase().fetchStats(event.getUniqueId());
+        PlayerStats stats = (PlayerStats) BedWars.getRemoteDatabase().fetchStats(event.getUniqueId());
         stats.setName(event.getName());
         BedWars.getStatsManager().put(event.getUniqueId(), stats);
     }
@@ -75,12 +79,12 @@ public class StatsListener implements Listener {
         Player breaker = event.getPlayer();
         if (sharesPartyWithVictimTeam(breaker, event.getArena(), event.getVictimTeam())) return;
 
-        IPlayerStats stats = getCachedStats(breaker.getUniqueId(), "bed-break");
+        PlayerStats stats = getCachedStats(breaker.getUniqueId(), "bed-break");
         if (stats == null) return;
         PlayerStatChangeEvent ev = new PlayerStatChangeEvent(breaker, event.getArena(), PlayerStatChangeEvent.StatType.BEDS_DESTROYED);
         Bukkit.getPluginManager().callEvent(ev);
         if (!ev.isCancelled()) {
-            stats.setBedsDestroyed(stats.getBedsDestroyed() + 1);
+            apply(stats, event.getArena(), bucket -> bucket.setBedsDestroyed(bucket.getBedsDestroyed() + 1));
         }
     }
 
@@ -91,9 +95,9 @@ public class StatsListener implements Listener {
 
         if (sameParty(killer, victim)) return;
 
-        IPlayerStats victimStats = getCachedStats(victim.getUniqueId(), "kill-victim");
+        PlayerStats victimStats = getCachedStats(victim.getUniqueId(), "kill-victim");
         if (victimStats == null) return;
-        IPlayerStats killerStats = (killer != null && !victim.equals(killer))
+        PlayerStats killerStats = (killer != null && !victim.equals(killer))
                 ? getCachedStats(killer.getUniqueId(), "kill-killer")
                 : null;
 
@@ -106,23 +110,34 @@ public class StatsListener implements Listener {
 
         if (event.getCause().isFinalKill()) {
             Bukkit.getPluginManager().callEvent(evFinalDeaths);
-            if (!evFinalDeaths.isCancelled()) victimStats.setFinalDeaths(victimStats.getFinalDeaths() + 1);
+            if (!evFinalDeaths.isCancelled()) {
+                apply(victimStats, event.getArena(), bucket -> bucket.setFinalDeaths(bucket.getFinalDeaths() + 1));
+            }
 
             Bukkit.getPluginManager().callEvent(evLosses);
-            if (!evLosses.isCancelled()) victimStats.setLosses(victimStats.getLosses() + 1);
+            if (!evLosses.isCancelled()) {
+                apply(victimStats, event.getArena(), bucket -> bucket.setLosses(bucket.getLosses() + 1));
+            }
 
             Bukkit.getPluginManager().callEvent(evGamesPlayed);
-            if (!evGamesPlayed.isCancelled()) victimStats.setGamesPlayed(victimStats.getGamesPlayed() + 1);
+            if (!evGamesPlayed.isCancelled()) {
+                apply(victimStats, event.getArena(), bucket -> bucket.setGamesPlayed(bucket.getGamesPlayed() + 1));
+            }
 
             Bukkit.getPluginManager().callEvent(evFinalKill);
-            if (!evFinalKill.isCancelled() && killerStats != null)
-                killerStats.setFinalKills(killerStats.getFinalKills() + 1);
+            if (!evFinalKill.isCancelled() && killerStats != null) {
+                apply(killerStats, event.getArena(), bucket -> bucket.setFinalKills(bucket.getFinalKills() + 1));
+            }
         } else {
             Bukkit.getPluginManager().callEvent(evDeaths);
-            if (!evDeaths.isCancelled()) victimStats.setDeaths(victimStats.getDeaths() + 1);
+            if (!evDeaths.isCancelled()) {
+                apply(victimStats, event.getArena(), bucket -> bucket.setDeaths(bucket.getDeaths() + 1));
+            }
 
             Bukkit.getPluginManager().callEvent(evKill);
-            if (!evKill.isCancelled() && killerStats != null) killerStats.setKills(killerStats.getKills() + 1);
+            if (!evKill.isCancelled() && killerStats != null) {
+                apply(killerStats, event.getArena(), bucket -> bucket.setKills(bucket.getKills() + 1));
+            }
         }
     }
 
@@ -132,32 +147,37 @@ public class StatsListener implements Listener {
             Player player = Bukkit.getPlayer(uuid);
             if (player == null || !player.isOnline()) continue;
 
-            IPlayerStats stats = getCachedStats(uuid, "game-end-winner");
+            PlayerStats stats = getCachedStats(uuid, "game-end-winner");
             if (stats == null) continue;
 
             PlayerStatChangeEvent evWins = new PlayerStatChangeEvent(player, event.getArena(), PlayerStatChangeEvent.StatType.WINS);
             PlayerStatChangeEvent evGamesPlayed = new PlayerStatChangeEvent(player, event.getArena(), PlayerStatChangeEvent.StatType.GAMES_PLAYED);
 
             Bukkit.getPluginManager().callEvent(evWins);
-            if (!evWins.isCancelled()) stats.setWins(stats.getWins() + 1);
+            if (!evWins.isCancelled()) {
+                apply(stats, event.getArena(), bucket -> bucket.setWins(bucket.getWins() + 1));
+            }
 
             IArena playerArena = Arena.getArenaByPlayer(player);
             if (playerArena != null && playerArena.equals(event.getArena())) {
                 Bukkit.getPluginManager().callEvent(evGamesPlayed);
-                if (!evGamesPlayed.isCancelled()) stats.setGamesPlayed(stats.getGamesPlayed() + 1);
+                if (!evGamesPlayed.isCancelled()) {
+                    apply(stats, event.getArena(), bucket -> bucket.setGamesPlayed(bucket.getGamesPlayed() + 1));
+                }
             }
         }
     }
 
     @EventHandler
     public void onArenaLeave(PlayerLeaveArenaEvent event) {
-        final Player player = event.getPlayer();
+        Player player = event.getPlayer();
         ITeam team = event.getArena().getExTeam(player.getUniqueId());
         if (team == null) return;
-        if (event.getArena().getStatus() == GameState.starting || event.getArena().getStatus() == GameState.waiting)
+        if (event.getArena().getStatus() == GameState.starting || event.getArena().getStatus() == GameState.waiting) {
             return;
+        }
 
-        IPlayerStats playerStats = getCachedStats(player.getUniqueId(), "arena-leave-player");
+        PlayerStats playerStats = getCachedStats(player.getUniqueId(), "arena-leave-player");
         if (playerStats == null) return;
 
         PlayerStatChangeEvent evFirst = new PlayerStatChangeEvent(player, event.getArena(), PlayerStatChangeEvent.StatType.FIRST_PLAY);
@@ -167,19 +187,29 @@ public class StatsListener implements Listener {
 
         Instant now = Instant.now();
         Bukkit.getPluginManager().callEvent(evLast);
-        if (!evLast.isCancelled()) playerStats.setLastPlay(now);
-        if (playerStats.getFirstPlay() == null) {
-            Bukkit.getPluginManager().callEvent(evFirst);
-            if (!evFirst.isCancelled()) playerStats.setFirstPlay(now);
+        if (!evLast.isCancelled()) {
+            apply(playerStats, event.getArena(), bucket -> bucket.setLastPlay(now));
+        }
+        Bukkit.getPluginManager().callEvent(evFirst);
+        if (!evFirst.isCancelled()) {
+            apply(playerStats, event.getArena(), bucket -> {
+                if (bucket.getFirstPlay() == null) {
+                    bucket.setFirstPlay(now);
+                }
+            });
         }
 
         if (event.getArena().getStatus() == GameState.playing) {
             if (team.isBedDestroyed()) {
                 if (event.getArena().isPlayer(player)) {
                     Bukkit.getPluginManager().callEvent(evFinalDeaths);
-                    if (!evFinalDeaths.isCancelled()) playerStats.setFinalDeaths(playerStats.getFinalDeaths() + 1);
+                    if (!evFinalDeaths.isCancelled()) {
+                        apply(playerStats, event.getArena(), bucket -> bucket.setFinalDeaths(bucket.getFinalDeaths() + 1));
+                    }
                     Bukkit.getPluginManager().callEvent(evLosses);
-                    if (!evLosses.isCancelled()) playerStats.setLosses(playerStats.getLosses() + 1);
+                    if (!evLosses.isCancelled()) {
+                        apply(playerStats, event.getArena(), bucket -> bucket.setLosses(bucket.getLosses() + 1));
+                    }
                 }
 
                 Player damager = event.getLastDamager();
@@ -188,9 +218,9 @@ public class StatsListener implements Listener {
                         PlayerStatChangeEvent evFinalKill = new PlayerStatChangeEvent(damager, event.getArena(), PlayerStatChangeEvent.StatType.FINAL_KILLS);
                         Bukkit.getPluginManager().callEvent(evFinalKill);
                         if (!evFinalKill.isCancelled()) {
-                            IPlayerStats damagerStats = getCachedStats(damager.getUniqueId(), "arena-leave-final-kill");
+                            PlayerStats damagerStats = getCachedStats(damager.getUniqueId(), "arena-leave-final-kill");
                             if (damagerStats != null) {
-                                damagerStats.setFinalKills(damagerStats.getFinalKills() + 1);
+                                apply(damagerStats, event.getArena(), bucket -> bucket.setFinalKills(bucket.getFinalKills() + 1));
                                 event.getArena().addPlayerKill(damager, true, player);
                             }
                         }
@@ -205,16 +235,16 @@ public class StatsListener implements Listener {
 
                         Bukkit.getPluginManager().callEvent(evDeaths);
                         if (!evDeaths.isCancelled()) {
-                            playerStats.setDeaths(playerStats.getDeaths() + 1);
+                            apply(playerStats, event.getArena(), bucket -> bucket.setDeaths(bucket.getDeaths() + 1));
                         }
                         event.getArena().addPlayerDeath(player);
 
                         event.getArena().addPlayerKill(damager, false, player);
                         Bukkit.getPluginManager().callEvent(evKills);
                         if (!evKills.isCancelled()) {
-                            IPlayerStats damagerStats = getCachedStats(damager.getUniqueId(), "arena-leave-kill");
+                            PlayerStats damagerStats = getCachedStats(damager.getUniqueId(), "arena-leave-kill");
                             if (damagerStats != null) {
-                                damagerStats.setKills(damagerStats.getKills() + 1);
+                                apply(damagerStats, event.getArena(), bucket -> bucket.setKills(bucket.getKills() + 1));
                             }
                         }
                     }

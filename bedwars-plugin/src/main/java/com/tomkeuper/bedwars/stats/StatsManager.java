@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 public class StatsManager implements IStatsManager {
 
@@ -29,6 +30,22 @@ public class StatsManager implements IStatsManager {
 
     public void put(UUID uuid, IPlayerStats playerStats) {
         stats.put(uuid, playerStats);
+    }
+
+    public @Nullable PlayerStats getMutable(UUID uuid) {
+        IPlayerStats playerStats = stats.get(uuid);
+        if (playerStats instanceof PlayerStats mutable) {
+            return mutable;
+        }
+        return null;
+    }
+
+    public void apply(Player player, IArena arena, Consumer<ModeStats> updater) {
+        PlayerStats playerStats = getMutable(player.getUniqueId());
+        if (playerStats == null) {
+            throw new IllegalStateException("Trying to mutate stats data of an unloaded player!");
+        }
+        playerStats.applyToOverallAndMode(StatsModeResolver.resolve(arena), updater);
     }
 
     @Override
@@ -47,98 +64,90 @@ public class StatsManager implements IStatsManager {
 
     @Override
     public void addPlayerKill(Player player) {
-        IPlayerStats playerStats = get(player.getUniqueId());
         IArena arena = Arena.getArenaByPlayer(player);
         PlayerStatChangeEvent ev = new PlayerStatChangeEvent(player, arena, PlayerStatChangeEvent.StatType.KILLS);
         Bukkit.getPluginManager().callEvent(ev);
         if (ev.isCancelled()) {
             return;
         }
-        playerStats.setKills(playerStats.getKills() + 1);
+        apply(player, arena, stats -> stats.setKills(stats.getKills() + 1));
     }
 
     @Override
     public void addFinalKill(Player player) {
-        IPlayerStats playerStats = get(player.getUniqueId());
         IArena arena = Arena.getArenaByPlayer(player);
         PlayerStatChangeEvent ev = new PlayerStatChangeEvent(player, arena, PlayerStatChangeEvent.StatType.FINAL_KILLS);
         Bukkit.getPluginManager().callEvent(ev);
         if (ev.isCancelled()) {
             return;
         }
-        playerStats.setFinalKills(playerStats.getFinalKills() + 1);
+        apply(player, arena, stats -> stats.setFinalKills(stats.getFinalKills() + 1));
     }
 
     @Override
     public void addPlayerDeath(Player player) {
-        IPlayerStats playerStats = get(player.getUniqueId());
         IArena arena = Arena.getArenaByPlayer(player);
         PlayerStatChangeEvent ev = new PlayerStatChangeEvent(player, arena, PlayerStatChangeEvent.StatType.DEATHS);
         Bukkit.getPluginManager().callEvent(ev);
         if (ev.isCancelled()) {
             return;
         }
-        playerStats.setDeaths(playerStats.getDeaths() + 1);
+        apply(player, arena, stats -> stats.setDeaths(stats.getDeaths() + 1));
     }
 
     @Override
     public void addFinalDeath(Player player) {
-        IPlayerStats playerStats = get(player.getUniqueId());
         IArena arena = Arena.getArenaByPlayer(player);
         PlayerStatChangeEvent ev = new PlayerStatChangeEvent(player, arena, PlayerStatChangeEvent.StatType.FINAL_DEATHS);
         Bukkit.getPluginManager().callEvent(ev);
         if (ev.isCancelled()) {
             return;
         }
-        playerStats.setFinalDeaths(playerStats.getFinalDeaths() + 1);
+        apply(player, arena, stats -> stats.setFinalDeaths(stats.getFinalDeaths() + 1));
     }
 
     @Override
     public void addBedBreak(Player player) {
-        IPlayerStats playerStats = get(player.getUniqueId());
         IArena arena = Arena.getArenaByPlayer(player);
         PlayerStatChangeEvent ev = new PlayerStatChangeEvent(player, arena, PlayerStatChangeEvent.StatType.BEDS_DESTROYED);
         Bukkit.getPluginManager().callEvent(ev);
         if (ev.isCancelled()) {
             return;
         }
-        playerStats.setBedsDestroyed(playerStats.getBedsDestroyed() + 1);
+        apply(player, arena, stats -> stats.setBedsDestroyed(stats.getBedsDestroyed() + 1));
     }
 
     @Override
     public void addWin(Player player) {
-        IPlayerStats playerStats = get(player.getUniqueId());
         IArena arena = Arena.getArenaByPlayer(player);
         PlayerStatChangeEvent ev = new PlayerStatChangeEvent(player, arena, PlayerStatChangeEvent.StatType.WINS);
         Bukkit.getPluginManager().callEvent(ev);
         if (ev.isCancelled()) {
             return;
         }
-        playerStats.setWins(playerStats.getWins() + 1);
+        apply(player, arena, stats -> stats.setWins(stats.getWins() + 1));
     }
 
     @Override
     public void addLoss(Player player) {
-        IPlayerStats playerStats = get(player.getUniqueId());
         IArena arena = Arena.getArenaByPlayer(player);
         PlayerStatChangeEvent ev = new PlayerStatChangeEvent(player, arena, PlayerStatChangeEvent.StatType.LOSSES);
         Bukkit.getPluginManager().callEvent(ev);
         if (ev.isCancelled()) {
             return;
         }
-        playerStats.setLosses(playerStats.getLosses() + 1);
+        apply(player, arena, stats -> stats.setLosses(stats.getLosses() + 1));
     }
 
     @Override
     public void addGamesPlayed(Player player) {
-        IPlayerStats playerStats = get(player.getUniqueId());
         IArena arena = Arena.getArenaByPlayer(player);
         PlayerStatChangeEvent ev = new PlayerStatChangeEvent(player, arena, PlayerStatChangeEvent.StatType.GAMES_PLAYED);
         Bukkit.getPluginManager().callEvent(ev);
         if (ev.isCancelled()) {
             return;
         }
-        playerStats.setGamesPlayed(playerStats.getGamesPlayed() + 1);
+        apply(player, arena, stats -> stats.setGamesPlayed(stats.getGamesPlayed() + 1));
     }
 
     /**

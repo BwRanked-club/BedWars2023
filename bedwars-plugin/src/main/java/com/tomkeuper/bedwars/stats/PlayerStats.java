@@ -3,24 +3,19 @@ package com.tomkeuper.bedwars.stats;
 import com.tomkeuper.bedwars.api.stats.IPlayerStats;
 
 import java.time.Instant;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class PlayerStats implements IPlayerStats {
 
     private final UUID uuid;
+    private final ModeStats overallStats = new ModeStats();
+    private final EnumMap<StatsMode, ModeStats> modeStats = new EnumMap<>(StatsMode.class);
 
     private String name;
-    private Instant firstPlay;
-    private Instant lastPlay;
-    private int wins;
-    private int kills;
-    private int finalKills;
-    private int totalKills;
-    private int losses;
-    private int deaths;
-    private int finalDeaths;
-    private int bedsDestroyed;
-    private int gamesPlayed;
 
     public PlayerStats(UUID uuid) {
         this.uuid = uuid;
@@ -39,88 +34,122 @@ public class PlayerStats implements IPlayerStats {
     }
 
     public Instant getFirstPlay() {
-        return firstPlay;
+        return overallStats.getFirstPlay();
     }
 
     public void setFirstPlay(Instant firstPlay) {
-        this.firstPlay = firstPlay;
+        overallStats.setFirstPlay(firstPlay);
     }
 
     public Instant getLastPlay() {
-        return lastPlay;
+        return overallStats.getLastPlay();
     }
 
     public void setLastPlay(Instant lastPlay) {
-        this.lastPlay = lastPlay;
+        overallStats.setLastPlay(lastPlay);
     }
 
     public int getWins() {
-        return wins;
+        return overallStats.getWins();
     }
 
     public void setWins(int wins) {
-        this.wins = wins;
+        overallStats.setWins(wins);
     }
 
     public int getKills() {
-        return kills;
+        return overallStats.getKills();
     }
 
     public void setKills(int kills) {
-        this.kills = kills;
-        this.totalKills = kills + finalKills;
+        overallStats.setKills(kills);
     }
 
     public int getFinalKills() {
-        return finalKills;
+        return overallStats.getFinalKills();
     }
 
     public void setFinalKills(int finalKills) {
-        this.finalKills = finalKills;
-        this.totalKills = kills + finalKills;
+        overallStats.setFinalKills(finalKills);
     }
 
     public int getLosses() {
-        return losses;
+        return overallStats.getLosses();
     }
 
     public void setLosses(int losses) {
-        this.losses = losses;
+        overallStats.setLosses(losses);
     }
 
     public int getDeaths() {
-        return deaths;
+        return overallStats.getDeaths();
     }
 
     public void setDeaths(int deaths) {
-        this.deaths = deaths;
+        overallStats.setDeaths(deaths);
     }
 
     public int getFinalDeaths() {
-        return finalDeaths;
+        return overallStats.getFinalDeaths();
     }
 
     public void setFinalDeaths(int finalDeaths) {
-        this.finalDeaths = finalDeaths;
+        overallStats.setFinalDeaths(finalDeaths);
     }
 
     public int getBedsDestroyed() {
-        return bedsDestroyed;
+        return overallStats.getBedsDestroyed();
     }
 
     public void setBedsDestroyed(int bedsDestroyed) {
-        this.bedsDestroyed = bedsDestroyed;
+        overallStats.setBedsDestroyed(bedsDestroyed);
     }
 
     public int getGamesPlayed() {
-        return gamesPlayed;
+        return overallStats.getGamesPlayed();
     }
 
     public void setGamesPlayed(int gamePlayed) {
-        this.gamesPlayed = gamePlayed;
+        overallStats.setGamesPlayed(gamePlayed);
     }
 
     public int getTotalKills() {
-        return totalKills;
+        return overallStats.getTotalKills();
+    }
+
+    public ModeStats getOverallStats() {
+        return overallStats;
+    }
+
+    public ModeStats getModeStats(StatsMode mode) {
+        if (mode == null || mode == StatsMode.OVERALL) {
+            return overallStats;
+        }
+        return modeStats.computeIfAbsent(mode, ignored -> new ModeStats());
+    }
+
+    public ModeStats getModeStatsOrEmpty(StatsMode mode) {
+        if (mode == null || mode == StatsMode.OVERALL) {
+            return overallStats;
+        }
+        return modeStats.getOrDefault(mode, new ModeStats());
+    }
+
+    public Map<StatsMode, ModeStats> getTrackedModeStats() {
+        return Collections.unmodifiableMap(modeStats);
+    }
+
+    public void setModeStats(StatsMode mode, ModeStats stats) {
+        if (mode == null || mode == StatsMode.OVERALL || stats == null) {
+            return;
+        }
+        modeStats.put(mode, stats);
+    }
+
+    public void applyToOverallAndMode(StatsMode mode, Consumer<ModeStats> consumer) {
+        consumer.accept(overallStats);
+        if (mode != null && mode != StatsMode.OVERALL) {
+            consumer.accept(getModeStats(mode));
+        }
     }
 }
