@@ -6,6 +6,8 @@ import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.shop.IQuickBuyElement;
 import com.tomkeuper.bedwars.api.stats.IPlayerStats;
 import com.tomkeuper.bedwars.stats.PlayerStats;
+import com.tomkeuper.bedwars.stats.ModeStats;
+import com.tomkeuper.bedwars.stats.StatsMode;
 import com.tomkeuper.bedwars.history.MatchHistoryEventRecord;
 import com.tomkeuper.bedwars.history.MatchHistoryRecord;
 
@@ -68,9 +70,18 @@ public class SQLite implements IDatabase {
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate(sql);
             }
-
-            migrateQuickBuyTable();
-
+            try (Statement statement = connection.createStatement()) {
+                sql = "CREATE TABLE IF NOT EXISTS player_stats_modes (" +
+                        "uuid VARCHAR(36) NOT NULL, " +
+                        "mode VARCHAR(64) NOT NULL, " +
+                        "first_play TIMESTAMP NULL DEFAULT NULL, " +
+                        "last_play TIMESTAMP DEFAULT NULL, " +
+                        "wins INTEGER(10), kills INTEGER(10), final_kills INTEGER(10), looses INTEGER(10), " +
+                        "deaths INTEGER(10), final_deaths INTEGER(10), beds_destroyed INTEGER(10), games_played INTEGER(10), " +
+                        "PRIMARY KEY (uuid, mode)" +
+                        ");";
+                statement.executeUpdate(sql);
+            }
             try (Statement st = connection.createStatement()) {
                 sql = "CREATE TABLE IF NOT EXISTS quick_buy (uuid VARCHAR(36) PRIMARY KEY, " +
                         "slot_19 VARCHAR(200), slot_20 VARCHAR(200), slot_21 VARCHAR(200), slot_22 VARCHAR(200), slot_23 VARCHAR(200), slot_24 VARCHAR(200), slot_25 VARCHAR(200)," +
@@ -86,6 +97,15 @@ public class SQLite implements IDatabase {
             try (Statement st = connection.createStatement()) {
                 sql = "CREATE TABLE IF NOT EXISTS  player_language (id INTEGER PRIMARY KEY AUTOINCREMENT, uuid VARCHAR(200), " +
                         "iso VARCHAR(200));";
+                st.executeUpdate(sql);
+            }
+            try (Statement st = connection.createStatement()) {
+                sql = "CREATE TABLE IF NOT EXISTS quick_buy_share (" +
+                        "code VARCHAR(12) PRIMARY KEY, " +
+                        "owner VARCHAR(36) UNIQUE, " +
+                        "compact TEXT, " +
+                        "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
+                        ");";
                 st.executeUpdate(sql);
             }
             try (Statement st = connection.createStatement()) {
@@ -156,6 +176,7 @@ public class SQLite implements IDatabase {
 
     @Override
     public void saveStats(IPlayerStats stats) {
+        PlayerStats playerStats = (PlayerStats) stats;
         String sql;
         try {
             checkConnection();
@@ -163,7 +184,7 @@ public class SQLite implements IDatabase {
             if (hasStats(stats.getUuid())) {
                 sql = "UPDATE global_stats SET last_play=?, wins=?, kills=?, final_kills=?, looses=?, deaths=?, final_deaths=?, beds_destroyed=?, games_played=?, name=? WHERE uuid = ?;";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                    statement.setTimestamp(1, Timestamp.from(stats.getLastPlay()));
+                    statement.setTimestamp(1, toTimestamp(stats.getLastPlay()));
                     statement.setInt(2, stats.getWins());
                     statement.setInt(3, stats.getKills());
                     statement.setInt(4, stats.getFinalKills());
@@ -181,8 +202,8 @@ public class SQLite implements IDatabase {
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setString(1, stats.getName());
                     statement.setString(2, stats.getUuid().toString());
-                    statement.setTimestamp(3, Timestamp.from(stats.getFirstPlay()));
-                    statement.setTimestamp(4, Timestamp.from(stats.getLastPlay()));
+                    statement.setTimestamp(3, toTimestamp(stats.getFirstPlay()));
+                    statement.setTimestamp(4, toTimestamp(stats.getLastPlay()));
                     statement.setInt(5, stats.getWins());
                     statement.setInt(6, stats.getKills());
                     statement.setInt(7, stats.getFinalKills());
@@ -194,6 +215,7 @@ public class SQLite implements IDatabase {
                     statement.executeUpdate();
                 }
             }
+            saveModeStats(playerStats);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -201,7 +223,7 @@ public class SQLite implements IDatabase {
 
     @Override
     public IPlayerStats fetchStats(UUID uuid) {
-        IPlayerStats stats = new PlayerStats(uuid);
+        PlayerStats stats = new PlayerStats(uuid);
         String sql = "SELECT * FROM global_stats WHERE uuid = ?;";
         try {
             checkConnection();
@@ -210,8 +232,9 @@ public class SQLite implements IDatabase {
                 statement.setString(1, uuid.toString());
                 try (ResultSet result = statement.executeQuery()) {
                     if (result.next()) {
-                        stats.setFirstPlay(result.getTimestamp("first_play").toInstant());
-                        stats.setLastPlay(result.getTimestamp("last_play").toInstant());
+                        stats.setName(result.getString("name"));
+                        stats.setFirstPlay(toInstant(result.getTimestamp("first_play")));
+                        stats.setLastPlay(toInstant(result.getTimestamp("last_play")));
                         stats.setWins(result.getInt("wins"));
                         stats.setKills(result.getInt("kills"));
                         stats.setFinalKills(result.getInt("final_kills"));
@@ -223,10 +246,71 @@ public class SQLite implements IDatabase {
                     }
                 }
             }
+            loadModeStats(stats);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return stats;
+    }
+
+    private void saveModeStats(PlayerStats stats) throws SQLException {
+        try (PreparedStatement delete = connection.prepareStatement("DELETE FROM player_stats_modes WHERE uuid = ?;")) {
+            delete.setString(1, stats.getUuid().toString());
+            delete.executeUpdate();
+        }
+
+        String sql = "INSERT INTO player_stats_modes (uuid, mode, first_play, last_play, wins, kills, final_kills, looses, deaths, final_deaths, beds_destroyed, games_played) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            for (Map.Entry<StatsMode, ModeStats> entry : stats.getTrackedModeStats().entrySet()) {
+                if (!entry.getValue().hasActivity()) continue;
+                statement.setString(1, stats.getUuid().toString());
+                statement.setString(2, entry.getKey().getId());
+                statement.setTimestamp(3, toTimestamp(entry.getValue().getFirstPlay()));
+                statement.setTimestamp(4, toTimestamp(entry.getValue().getLastPlay()));
+                statement.setInt(5, entry.getValue().getWins());
+                statement.setInt(6, entry.getValue().getKills());
+                statement.setInt(7, entry.getValue().getFinalKills());
+                statement.setInt(8, entry.getValue().getLosses());
+                statement.setInt(9, entry.getValue().getDeaths());
+                statement.setInt(10, entry.getValue().getFinalDeaths());
+                statement.setInt(11, entry.getValue().getBedsDestroyed());
+                statement.setInt(12, entry.getValue().getGamesPlayed());
+                statement.addBatch();
+            }
+            statement.executeBatch();
+        }
+    }
+
+    private void loadModeStats(PlayerStats stats) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM player_stats_modes WHERE uuid = ?;")) {
+            statement.setString(1, stats.getUuid().toString());
+            try (ResultSet result = statement.executeQuery()) {
+                while (result.next()) {
+                    StatsMode mode = StatsMode.fromId(result.getString("mode"));
+                    if (mode == null || mode == StatsMode.OVERALL) continue;
+                    ModeStats modeStats = new ModeStats();
+                    modeStats.setFirstPlay(toInstant(result.getTimestamp("first_play")));
+                    modeStats.setLastPlay(toInstant(result.getTimestamp("last_play")));
+                    modeStats.setWins(result.getInt("wins"));
+                    modeStats.setKills(result.getInt("kills"));
+                    modeStats.setFinalKills(result.getInt("final_kills"));
+                    modeStats.setLosses(result.getInt("looses"));
+                    modeStats.setDeaths(result.getInt("deaths"));
+                    modeStats.setFinalDeaths(result.getInt("final_deaths"));
+                    modeStats.setBedsDestroyed(result.getInt("beds_destroyed"));
+                    modeStats.setGamesPlayed(result.getInt("games_played"));
+                    stats.setModeStats(mode, modeStats);
+                }
+            }
+        }
+    }
+
+    private Timestamp toTimestamp(java.time.Instant instant) {
+        return instant == null ? null : Timestamp.from(instant);
+    }
+
+    private java.time.Instant toInstant(Timestamp timestamp) {
+        return timestamp == null ? null : timestamp.toInstant();
     }
 
     @Override
@@ -289,6 +373,7 @@ public class SQLite implements IDatabase {
             checkConnection();
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate("DELETE FROM global_stats;");
+                statement.executeUpdate("DELETE FROM player_stats_modes;");
                 try {
                     statement.executeUpdate("DELETE FROM sqlite_sequence WHERE name='global_stats';");
                 } catch (SQLException ignored) {
@@ -889,33 +974,6 @@ public class SQLite implements IDatabase {
 
         if (renew)
             this.connection = DriverManager.getConnection(url);
-    }
-
-    private void migrateQuickBuyTable() {
-        try {
-            checkConnection();
-
-            boolean hasQuickBuy2 = tableExists("quick_buy_2");
-            if (!hasQuickBuy2) return;
-
-            boolean hasQuickBuy = tableExists("quick_buy");
-            if (!hasQuickBuy) {
-                try (Statement st = connection.createStatement()) {
-                    st.executeUpdate("ALTER TABLE quick_buy_2 RENAME TO quick_buy;");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private boolean tableExists(String tableName) throws SQLException {
-        try (PreparedStatement ps = connection.prepareStatement("SELECT name FROM sqlite_master WHERE type='table' AND name=?;")) {
-            ps.setString(1, tableName);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
-        }
     }
 
     private void ensureMatchHistorySchema() throws SQLException {

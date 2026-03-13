@@ -6,6 +6,8 @@ import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.shop.IQuickBuyElement;
 import com.tomkeuper.bedwars.api.stats.IPlayerStats;
 import com.tomkeuper.bedwars.stats.PlayerStats;
+import com.tomkeuper.bedwars.stats.ModeStats;
+import com.tomkeuper.bedwars.stats.StatsMode;
 import com.tomkeuper.bedwars.history.MatchHistoryEventRecord;
 import com.tomkeuper.bedwars.history.MatchHistoryRecord;
 
@@ -51,6 +53,18 @@ public class H2 implements IDatabase {
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate(sql);
             }
+            try (Statement statement = connection.createStatement()) {
+                sql = "CREATE TABLE IF NOT EXISTS PLAYER_STATS_MODES (" +
+                        "UUID VARCHAR(36) NOT NULL, " +
+                        "MODE VARCHAR(64) NOT NULL, " +
+                        "FIRST_PLAY TIMESTAMP NULL DEFAULT NULL, " +
+                        "LAST_PLAY TIMESTAMP DEFAULT NULL, " +
+                        "WINS INTEGER, KILLS INTEGER, FINAL_KILLS INTEGER, LOSES INTEGER, " +
+                        "DEATHS INTEGER, FINAL_DEATHS INTEGER, BEDS_DESTROYED INTEGER, GAMES_PLAYED INTEGER, " +
+                        "PRIMARY KEY (UUID, MODE)" +
+                        ");";
+                statement.executeUpdate(sql);
+            }
             try (Statement st = connection.createStatement()) {
                 sql = "CREATE TABLE IF NOT EXISTS QUICK_BUY (UUID VARCHAR(36) PRIMARY KEY, " +
                         "SLOT_19 VARCHAR(200), SLOT_20 VARCHAR(200), SLOT_21 VARCHAR(200), SLOT_22 VARCHAR(200), SLOT_23 VARCHAR(200), SLOT_24 VARCHAR(200), SLOT_25 VARCHAR(200)," +
@@ -66,6 +80,15 @@ public class H2 implements IDatabase {
             try (Statement st = connection.createStatement()) {
                 sql = "CREATE TABLE IF NOT EXISTS PLAYER_LANGUAGE (id INTEGER PRIMARY KEY AUTO_INCREMENT, UUID VARCHAR(200), " +
                         "iso VARCHAR(200));";
+                st.executeUpdate(sql);
+            }
+            try (Statement st = connection.createStatement()) {
+                sql = "CREATE TABLE IF NOT EXISTS QUICK_BUY_SHARE (" +
+                        "CODE VARCHAR(12) PRIMARY KEY, " +
+                        "OWNER VARCHAR(36) UNIQUE, " +
+                        "COMPACT CLOB, " +
+                        "CREATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
+                        ");";
                 st.executeUpdate(sql);
             }
             try (Statement st = connection.createStatement()) {
@@ -136,6 +159,7 @@ public class H2 implements IDatabase {
 
     @Override
     public void saveStats(IPlayerStats stats) {
+        PlayerStats playerStats = (PlayerStats) stats;
         String sql;
         try {
             checkConnection();
@@ -143,7 +167,7 @@ public class H2 implements IDatabase {
             if (hasStats(stats.getUuid())) {
                 sql = "UPDATE GLOBAL_STATS SET last_play=?, wins=?, kills=?, final_kills=?, loses=?, deaths=?, final_deaths=?, beds_destroyed=?, games_played=?, NAME=? WHERE UUID = ?;";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                    statement.setTimestamp(1, Timestamp.from(stats.getLastPlay()));
+                    statement.setTimestamp(1, toTimestamp(stats.getLastPlay()));
                     statement.setInt(2, stats.getWins());
                     statement.setInt(3, stats.getKills());
                     statement.setInt(4, stats.getFinalKills());
@@ -161,8 +185,8 @@ public class H2 implements IDatabase {
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setString(1, stats.getName());
                     statement.setString(2, stats.getUuid().toString());
-                    statement.setTimestamp(3, Timestamp.from(stats.getFirstPlay()));
-                    statement.setTimestamp(4, Timestamp.from(stats.getLastPlay()));
+                    statement.setTimestamp(3, toTimestamp(stats.getFirstPlay()));
+                    statement.setTimestamp(4, toTimestamp(stats.getLastPlay()));
                     statement.setInt(5, stats.getWins());
                     statement.setInt(6, stats.getKills());
                     statement.setInt(7, stats.getFinalKills());
@@ -174,6 +198,8 @@ public class H2 implements IDatabase {
                     statement.executeUpdate();
                 }
             }
+
+            saveModeStats(playerStats);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -181,7 +207,7 @@ public class H2 implements IDatabase {
 
     @Override
     public IPlayerStats fetchStats(UUID uuid) {
-        IPlayerStats stats = new PlayerStats(uuid);
+        PlayerStats stats = new PlayerStats(uuid);
         String sql = "SELECT * FROM GLOBAL_STATS WHERE UUID = ?;";
         try {
             checkConnection();
@@ -190,8 +216,9 @@ public class H2 implements IDatabase {
                 statement.setString(1, uuid.toString());
                 try (ResultSet result = statement.executeQuery()) {
                     if (result.next()) {
-                        stats.setFirstPlay(result.getTimestamp("first_play").toInstant());
-                        stats.setLastPlay(result.getTimestamp("last_play").toInstant());
+                        stats.setName(result.getString("NAME"));
+                        stats.setFirstPlay(toInstant(result.getTimestamp("first_play")));
+                        stats.setLastPlay(toInstant(result.getTimestamp("last_play")));
                         stats.setWins(result.getInt("wins"));
                         stats.setKills(result.getInt("kills"));
                         stats.setFinalKills(result.getInt("final_kills"));
@@ -203,10 +230,72 @@ public class H2 implements IDatabase {
                     }
                 }
             }
+            loadModeStats(stats);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return stats;
+    }
+
+    private void saveModeStats(PlayerStats stats) throws SQLException {
+        try (PreparedStatement delete = connection.prepareStatement("DELETE FROM PLAYER_STATS_MODES WHERE UUID = ?;")) {
+            delete.setString(1, stats.getUuid().toString());
+            delete.executeUpdate();
+        }
+
+        String sql = "MERGE INTO PLAYER_STATS_MODES (UUID, MODE, FIRST_PLAY, LAST_PLAY, WINS, KILLS, FINAL_KILLS, LOSES, DEATHS, FINAL_DEATHS, BEDS_DESTROYED, GAMES_PLAYED) " +
+                "KEY (UUID, MODE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            for (Map.Entry<StatsMode, ModeStats> entry : stats.getTrackedModeStats().entrySet()) {
+                if (!entry.getValue().hasActivity()) continue;
+                statement.setString(1, stats.getUuid().toString());
+                statement.setString(2, entry.getKey().getId());
+                statement.setTimestamp(3, toTimestamp(entry.getValue().getFirstPlay()));
+                statement.setTimestamp(4, toTimestamp(entry.getValue().getLastPlay()));
+                statement.setInt(5, entry.getValue().getWins());
+                statement.setInt(6, entry.getValue().getKills());
+                statement.setInt(7, entry.getValue().getFinalKills());
+                statement.setInt(8, entry.getValue().getLosses());
+                statement.setInt(9, entry.getValue().getDeaths());
+                statement.setInt(10, entry.getValue().getFinalDeaths());
+                statement.setInt(11, entry.getValue().getBedsDestroyed());
+                statement.setInt(12, entry.getValue().getGamesPlayed());
+                statement.addBatch();
+            }
+            statement.executeBatch();
+        }
+    }
+
+    private void loadModeStats(PlayerStats stats) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM PLAYER_STATS_MODES WHERE UUID = ?;")) {
+            statement.setString(1, stats.getUuid().toString());
+            try (ResultSet result = statement.executeQuery()) {
+                while (result.next()) {
+                    StatsMode mode = StatsMode.fromId(result.getString("MODE"));
+                    if (mode == null || mode == StatsMode.OVERALL) continue;
+                    ModeStats modeStats = new ModeStats();
+                    modeStats.setFirstPlay(toInstant(result.getTimestamp("FIRST_PLAY")));
+                    modeStats.setLastPlay(toInstant(result.getTimestamp("LAST_PLAY")));
+                    modeStats.setWins(result.getInt("WINS"));
+                    modeStats.setKills(result.getInt("KILLS"));
+                    modeStats.setFinalKills(result.getInt("FINAL_KILLS"));
+                    modeStats.setLosses(result.getInt("LOSES"));
+                    modeStats.setDeaths(result.getInt("DEATHS"));
+                    modeStats.setFinalDeaths(result.getInt("FINAL_DEATHS"));
+                    modeStats.setBedsDestroyed(result.getInt("BEDS_DESTROYED"));
+                    modeStats.setGamesPlayed(result.getInt("GAMES_PLAYED"));
+                    stats.setModeStats(mode, modeStats);
+                }
+            }
+        }
+    }
+
+    private Timestamp toTimestamp(java.time.Instant instant) {
+        return instant == null ? null : Timestamp.from(instant);
+    }
+
+    private java.time.Instant toInstant(Timestamp timestamp) {
+        return timestamp == null ? null : timestamp.toInstant();
     }
 
     @Override
@@ -237,19 +326,13 @@ public class H2 implements IDatabase {
     }
 
     public void checkCustomColumnExists(String columnName, String dataType) {
-        String sql = "SHOW COLUMNS FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?;";
         try {
             checkConnection();
 
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, columnName);
-                try (ResultSet result = statement.executeQuery()) {
-                    if (!result.next()) {
-                        sql = "ALTER TABLE GLOBAL_STATS ADD COLUMN " + columnName + " " + dataType;
-                        try (PreparedStatement statement1 = connection.prepareStatement(sql)) {
-                            statement1.executeUpdate();
-                        }
-                    }
+            if (!columnExists("GLOBAL_STATS", columnName)) {
+                String sql = "ALTER TABLE GLOBAL_STATS ADD COLUMN " + columnName + " " + dataType;
+                try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                    statement.executeUpdate();
                 }
             }
         } catch (SQLException e) {
@@ -263,6 +346,7 @@ public class H2 implements IDatabase {
             checkConnection();
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate("TRUNCATE TABLE GLOBAL_STATS;");
+                statement.executeUpdate("TRUNCATE TABLE PLAYER_STATS_MODES;");
             }
             return true;
         } catch (SQLException ignored) {
@@ -270,6 +354,7 @@ public class H2 implements IDatabase {
                 checkConnection();
                 try (Statement statement = connection.createStatement()) {
                     statement.executeUpdate("DELETE FROM GLOBAL_STATS;");
+                    statement.executeUpdate("DELETE FROM PLAYER_STATS_MODES;");
                 }
                 return true;
             } catch (SQLException e) {
@@ -897,8 +982,8 @@ public class H2 implements IDatabase {
 
     private boolean columnExists(String tableName, String columnName) throws SQLException {
         try (PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ? AND COLUMN_NAME = ?;")) {
-            ps.setString(1, tableName);
-            ps.setString(2, columnName);
+            ps.setString(1, tableName.toUpperCase(Locale.ROOT));
+            ps.setString(2, columnName.toUpperCase(Locale.ROOT));
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1) > 0;

@@ -7,6 +7,8 @@ import com.tomkeuper.bedwars.api.language.Language;
 import com.tomkeuper.bedwars.api.shop.IQuickBuyElement;
 import com.tomkeuper.bedwars.api.stats.IPlayerStats;
 import com.tomkeuper.bedwars.stats.PlayerStats;
+import com.tomkeuper.bedwars.stats.ModeStats;
+import com.tomkeuper.bedwars.stats.StatsMode;
 import com.tomkeuper.bedwars.history.MatchHistoryEventRecord;
 import com.tomkeuper.bedwars.history.MatchHistoryRecord;
 import com.zaxxer.hikari.HikariConfig;
@@ -127,6 +129,25 @@ public class MySQL implements IDatabase {
                 statement.executeUpdate(sql);
             }
 
+            sql = "CREATE TABLE IF NOT EXISTS player_stats_modes (" +
+                    "uuid VARCHAR(36) NOT NULL," +
+                    "mode VARCHAR(64) NOT NULL," +
+                    "first_play TIMESTAMP NULL DEFAULT NULL," +
+                    "last_play TIMESTAMP NULL DEFAULT NULL," +
+                    "wins INT(200)," +
+                    "kills INT(200)," +
+                    "final_kills INT(200)," +
+                    "looses INT(200)," +
+                    "deaths INT(200)," +
+                    "final_deaths INT(200)," +
+                    "beds_destroyed INT(200)," +
+                    "games_played INT(200)," +
+                    "PRIMARY KEY (uuid, mode)" +
+                    ");";
+            try (Statement statement = connection.createStatement()) {
+                statement.executeUpdate(sql);
+            }
+
             sql = "CREATE TABLE IF NOT EXISTS quick_buy (uuid VARCHAR(36) PRIMARY KEY, " +
                     "slot_19 VARCHAR(200), slot_20 VARCHAR(200), slot_21 VARCHAR(200), slot_22 VARCHAR(200), slot_23 VARCHAR(200), slot_24 VARCHAR(200), slot_25 VARCHAR(200)," +
                     "slot_28 VARCHAR(200), slot_29 VARCHAR(200), slot_30 VARCHAR(200), slot_31 VARCHAR(200), slot_32 VARCHAR(200), slot_33 VARCHAR(200), slot_34 VARCHAR(200)," +
@@ -206,56 +227,9 @@ public class MySQL implements IDatabase {
         }
     }
 
-    /**
-     * Migrate quick_buy_2 table to quick_buy.
-     * This will:
-     * 1. Check if quick_buy_2 exists
-     * 2. Drop old quick_buy if it exists
-     * 3. Rename quick_buy_2 to quick_buy
-     *
-     * @return true if migration was performed or not needed, false if an error occurred
-     */
-    public boolean migrateQuickBuyTable() {
-        try (Connection connection = dataSource.getConnection()) {
-            // Check if quick_buy_2 exists
-            boolean hasQuickBuy2;
-            try (ResultSet rs = connection.getMetaData().getTables(null, null, "quick_buy_2", null)) {
-                hasQuickBuy2 = rs.next();
-            }
-
-            if (!hasQuickBuy2) return true;
-
-            try (Statement statement = connection.createStatement()) {
-                // Drop old quick_buy table if it exists
-                // Check if old quick_buy exists
-                boolean hasOldQuickBuy = false;
-                try (ResultSet rs = connection.getMetaData().getTables(null, null, "quick_buy", null)) {
-                    hasOldQuickBuy = rs.next();
-                }
-
-                if (hasOldQuickBuy) {
-                    BedWars.plugin.getLogger().info("Dropping old 'quick_buy' table...");
-                    statement.executeUpdate("DROP TABLE IF EXISTS quick_buy;");
-                }
-
-                // Rename quick_buy_2 to quick_buy
-                BedWars.plugin.getLogger().info("Renaming 'quick_buy_2' to 'quick_buy'...");
-
-                // Rename quick_buy_2 to quick_buy
-                statement.executeUpdate("RENAME TABLE quick_buy_2 TO quick_buy;");
-
-                BedWars.plugin.getLogger().info("Successfully renamed 'quick_buy_2' to 'quick_buy'.");
-                return true;
-            }
-        } catch (SQLException e) {
-            BedWars.plugin.getLogger().severe("Failed to migrate Quick Buy table: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     @Override
     public void saveStats(IPlayerStats stats) {
+        PlayerStats playerStats = (PlayerStats) stats;
         String sql;
         try (Connection connection = dataSource.getConnection()) {
             if (hasStats(stats.getUuid())) {
@@ -293,6 +267,7 @@ public class MySQL implements IDatabase {
                     statement.executeUpdate();
                 }
             }
+            saveModeStats(connection, playerStats);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -300,33 +275,96 @@ public class MySQL implements IDatabase {
 
     @Override
     public IPlayerStats fetchStats(UUID uuid) {
-        IPlayerStats stats = new PlayerStats(uuid);
-        String sql = "SELECT first_play, last_play, wins, kills, final_kills, looses, deaths, final_deaths," +
+        PlayerStats stats = new PlayerStats(uuid);
+        String sql = "SELECT name, first_play, last_play, wins, kills, final_kills, looses, deaths, final_deaths," +
                 "beds_destroyed, games_played FROM global_stats WHERE uuid = ?;";
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, uuid.toString());
                 try (ResultSet result = statement.executeQuery()) {
                     if (result.next()) {
-                        Timestamp firstPlay = result.getTimestamp(1);
-                        Timestamp lastPlay = result.getTimestamp(2);
+                        stats.setName(result.getString(1));
+                        Timestamp firstPlay = result.getTimestamp(2);
+                        Timestamp lastPlay = result.getTimestamp(3);
                         stats.setFirstPlay(firstPlay != null ? firstPlay.toInstant() : null);
                         stats.setLastPlay(lastPlay != null ? lastPlay.toInstant() : null);
-                        stats.setWins(result.getInt(3));
-                        stats.setKills(result.getInt(4));
-                        stats.setFinalKills(result.getInt(5));
-                        stats.setLosses(result.getInt(6));
-                        stats.setDeaths(result.getInt(7));
-                        stats.setFinalDeaths(result.getInt(8));
-                        stats.setBedsDestroyed(result.getInt(9));
-                        stats.setGamesPlayed(result.getInt(10));
+                        stats.setWins(result.getInt(4));
+                        stats.setKills(result.getInt(5));
+                        stats.setFinalKills(result.getInt(6));
+                        stats.setLosses(result.getInt(7));
+                        stats.setDeaths(result.getInt(8));
+                        stats.setFinalDeaths(result.getInt(9));
+                        stats.setBedsDestroyed(result.getInt(10));
+                        stats.setGamesPlayed(result.getInt(11));
                     }
                 }
             }
+            loadModeStats(connection, stats);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return stats;
+    }
+
+    private void saveModeStats(Connection connection, PlayerStats stats) throws SQLException {
+        try (PreparedStatement delete = connection.prepareStatement("DELETE FROM player_stats_modes WHERE uuid = ?;")) {
+            delete.setString(1, stats.getUuid().toString());
+            delete.executeUpdate();
+        }
+
+        String sql = "INSERT INTO player_stats_modes (uuid, mode, first_play, last_play, wins, kills, final_kills, looses, deaths, final_deaths, beds_destroyed, games_played) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            for (Map.Entry<StatsMode, ModeStats> entry : stats.getTrackedModeStats().entrySet()) {
+                if (!entry.getValue().hasActivity()) continue;
+                statement.setString(1, stats.getUuid().toString());
+                statement.setString(2, entry.getKey().getId());
+                statement.setTimestamp(3, toTimestamp(entry.getValue().getFirstPlay()));
+                statement.setTimestamp(4, toTimestamp(entry.getValue().getLastPlay()));
+                statement.setInt(5, entry.getValue().getWins());
+                statement.setInt(6, entry.getValue().getKills());
+                statement.setInt(7, entry.getValue().getFinalKills());
+                statement.setInt(8, entry.getValue().getLosses());
+                statement.setInt(9, entry.getValue().getDeaths());
+                statement.setInt(10, entry.getValue().getFinalDeaths());
+                statement.setInt(11, entry.getValue().getBedsDestroyed());
+                statement.setInt(12, entry.getValue().getGamesPlayed());
+                statement.addBatch();
+            }
+            statement.executeBatch();
+        }
+    }
+
+    private void loadModeStats(Connection connection, PlayerStats stats) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM player_stats_modes WHERE uuid = ?;")) {
+            statement.setString(1, stats.getUuid().toString());
+            try (ResultSet result = statement.executeQuery()) {
+                while (result.next()) {
+                    StatsMode mode = StatsMode.fromId(result.getString("mode"));
+                    if (mode == null || mode == StatsMode.OVERALL) continue;
+                    ModeStats modeStats = new ModeStats();
+                    modeStats.setFirstPlay(toInstant(result.getTimestamp("first_play")));
+                    modeStats.setLastPlay(toInstant(result.getTimestamp("last_play")));
+                    modeStats.setWins(result.getInt("wins"));
+                    modeStats.setKills(result.getInt("kills"));
+                    modeStats.setFinalKills(result.getInt("final_kills"));
+                    modeStats.setLosses(result.getInt("looses"));
+                    modeStats.setDeaths(result.getInt("deaths"));
+                    modeStats.setFinalDeaths(result.getInt("final_deaths"));
+                    modeStats.setBedsDestroyed(result.getInt("beds_destroyed"));
+                    modeStats.setGamesPlayed(result.getInt("games_played"));
+                    stats.setModeStats(mode, modeStats);
+                }
+            }
+        }
+    }
+
+    private Timestamp toTimestamp(java.time.Instant instant) {
+        return instant == null ? null : Timestamp.from(instant);
+    }
+
+    private java.time.Instant toInstant(Timestamp timestamp) {
+        return timestamp == null ? null : timestamp.toInstant();
     }
 
     @Override
@@ -396,11 +434,13 @@ public class MySQL implements IDatabase {
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
             statement.executeUpdate("TRUNCATE TABLE global_stats;");
+            statement.executeUpdate("TRUNCATE TABLE player_stats_modes;");
             return true;
         } catch (SQLException ignored) {
             try (Connection connection = dataSource.getConnection();
                  Statement statement = connection.createStatement()) {
                 statement.executeUpdate("DELETE FROM global_stats;");
+                statement.executeUpdate("DELETE FROM player_stats_modes;");
                 return true;
             } catch (SQLException e) {
                 e.printStackTrace();
