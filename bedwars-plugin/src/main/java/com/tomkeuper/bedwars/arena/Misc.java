@@ -10,9 +10,13 @@ import com.tomkeuper.bedwars.api.exceptions.InvalidMaterialException;
 import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.api.region.Region;
 import com.tomkeuper.bedwars.api.server.ServerType;
-import com.tomkeuper.bedwars.api.stats.IPlayerStats;
 import com.tomkeuper.bedwars.configuration.Sounds;
+import com.tomkeuper.bedwars.stats.ModeStats;
+import com.tomkeuper.bedwars.stats.PlayerStats;
+import com.tomkeuper.bedwars.stats.StatsMode;
+import com.tomkeuper.bedwars.stats.StatsMenuHolder;
 import com.tomkeuper.bedwars.support.papi.SupportPAPI;
+import com.tomkeuper.bedwars.utils.ItemBuilder;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -35,9 +39,9 @@ import org.jetbrains.annotations.Nullable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 
@@ -260,75 +264,190 @@ public final class Misc {
         return tc;
     }
 
-    public static void addDefaultStatsItem(@NotNull YamlConfiguration yml, int slot, @NotNull Material item, int data, @NotNull String path) {
+    public static void addDefaultStatsItem(@NotNull YamlConfiguration yml,
+                                           int slot,
+                                           @NotNull Material item,
+                                           int data,
+                                           int amount,
+                                           boolean enchanted,
+                                           @NotNull String path,
+                                           @NotNull String mode) {
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_MATERIAL.replace("%path%", path), item.toString());
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_DATA.replace("%path%", path), data);
         yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_SLOT.replace("%path%", path), slot);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_AMOUNT.replace("%path%", path), amount);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_ENCHANTED.replace("%path%", path), enchanted);
+        yml.addDefault(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_MODE.replace("%path%", path), mode);
     }
 
-    public static void openStatsGUI(@NotNull Player p) {
+    public static void openStatsGUI(@NotNull Player player) {
+        PlayerStats stats = BedWars.getStatsManager().getMutable(player.getUniqueId());
+        if (stats == null) {
+            return;
+        }
+        openStatsGUI(player, stats, player.getUniqueId(), player.getName());
+    }
+
+    public static void openStatsGUI(@NotNull Player viewer,
+                                    @NotNull PlayerStats targetStats,
+                                    @NotNull java.util.UUID targetId,
+                                    @Nullable String fallbackName) {
         Bukkit.getScheduler().runTask(plugin, () -> {
-            if (!p.isOnline()) return;
-
-            Inventory inv = Bukkit.createInventory(
-                    null,
-                    config.getInt(ConfigPath.GENERAL_CONFIGURATION_STATS_GUI_SIZE),
-                    replaceStatsPlaceholders(p, getMsg(p, Messages.PLAYER_STATS_GUI_INV_NAME), true)
-            );
-
-            for (String s : config.getYml().getConfigurationSection(ConfigPath.GENERAL_CONFIGURATION_STATS_PATH).getKeys(false)) {
-                if (ConfigPath.GENERAL_CONFIGURATION_STATS_GUI_SIZE.contains(s)) continue;
-
-                ItemStack i = nms.createItemStack(
-                        config.getYml().getString(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_MATERIAL.replace("%path%", s)).toUpperCase(),
-                        1,
-                        (short) config.getInt(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_DATA.replace("%path%", s))
-                );
-
-                ItemMeta im = i.getItemMeta();
-                if (im != null) {
-                    im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-                    im.setDisplayName(replaceStatsPlaceholders(p, getMsg(p, Messages.PLAYER_STATS_GUI_PATH + "-" + s + "-name"), true));
-                    List<String> lore = new ArrayList<>();
-                    for (String line : getList(p, Messages.PLAYER_STATS_GUI_PATH + "-" + s + "-lore")) {
-                        lore.add(replaceStatsPlaceholders(p, line, true));
-                    }
-                    im.setLore(lore);
-                    i.setItemMeta(im);
-                }
-
-                inv.setItem(config.getInt(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_SLOT.replace("%path%", s)), i);
+            if (!viewer.isOnline()) {
+                return;
             }
 
-            p.openInventory(inv);
-            Sounds.playSound("stats-gui-open", p);
+            Player targetPlayer = Bukkit.getPlayer(targetId);
+            String targetName = resolveStatsTargetName(targetStats, targetPlayer, fallbackName);
+            StatsMenuHolder holder = new StatsMenuHolder(targetId);
+            Inventory inv = Bukkit.createInventory(
+                    holder,
+                    config.getInt(ConfigPath.GENERAL_CONFIGURATION_STATS_GUI_SIZE),
+                    replaceStatsPlaceholders(viewer, targetStats, targetPlayer, targetName, getMsg(viewer, Messages.PLAYER_STATS_GUI_INV_NAME), StatsMode.OVERALL, true)
+            );
+            holder.setInventory(inv);
+
+            applyStatsFiller(inv);
+
+            if (config.getYml().getConfigurationSection(ConfigPath.GENERAL_CONFIGURATION_STATS_PATH) == null) {
+                return;
+            }
+            for (String key : config.getYml().getConfigurationSection(ConfigPath.GENERAL_CONFIGURATION_STATS_PATH).getKeys(false)) {
+                if (ConfigPath.GENERAL_CONFIGURATION_STATS_GUI_SIZE.contains(key) || "filler".equalsIgnoreCase(key)) {
+                    continue;
+                }
+
+                String modeId = config.getString(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_MODE.replace("%path%", key));
+                StatsMode mode = StatsMode.fromId(modeId);
+                if (mode == null) {
+                    continue;
+                }
+
+                ItemStack item = nms.createItemStack(
+                        config.getYml().getString(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_MATERIAL.replace("%path%", key)).toUpperCase(Locale.ROOT),
+                        Math.max(1, config.getInt(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_AMOUNT.replace("%path%", key))),
+                        (short) config.getInt(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_DATA.replace("%path%", key))
+                );
+
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null) {
+                    meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                    if (config.getBoolean(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_ENCHANTED.replace("%path%", key))) {
+                        meta.addEnchant(Enchantment.LUCK, 1, true);
+                        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    }
+                    meta.setDisplayName(replaceStatsPlaceholders(viewer, targetStats, targetPlayer, targetName, getMsg(viewer, Messages.PLAYER_STATS_GUI_PATH + "-" + key + "-name"), mode, true));
+                    List<String> lore = new ArrayList<>();
+                    for (String line : getList(viewer, Messages.PLAYER_STATS_GUI_PATH + "-" + key + "-lore")) {
+                        lore.add(replaceStatsPlaceholders(viewer, targetStats, targetPlayer, targetName, line, mode, true));
+                    }
+                    meta.setLore(lore);
+                    item.setItemMeta(meta);
+                }
+
+                inv.setItem(config.getInt(ConfigPath.GENERAL_CONFIGURATION_STATS_ITEMS_SLOT.replace("%path%", key)), item);
+            }
+
+            viewer.openInventory(inv);
+            Sounds.playSound("stats-gui-open", viewer);
         });
     }
 
     public static String replaceStatsPlaceholders(@NotNull Player player, @NotNull String s, boolean papiReplacements) {
-        IPlayerStats stats = BedWars.getStatsManager().get(player.getUniqueId());
+        return replaceStatsPlaceholders(player, s, StatsMode.OVERALL, papiReplacements);
+    }
 
-        s = s.replace("%bw_player%", getPlayerName(player))
-                .replace("%bw_playername%", player.getName())
-                .replace("%bw_prefix%", BedWars.getChatSupport().getPrefix(player))
-                .replace("%bw_kills%", String.valueOf(stats.getKills()))
-                .replace("%bw_deaths%", String.valueOf(stats.getDeaths()))
-                .replace("%bw_losses%", String.valueOf(stats.getLosses()))
-                .replace("%bw_wins%", String.valueOf(stats.getWins()))
-                .replace("%bw_final_kills%", String.valueOf(stats.getFinalKills()))
-                .replace("%bw_final_deaths%", String.valueOf(stats.getFinalDeaths()))
-                .replace("%bw_beds%", String.valueOf(stats.getBedsDestroyed()))
-                .replace("%bw_games_played%", String.valueOf(stats.getGamesPlayed()));
+    public static String replaceStatsPlaceholders(@NotNull Player player,
+                                                  @NotNull String s,
+                                                  @NotNull StatsMode mode,
+                                                  boolean papiReplacements) {
+        PlayerStats stats = BedWars.getStatsManager().getMutable(player.getUniqueId());
+        if (stats == null) {
+            return s;
+        }
+        return replaceStatsPlaceholders(player, stats, player, player.getName(), s, mode, papiReplacements);
+    }
 
-        final String dateFmt = getMsg(player, Messages.FORMATTING_STATS_DATE_FORMAT);
-        Instant first = stats.getFirstPlay() != null ? stats.getFirstPlay() : Instant.now();
-        Instant last = stats.getLastPlay() != null ? stats.getLastPlay() : Instant.now();
+    public static String replaceStatsPlaceholders(@NotNull Player viewer,
+                                                  @NotNull PlayerStats targetStats,
+                                                  @Nullable Player targetPlayer,
+                                                  @Nullable String fallbackName,
+                                                  @NotNull String s,
+                                                  @NotNull StatsMode mode,
+                                                  boolean papiReplacements) {
+        ModeStats selected = targetStats.getModeStatsOrEmpty(mode);
+        String targetName = resolveStatsTargetName(targetStats, targetPlayer, fallbackName);
+        String statsDisplayName = targetPlayer != null ? getPlayerName(targetPlayer) : targetName;
+        String prefix = targetPlayer != null ? BedWars.getChatSupport().getPrefix(targetPlayer) : "";
+
+        s = s.replace("%bw_player%", statsDisplayName)
+                .replace("%bw_playername%", targetName)
+                .replace("%bw_prefix%", prefix)
+                .replace("%bw_mode%", mode.getId())
+                .replace("%bw_kills%", String.valueOf(selected.getKills()))
+                .replace("%bw_total_kills%", String.valueOf(selected.getTotalKills()))
+                .replace("%bw_deaths%", String.valueOf(selected.getDeaths()))
+                .replace("%bw_losses%", String.valueOf(selected.getLosses()))
+                .replace("%bw_wins%", String.valueOf(selected.getWins()))
+                .replace("%bw_final_kills%", String.valueOf(selected.getFinalKills()))
+                .replace("%bw_final_deaths%", String.valueOf(selected.getFinalDeaths()))
+                .replace("%bw_beds%", String.valueOf(selected.getBedsDestroyed()))
+                .replace("%bw_games_played%", String.valueOf(selected.getGamesPlayed()))
+                .replace("%bw_kdr%", formatRatio(selected.getKills(), selected.getDeaths()))
+                .replace("%bw_fkdr%", formatRatio(selected.getFinalKills(), selected.getFinalDeaths()))
+                .replace("%bw_wlr%", formatRatio(selected.getWins(), selected.getLosses()));
+
+        final String dateFmt = getMsg(viewer, Messages.FORMATTING_STATS_DATE_FORMAT);
         SimpleDateFormat sdf = new SimpleDateFormat(dateFmt);
+        String never = getMsg(viewer, Messages.MEANING_NEVER);
+        String first = selected.getFirstPlay() == null ? never : sdf.format(Timestamp.from(selected.getFirstPlay()));
+        String last = selected.getLastPlay() == null ? never : sdf.format(Timestamp.from(selected.getLastPlay()));
 
-        s = s.replace("%bw_play_first%", sdf.format(Timestamp.from(first)))
-                .replace("%bw_play_last%", sdf.format(Timestamp.from(last)));
+        s = s.replace("%bw_play_first%", first)
+                .replace("%bw_play_last%", last);
 
-        return papiReplacements ? SupportPAPI.getSupportPAPI().replace(player, s) : s;
+        return papiReplacements && targetPlayer != null ? SupportPAPI.getSupportPAPI().replace(targetPlayer, s) : s;
+    }
+
+    private static void applyStatsFiller(@NotNull Inventory inv) {
+        if (!config.getBoolean(ConfigPath.GENERAL_CONFIGURATION_STATS_FILLER_ENABLED)) {
+            return;
+        }
+
+        ItemStack filler = nms.createItemStack(
+                config.getString(ConfigPath.GENERAL_CONFIGURATION_STATS_FILLER_MATERIAL).toUpperCase(Locale.ROOT),
+                1,
+                (short) config.getInt(ConfigPath.GENERAL_CONFIGURATION_STATS_FILLER_DATA)
+        );
+        ItemMeta fillerMeta = filler.getItemMeta();
+        if (fillerMeta != null) {
+            fillerMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            fillerMeta.setDisplayName(" ");
+            filler.setItemMeta(fillerMeta);
+        }
+        if (config.getBoolean(ConfigPath.GENERAL_CONFIGURATION_STATS_FILLER_ENCHANTED)) {
+            filler = new ItemBuilder(filler.getType()).setDurability(filler.getDurability()).setGlow(true).build();
+        }
+        for (int slot = 0; slot < inv.getSize(); slot++) {
+            inv.setItem(slot, filler.clone());
+        }
+    }
+
+    private static String resolveStatsTargetName(@NotNull PlayerStats stats, @Nullable Player targetPlayer, @Nullable String fallbackName) {
+        if (targetPlayer != null) {
+            return targetPlayer.getName();
+        }
+        if (stats.getName() != null && !stats.getName().isBlank()) {
+            return stats.getName();
+        }
+        return fallbackName == null || fallbackName.isBlank() ? "Unknown" : fallbackName;
+    }
+
+    private static String formatRatio(int numerator, int denominator) {
+        if (denominator <= 0) {
+            return String.format(Locale.US, "%.2f", (double) numerator);
+        }
+        return String.format(Locale.US, "%.2f", (double) numerator / (double) denominator);
     }
 
     public static String getPlayerName(@NotNull Player player) {

@@ -5,12 +5,9 @@ import com.tomkeuper.bedwars.api.arena.GameState;
 import com.tomkeuper.bedwars.api.arena.IArena;
 import com.tomkeuper.bedwars.api.arena.team.TeamEnchant;
 import com.tomkeuper.bedwars.api.events.gameplay.GameStateChangeEvent;
-import com.tomkeuper.bedwars.api.language.Language;
-import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.api.server.ServerType;
 import com.tomkeuper.bedwars.api.server.SetupType;
 import com.tomkeuper.bedwars.arena.Arena;
-import com.tomkeuper.bedwars.arena.Misc;
 import com.tomkeuper.bedwars.arena.Misc;
 import com.tomkeuper.bedwars.arena.SetupSession;
 import com.tomkeuper.bedwars.commands.bedwars.subcmds.regular.CmdLeave;
@@ -20,6 +17,7 @@ import com.tomkeuper.bedwars.history.HistoryMenu;
 import com.tomkeuper.bedwars.history.HistoryMenuHolder;
 import com.tomkeuper.bedwars.shop.main.ShopCategory;
 import com.tomkeuper.bedwars.shop.main.ShopIndex;
+import com.tomkeuper.bedwars.stats.StatsMenuHolder;
 import com.tomkeuper.bedwars.support.version.common.VersionCommon;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -224,10 +222,7 @@ public class PlayerInventoryListeners implements Listener {
             }
         }
 
-        // Prevent players from moving items in stats GUI
-        if (nms.getInventoryName(e).equals(Language.getMsg(p, Messages.PLAYER_STATS_GUI_INV_NAME)
-                .replace("%bw_playername%", p.getName())
-                .replace("%bw_player%", Misc.getPlayerName(p)))) {
+        if (e.getView().getTopInventory().getHolder() instanceof StatsMenuHolder) {
             e.setCancelled(true);
             return;
         }
