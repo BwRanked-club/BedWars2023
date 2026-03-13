@@ -8,6 +8,9 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -52,7 +55,9 @@ public class ConfigManager {
 
         yml = new YamlConfiguration();
         try {
-            yml.load(config);
+            try (Reader reader = Files.newBufferedReader(config.toPath(), StandardCharsets.UTF_8)) {
+                yml.load(reader);
+            }
             yml.options().copyDefaults(true);
         } catch (InvalidConfigurationException e) {
             loadError = true;
@@ -71,7 +76,14 @@ public class ConfigManager {
      * Reload configuration.
      */
     public void reload() {
-        yml = YamlConfiguration.loadConfiguration(config);
+        yml = new YamlConfiguration();
+        try (Reader reader = Files.newBufferedReader(config.toPath(), StandardCharsets.UTF_8)) {
+            yml.load(reader);
+            yml.options().copyDefaults(true);
+        } catch (IOException | InvalidConfigurationException e) {
+            loadError = true;
+            Bukkit.getLogger().log(Level.SEVERE, "Failed to reload configuration file: " + config.getPath(), e);
+        }
     }
 
     /**
@@ -173,7 +185,11 @@ public class ConfigManager {
      */
     public void save() {
         try {
-            yml.save(config);
+            if (loadError) {
+                return;
+            }
+            String content = yml.saveToString().replace("\r\n", "\n").replace("\n", "\r\n");
+            Files.writeString(config.toPath(), content, StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
         }
