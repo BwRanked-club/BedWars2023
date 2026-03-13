@@ -9,6 +9,8 @@ import com.tomkeuper.bedwars.api.entity.GeneratorHolder;
 import com.tomkeuper.bedwars.api.exceptions.InvalidEffectException;
 import com.tomkeuper.bedwars.api.hologram.containers.IHoloLine;
 import com.tomkeuper.bedwars.api.hologram.containers.IHologram;
+import com.tomkeuper.bedwars.api.language.Language;
+import com.tomkeuper.bedwars.api.arena.shop.ShopHolo;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,7 +26,10 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -85,6 +90,12 @@ public abstract class VersionSupport {
     public abstract void hideEntity(Entity e, Player p);
 
     /**
+     * Legacy hook kept for old version-support modules.
+     */
+    public void fakeDamagePlayer(Player player) {
+    }
+
+    /**
      * Check if item-stack is armor
      */
     public abstract boolean isArmor(ItemStack itemStack);
@@ -134,12 +145,65 @@ public abstract class VersionSupport {
     /**
      * Spawn shop NPC
      */
-    public abstract void spawnShop(Location loc, String name1, List<Player> players, IArena arena);
+    public void spawnShop(Location loc, String name1, List<Player> players, IArena arena) {
+        spawnShop(loc, name1, (Iterable<Player>) players, arena);
+    }
+
+    /**
+     * Legacy shop NPC hook kept for old version-support modules.
+     */
+    @Deprecated
+    public void spawnShop(Location loc, String name1, Iterable<Player> players, IArena arena) {
+        throw new UnsupportedOperationException("Legacy spawnShop hook must be implemented by the version support module.");
+    }
 
     /**
      * Spawn shop hologram
      */
-    public abstract void spawnShopHologram(Location loc, String name1, List<Player> players, IArena arena, ITeam team);
+    public void spawnShopHologram(Location loc, String name1, List<Player> players, IArena arena, ITeam team) {
+        if (loc == null || players == null || players.isEmpty() || arena == null) return;
+
+        Map<String, List<Player>> playersByIso = new HashMap<>();
+        for (Player player : players) {
+            if (player == null || !player.isOnline()) continue;
+
+            playersByIso.computeIfAbsent(Language.getPlayerLanguage(player).getIso(), key -> new ArrayList<>()).add(player);
+        }
+
+        for (Map.Entry<String, List<Player>> entry : playersByIso.entrySet()) {
+            List<Player> localizedPlayers = entry.getValue();
+            if (localizedPlayers.isEmpty()) continue;
+
+            Player sample = localizedPlayers.get(0);
+            List<String> lines = Language.getList(sample, name1);
+            if (lines == null || lines.isEmpty()) {
+                lines = Language.getList(sample, name1.replace(name1.split("\\.")[2], "default"));
+            }
+            if (lines == null || lines.isEmpty()) continue;
+
+            ShopHolo existing = arena.findShopHologram(entry.getKey(), team, loc);
+            if (existing != null) {
+                for (Player localizedPlayer : localizedPlayers) {
+                    existing.getHologram().addPlayer(localizedPlayer);
+                }
+                existing.update();
+                continue;
+            }
+
+            IHologram hologram = createHologram(localizedPlayers, loc, lines.toArray(new String[0]));
+            ShopHolo shopHolo = new ShopHolo(hologram, arena, team);
+            arena.registerShopHologram(entry.getKey(), shopHolo);
+            shopHolo.update();
+        }
+    }
+
+    /**
+     * Legacy shop hologram hook kept for source compatibility with old modules.
+     */
+    @Deprecated
+    public void spawnShopHologram(Location loc, String name1, Iterable<Player> players, ITeam team) {
+        throw new UnsupportedOperationException("Legacy spawnShopHologram hook is no longer supported without an arena context.");
+    }
 
     /**
      * Get item-stack damage amount
@@ -485,19 +549,75 @@ public abstract class VersionSupport {
 
     public abstract IHologram createHologram(Player p, Location location, IHoloLine... lines);
 
-    public abstract IHologram createHologram(List<Player> players, Location location, String... lines);
+    public IHologram createHologram(List<Player> players, Location location, String... lines) {
+        return createHologram((Iterable<Player>) players, location, lines);
+    }
 
-    public abstract IHologram createHologram(List<Player> players, Location location, IHoloLine... lines);
+    /**
+     * Legacy hologram hook kept for old version-support modules.
+     */
+    @Deprecated
+    public IHologram createHologram(Iterable<Player> players, Location location, String... lines) {
+        throw new UnsupportedOperationException("Legacy createHologram hook must be implemented by the version support module.");
+    }
+
+    public IHologram createHologram(List<Player> players, Location location, IHoloLine... lines) {
+        return createHologram((Iterable<Player>) players, location, lines);
+    }
+
+    /**
+     * Legacy hologram hook kept for old version-support modules.
+     */
+    @Deprecated
+    public IHologram createHologram(Iterable<Player> players, Location location, IHoloLine... lines) {
+        throw new UnsupportedOperationException("Legacy createHologram hook must be implemented by the version support module.");
+    }
 
     public abstract IHoloLine lineFromText(String text, @Nonnull IHologram hologram);
 
     public abstract IGeneratorAnimation createDefaultGeneratorAnimation(ArmorStand armorStand);
 
-    public abstract void destroyPacketArmorStand(GeneratorHolder generatorHolder, List<Player> players);
+    public void destroyPacketArmorStand(GeneratorHolder generatorHolder, List<Player> players) {
+        destroyPacketArmorStand(generatorHolder, (Iterable<Player>) players);
+    }
 
-    public abstract ArmorStand createPacketArmorStand(@Nonnull Location loc, List<Player> players);
+    /**
+     * Legacy packet armor stand hook kept for old version-support modules.
+     */
+    @Deprecated
+    public void destroyPacketArmorStand(GeneratorHolder generatorHolder, Iterable<Player> players) {
+        throw new UnsupportedOperationException("Legacy destroyPacketArmorStand hook must be implemented by the version support module.");
+    }
 
-    public abstract void updatePacketArmorStand(GeneratorHolder generatorHolder, List<Player> players);
+    public ArmorStand createPacketArmorStand(@Nonnull Location loc, List<Player> players) {
+        return createPacketArmorStand(loc, (Iterable<Player>) players);
+    }
+
+    /**
+     * Legacy packet armor stand hook kept for old version-support modules.
+     */
+    @Deprecated
+    public ArmorStand createPacketArmorStand(@Nonnull Location loc, Iterable<Player> players) {
+        throw new UnsupportedOperationException("Legacy createPacketArmorStand hook must be implemented by the version support module.");
+    }
+
+    public void updatePacketArmorStand(GeneratorHolder generatorHolder, List<Player> players) {
+        updatePacketArmorStand(generatorHolder, (Iterable<Player>) players);
+    }
+
+    /**
+     * Legacy packet armor stand hook kept for old version-support modules.
+     */
+    @Deprecated
+    public void updatePacketArmorStand(GeneratorHolder generatorHolder, Iterable<Player> players) {
+        throw new UnsupportedOperationException("Legacy updatePacketArmorStand hook must be implemented by the version support module.");
+    }
+
+    /**
+     * Legacy hook kept for old version-support modules.
+     */
+    public void callPlayerDeathEvent(Player player, List<org.bukkit.inventory.ItemStack> drops, int droppedExp, int newLevel, String deathMessage) {
+    }
 
     public abstract void updatePacketArmorStandEquipment(GeneratorHolder generatorHolder);
 }

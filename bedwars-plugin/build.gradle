@@ -3,11 +3,6 @@ plugins {
     id 'dev.racci.slimjar' version '2.0.2'
 }
 
-// Ensure plugin is compiled for Java 21 to be compatible with 1.20.4+/1.21 support modules
-tasks.named('compileJava', JavaCompile) {
-    options.release = 21
-}
-
 repositories {
     mavenCentral()
     mavenLocal()
@@ -112,6 +107,17 @@ tasks.named('processResources') {
 def versions = [
         ':versionsupport_common',
         ':versionsupport_1_8_r3',
+        ':versionsupport_1_12_r1',
+        ':versionsupport_v1_16_r3',
+        ':versionsupport_v1_17_r1',
+        ':versionsupport_v1_18_r2',
+        ':versionsupport_v1_19_r3',
+        ':versionsupport_v1_20_r4',
+        ':versionsupport_v1_20_6',
+        ':versionsupport_v1_21_r1',
+        ':versionsupport_v1_21_r2',
+        ':versionsupport_v1_21_r3',
+        ':versionsupport_v1_21_r5',
         ':resetadapter_slime'
 ] as Set
 
@@ -128,7 +134,6 @@ tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.Shadow
     versions.each { path ->
         def vp = project(path)
         dependsOn vp.tasks.named('shadowJar')
-        dependsOn vp.tasks.withType(Jar)
         from({
             def shadeTask = vp.tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar).get()
             zipTree(shadeTask.archiveFile.get().asFile)
@@ -158,6 +163,6 @@ tasks.named('slimJar') {
     mustRunAfter 'sourcesJar', 'generateTestEffectiveLombokConfig', 'processTestResources', 'delombok', 'javadocJar'
 }
 
-tasks.withType(JavaCompile).configureEach {
+tasks.named('compileJava', JavaCompile) {
     options.release = 17
 }

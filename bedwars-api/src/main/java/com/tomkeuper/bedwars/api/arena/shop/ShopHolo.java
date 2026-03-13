@@ -19,6 +19,14 @@ public class ShopHolo {
         this.t = t;
     }
 
+    /**
+     * Legacy constructor kept only for source compatibility with older version-support modules.
+     */
+    @Deprecated
+    public ShopHolo(@Nonnull IHologram hologram, ITeam t, String ignoredIso) {
+        this(hologram, null, t);
+    }
+
     public IHologram getHologram() {
         return hologram;
     }

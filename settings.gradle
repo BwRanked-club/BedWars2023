@@ -21,7 +21,18 @@ include ':bedwars-plugin'
 include ':resetadapter_slime'
 
 include ':versionsupport_1_8_r3'
+include ':versionsupport_1_12_r1'
 include ':versionsupport_common'
+include ':versionsupport_v1_16_r3'
+include ':versionsupport_v1_17_r1'
+include ':versionsupport_v1_18_r2'
+include ':versionsupport_v1_19_r3'
+include ':versionsupport_v1_20_r4'
+include ':versionsupport_v1_20_6'
+include ':versionsupport_v1_21_r1'
+include ':versionsupport_v1_21_r2'
+include ':versionsupport_v1_21_r3'
+include ':versionsupport_v1_21_r5'
 
 
 // Enable type-safe project accessors for Kotlin DSL usages that remain
