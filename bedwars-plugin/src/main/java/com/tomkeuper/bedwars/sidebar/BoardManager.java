@@ -13,6 +13,10 @@ import com.tomkeuper.bedwars.api.tasks.PlayingTask;
 import com.tomkeuper.bedwars.arena.Arena;
 import com.tomkeuper.bedwars.arena.Misc;
 import com.tomkeuper.bedwars.levels.internal.PlayerLevel;
+import com.tomkeuper.bedwars.stats.ModeStats;
+import com.tomkeuper.bedwars.stats.PlayerStats;
+import com.tomkeuper.bedwars.stats.StatsMode;
+import com.tomkeuper.bedwars.stats.StatsModeResolver;
 import com.tomkeuper.bedwars.support.papi.SupportPAPI;
 import me.neznamy.tab.api.TabAPI;
 import me.neznamy.tab.api.TabPlayer;
@@ -216,6 +220,9 @@ public class BoardManager implements IScoreboardService {
         placeholderManager.registerPlayerPlaceholder("%bw_level_unformatted%", placeholderRefresh, player -> String.valueOf(PlayerLevel.getLevelByPlayer(player.getUniqueId()).getLevel()));
         placeholderManager.registerPlayerPlaceholder("%bw_current_xp%", placeholderRefresh, player -> PlayerLevel.getLevelByPlayer(player.getUniqueId()).getFormattedCurrentXp());
         placeholderManager.registerPlayerPlaceholder("%bw_required_xp%", placeholderRefresh, player -> PlayerLevel.getLevelByPlayer(player.getUniqueId()).getFormattedRequiredXp());
+        placeholderManager.registerPlayerPlaceholder("%bw_xp%", placeholderRefresh, player -> PlayerLevel.getLevelByPlayer(player.getUniqueId()).getFormattedCurrentXp());
+        registerStatsAliasPlaceholder("%bw_stats_level%", placeholderRefresh, tabPlayer -> PlayerLevel.getLevelByPlayer(tabPlayer.getUniqueId()).getLevelName());
+        registerStatsAliasPlaceholder("%bw_stats_xp%", placeholderRefresh, tabPlayer -> PlayerLevel.getLevelByPlayer(tabPlayer.getUniqueId()).getFormattedCurrentXp());
         placeholderManager.registerPlayerPlaceholder("%bw_map%", placeholderRefresh, player -> Arena.getArenaByPlayer((Player) player.getPlayer()) == null ? "" : Arena.getArenaByPlayer((Player) player.getPlayer()).getDisplayName());
         placeholderManager.registerPlayerPlaceholder("%bw_map_name%", placeholderRefresh, player -> Arena.getArenaByPlayer((Player) player.getPlayer()) == null ? "" : Arena.getArenaByPlayer((Player) player.getPlayer()).getArenaName());
         placeholderManager.registerPlayerPlaceholder("%bw_rating%", placeholderRefresh, tabPlayer -> {
@@ -234,6 +241,7 @@ public class BoardManager implements IScoreboardService {
                 return String.valueOf(Arena.getArenaByPlayer((Player) player.getPlayer()).getPlayerKills((Player) player.getPlayer(), false));
             return String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getKills());
         });
+        registerStatsAliasPlaceholder("%bw_stats_kills%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getKills()));
         placeholderManager.registerPlayerPlaceholder("%bw_total_kills%", placeholderRefresh, player -> {
             if (null != Arena.getArenaByPlayer((Player) player.getPlayer()))
                 return String.valueOf(Arena.getArenaByPlayer((Player) player.getPlayer()).getPlayerTotalKills((Player) player.getPlayer()));
@@ -244,20 +252,35 @@ public class BoardManager implements IScoreboardService {
                 return String.valueOf(Arena.getArenaByPlayer((Player) player.getPlayer()).getPlayerKills((Player) player.getPlayer(), true));
             return String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getFinalKills());
         });
+        registerStatsAliasPlaceholder("%bw_stats_final_kills%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getFinalKills()));
         placeholderManager.registerPlayerPlaceholder("%bw_beds%", placeholderRefresh, player -> {
             if (null != Arena.getArenaByPlayer((Player) player.getPlayer()))
                 return String.valueOf(Arena.getArenaByPlayer((Player) player.getPlayer()).getPlayerBedsDestroyed((Player) player.getPlayer()));
             return String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getBedsDestroyed());
         });
+        placeholderManager.registerPlayerPlaceholder("%bw_beds_broken%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getBedsDestroyed()));
+        placeholderManager.registerPlayerPlaceholder("%bw_beds_lost%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getBedsLost()));
+        registerStatsAliasPlaceholder("%bw_stats_beds%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getBedsDestroyed()));
+        registerStatsAliasPlaceholder("%bw_stats_beds_broken%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getBedsDestroyed()));
+        registerStatsAliasPlaceholder("%bw_stats_beds_lost%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getBedsLost()));
         placeholderManager.registerPlayerPlaceholder("%bw_deaths%", placeholderRefresh, player -> {
             if (null != Arena.getArenaByPlayer((Player) player.getPlayer()))
                 return String.valueOf(Arena.getArenaByPlayer((Player) player.getPlayer()).getPlayerDeaths((Player) player.getPlayer(), false));
             return String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getDeaths());
         });
         placeholderManager.registerPlayerPlaceholder("%bw_final_deaths%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getFinalDeaths()));
+        placeholderManager.registerPlayerPlaceholder("%bw_assists%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getAssists()));
+        placeholderManager.registerPlayerPlaceholder("%bw_final_assists%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getFinalAssists()));
         placeholderManager.registerPlayerPlaceholder("%bw_wins%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getWins()));
         placeholderManager.registerPlayerPlaceholder("%bw_losses%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getLosses()));
         placeholderManager.registerPlayerPlaceholder("%bw_games_played%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getGamesPlayed()));
+        registerStatsAliasPlaceholder("%bw_stats_deaths%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getDeaths()));
+        registerStatsAliasPlaceholder("%bw_stats_final_deaths%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getFinalDeaths()));
+        registerStatsAliasPlaceholder("%bw_stats_assists%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getAssists()));
+        registerStatsAliasPlaceholder("%bw_stats_final_assists%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getFinalAssists()));
+        registerStatsAliasPlaceholder("%bw_stats_wins%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getWins()));
+        registerStatsAliasPlaceholder("%bw_stats_losses%", placeholderRefresh, player -> String.valueOf(BedWars.getStatsManager().get(player.getUniqueId()).getLosses()));
+        registerModeStatPlaceholders(placeholderRefresh);
         placeholderManager.registerPlayerPlaceholder("%bw_next_event%", placeholderRefresh, player -> getNextEventName((Player) player.getPlayer()));
         placeholderManager.registerPlayerPlaceholder("%bw_on%", placeholderRefresh, player -> String.valueOf(getOnlinePlayers((Player) player.getPlayer())));
         placeholderManager.registerPlayerPlaceholder("%bw_max%", placeholderRefresh, player -> Arena.getArenaByPlayer((Player) player.getPlayer()) == null ? "" : String.valueOf(Arena.getArenaByPlayer((Player) player.getPlayer()).getMaxPlayers()));
@@ -751,6 +774,65 @@ public class BoardManager implements IScoreboardService {
         IArena arena = Arena.getArenaByPlayer(player);
         if (arena == null) return Bukkit.getOnlinePlayers().size();
         return arena.getPlayers().size();
+    }
+
+    private void registerModeStatPlaceholders(int refreshInterval) {
+        for (StatsMode mode : StatsMode.values()) {
+            if (mode == StatsMode.OVERALL) continue;
+
+            registerModeStatPair(refreshInterval, mode, "kills", stats -> String.valueOf(stats.getKills()));
+            registerModeStatPair(refreshInterval, mode, "total_kills", stats -> String.valueOf(stats.getTotalKills()));
+            registerModeStatPair(refreshInterval, mode, "final_kills", stats -> String.valueOf(stats.getFinalKills()));
+            registerModeStatPair(refreshInterval, mode, "deaths", stats -> String.valueOf(stats.getDeaths()));
+            registerModeStatPair(refreshInterval, mode, "final_deaths", stats -> String.valueOf(stats.getFinalDeaths()));
+            registerModeStatPair(refreshInterval, mode, "beds", stats -> String.valueOf(stats.getBedsDestroyed()));
+            registerModeStatPair(refreshInterval, mode, "beds_broken", stats -> String.valueOf(stats.getBedsDestroyed()));
+            registerModeStatPair(refreshInterval, mode, "beds_lost", stats -> String.valueOf(stats.getBedsLost()));
+            registerModeStatPair(refreshInterval, mode, "assists", stats -> String.valueOf(stats.getAssists()));
+            registerModeStatPair(refreshInterval, mode, "final_assists", stats -> String.valueOf(stats.getFinalAssists()));
+            registerModeStatPair(refreshInterval, mode, "wins", stats -> String.valueOf(stats.getWins()));
+            registerModeStatPair(refreshInterval, mode, "losses", stats -> String.valueOf(stats.getLosses()));
+            registerModeStatPair(refreshInterval, mode, "games_played", stats -> String.valueOf(stats.getGamesPlayed()));
+            registerModeLevelPair(refreshInterval, mode, "level", tabPlayer -> PlayerLevel.getLevelByPlayer(tabPlayer.getUniqueId()).getLevelName());
+            registerModeLevelPair(refreshInterval, mode, "xp", tabPlayer -> PlayerLevel.getLevelByPlayer(tabPlayer.getUniqueId()).getFormattedCurrentXp());
+        }
+    }
+
+    private void registerModeStatPair(int refreshInterval, StatsMode mode, String statKey, java.util.function.Function<ModeStats, String> resolver) {
+        for (String token : StatsModeResolver.getPlaceholderTokens(mode)) {
+            registerModeStatPlaceholder("%bw_" + token + "_" + statKey + "%", refreshInterval, mode, resolver, null);
+            registerModeStatPlaceholder("%bw_mode_" + token + "_" + statKey + "%", refreshInterval, mode, resolver, null);
+            registerModeStatPlaceholder("%bw_stats_" + statKey + "_" + token + "%", refreshInterval, mode, resolver, null);
+        }
+    }
+
+    private void registerModeLevelPair(int refreshInterval, StatsMode mode, String statKey, java.util.function.Function<TabPlayer, String> resolver) {
+        for (String token : StatsModeResolver.getPlaceholderTokens(mode)) {
+            registerModeStatPlaceholder("%bw_" + token + "_" + statKey + "%", refreshInterval, mode, ignored -> null, resolver);
+            registerModeStatPlaceholder("%bw_mode_" + token + "_" + statKey + "%", refreshInterval, mode, ignored -> null, resolver);
+            registerModeStatPlaceholder("%bw_stats_" + statKey + "_" + token + "%", refreshInterval, mode, ignored -> null, resolver);
+        }
+    }
+
+    private void registerStatsAliasPlaceholder(String placeholder, int refreshInterval, java.util.function.Function<TabPlayer, String> resolver) {
+        placeholderManager.registerPlayerPlaceholder(placeholder, refreshInterval, resolver::apply);
+    }
+
+    private void registerModeStatPlaceholder(String placeholder,
+                                             int refreshInterval,
+                                             StatsMode mode,
+                                             java.util.function.Function<ModeStats, String> resolver,
+                                             @Nullable java.util.function.Function<TabPlayer, String> fallback) {
+        placeholderManager.registerPlayerPlaceholder(placeholder, refreshInterval, tabPlayer -> {
+            PlayerStats stats = BedWars.getStatsManager().getMutable(tabPlayer.getUniqueId());
+            if (stats == null) {
+                return fallback != null ? fallback.apply(tabPlayer) : "0";
+            }
+            if (resolver == null) {
+                return fallback != null ? fallback.apply(tabPlayer) : "0";
+            }
+            return resolver.apply(stats.getModeStatsOrEmpty(mode));
+        });
     }
 
     private String getTabPlayerNameFormat(Player player) {

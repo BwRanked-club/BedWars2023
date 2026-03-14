@@ -13,6 +13,9 @@ public final class ModeStats {
     private int deaths;
     private int finalDeaths;
     private int bedsDestroyed;
+    private int bedsLost;
+    private int assists;
+    private int finalAssists;
     private int gamesPlayed;
 
     public Instant getFirstPlay() {
@@ -87,6 +90,30 @@ public final class ModeStats {
         this.bedsDestroyed = bedsDestroyed;
     }
 
+    public int getBedsLost() {
+        return bedsLost;
+    }
+
+    public void setBedsLost(int bedsLost) {
+        this.bedsLost = bedsLost;
+    }
+
+    public int getAssists() {
+        return assists;
+    }
+
+    public void setAssists(int assists) {
+        this.assists = assists;
+    }
+
+    public int getFinalAssists() {
+        return finalAssists;
+    }
+
+    public void setFinalAssists(int finalAssists) {
+        this.finalAssists = finalAssists;
+    }
+
     public int getGamesPlayed() {
         return gamesPlayed;
     }
@@ -109,6 +136,9 @@ public final class ModeStats {
                 || deaths != 0
                 || finalDeaths != 0
                 || bedsDestroyed != 0
+                || bedsLost != 0
+                || assists != 0
+                || finalAssists != 0
                 || gamesPlayed != 0;
     }
 }

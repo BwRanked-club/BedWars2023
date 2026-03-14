@@ -156,6 +156,48 @@ public interface IPlayerStats {
     void setBedsDestroyed(int bedsDestroyed);
 
     /**
+     * Returns the number of beds lost by the player.
+     *
+     * @return The number of beds lost.
+     */
+    int getBedsLost();
+
+    /**
+     * Sets the number of beds lost by the player.
+     *
+     * @param bedsLost The number of beds lost.
+     */
+    void setBedsLost(int bedsLost);
+
+    /**
+     * Returns the number of assists of the player.
+     *
+     * @return The number of assists.
+     */
+    int getAssists();
+
+    /**
+     * Sets the number of assists of the player.
+     *
+     * @param assists The number of assists.
+     */
+    void setAssists(int assists);
+
+    /**
+     * Returns the number of final assists of the player.
+     *
+     * @return The number of final assists.
+     */
+    int getFinalAssists();
+
+    /**
+     * Sets the number of final assists of the player.
+     *
+     * @param finalAssists The number of final assists.
+     */
+    void setFinalAssists(int finalAssists);
+
+    /**
      * Returns the number of games played by the player.
      *
      * @return The number of games played.

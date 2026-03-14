@@ -22,6 +22,7 @@ import com.tomkeuper.bedwars.arena.SetupSession;
 import com.tomkeuper.bedwars.arena.team.BedWarsTeam;
 import com.tomkeuper.bedwars.configuration.Sounds;
 import com.tomkeuper.bedwars.listeners.dropshandler.PlayerDrops;
+import com.tomkeuper.bedwars.stats.AssistTracker;
 import com.tomkeuper.bedwars.support.paper.PaperSupport;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -96,6 +97,7 @@ public class PlayerListeners implements Listener {
         LastHit lh = LastHit.getLastHit(victim);
         if (lh != null) {
             lh.setDamager((Entity) damagerEntity);
+            lh.setTime(System.currentTimeMillis());
         } else {
             new LastHit(victim, (Entity) damagerEntity, System.currentTimeMillis());
         }
@@ -213,6 +215,7 @@ public class PlayerListeners implements Listener {
         damager.sendMessage(msg);
 
         updateLastHit(player, damager);
+        AssistTracker.recordHit(player, damager, arena);
     }
 
     @EventHandler
@@ -227,6 +230,7 @@ public class PlayerListeners implements Listener {
             EntityDamageByEntityEvent fake = new EntityDamageByEntityEvent(tnt, victim, EntityDamageEvent.DamageCause.ENTITY_EXPLOSION, 4.0);
             Bukkit.getPluginManager().callEvent(fake);
             if (!fake.isCancelled()) {
+                AssistTracker.recordHit(victim, owner, Arena.getArenaByPlayer(victim));
                 victim.damage(fake.getFinalDamage(), tnt);
                 updateLastHit(victim, owner);
             }
@@ -298,6 +302,7 @@ public class PlayerListeners implements Listener {
                 BedWarsTeam.reSpawnInvulnerability.remove(damager.getUniqueId());
 
                 updateLastHit(p, damagerSource);
+                AssistTracker.recordHit(p, damager, a);
 
                 if (a.getShowTime().containsKey(p)) removeInvisibilityAndShow(p, a);
             }
@@ -627,6 +632,7 @@ public class PlayerListeners implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         deathSpectateLocations.remove(event.getPlayer().getUniqueId());
+        AssistTracker.clearPlayer(event.getPlayer().getUniqueId());
     }
 
     @EventHandler

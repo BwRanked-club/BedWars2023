@@ -123,7 +123,8 @@ public class MySQL implements IDatabase {
             String sql = "CREATE TABLE IF NOT EXISTS global_stats (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
                     "name VARCHAR(200), uuid VARCHAR(200), first_play TIMESTAMP NULL DEFAULT NULL, " +
                     "last_play TIMESTAMP NULL DEFAULT NULL, wins INT(200), kills INT(200), " +
-                    "final_kills INT(200), looses INT(200), deaths INT(200), final_deaths INT(200), beds_destroyed INT(200), games_played INT(200));";
+                    "final_kills INT(200), looses INT(200), deaths INT(200), final_deaths INT(200), beds_destroyed INT(200), " +
+                    "beds_lost INT(200), assists INT(200), final_assists INT(200), games_played INT(200));";
 
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate(sql);
@@ -141,12 +142,16 @@ public class MySQL implements IDatabase {
                     "deaths INT(200)," +
                     "final_deaths INT(200)," +
                     "beds_destroyed INT(200)," +
+                    "beds_lost INT(200)," +
+                    "assists INT(200)," +
+                    "final_assists INT(200)," +
                     "games_played INT(200)," +
                     "PRIMARY KEY (uuid, mode)" +
                     ");";
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate(sql);
             }
+            ensureStatsSchema(connection);
 
             sql = "CREATE TABLE IF NOT EXISTS quick_buy (uuid VARCHAR(36) PRIMARY KEY, " +
                     "slot_19 VARCHAR(200), slot_20 VARCHAR(200), slot_21 VARCHAR(200), slot_22 VARCHAR(200), slot_23 VARCHAR(200), slot_24 VARCHAR(200), slot_25 VARCHAR(200)," +
@@ -233,7 +238,7 @@ public class MySQL implements IDatabase {
         String sql;
         try (Connection connection = dataSource.getConnection()) {
             if (hasStats(stats.getUuid())) {
-                sql = "UPDATE global_stats SET first_play=?, last_play=?, wins=?, kills=?, final_kills=?, looses=?, deaths=?, final_deaths=?, beds_destroyed=?, games_played=?, name=? WHERE uuid = ?;";
+                sql = "UPDATE global_stats SET first_play=?, last_play=?, wins=?, kills=?, final_kills=?, looses=?, deaths=?, final_deaths=?, beds_destroyed=?, beds_lost=?, assists=?, final_assists=?, games_played=?, name=? WHERE uuid = ?;";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setTimestamp(1, stats.getFirstPlay() != null ? Timestamp.from(stats.getFirstPlay()) : null);
                     statement.setTimestamp(2, stats.getLastPlay() != null ? Timestamp.from(stats.getLastPlay()) : null);
@@ -244,18 +249,21 @@ public class MySQL implements IDatabase {
                     statement.setInt(7, stats.getDeaths());
                     statement.setInt(8, stats.getFinalDeaths());
                     statement.setInt(9, stats.getBedsDestroyed());
-                    statement.setInt(10, stats.getGamesPlayed());
-                    statement.setString(11, stats.getName());
-                    statement.setString(12, stats.getUuid().toString());
+                    statement.setInt(10, stats.getBedsLost());
+                    statement.setInt(11, stats.getAssists());
+                    statement.setInt(12, stats.getFinalAssists());
+                    statement.setInt(13, stats.getGamesPlayed());
+                    statement.setString(14, stats.getName());
+                    statement.setString(15, stats.getUuid().toString());
                     statement.executeUpdate();
                 }
             } else {
-                sql = "INSERT INTO global_stats (name, uuid, first_play, last_play, wins, kills, final_kills, looses, deaths, final_deaths, beds_destroyed, games_played) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                sql = "INSERT INTO global_stats (name, uuid, first_play, last_play, wins, kills, final_kills, looses, deaths, final_deaths, beds_destroyed, beds_lost, assists, final_assists, games_played) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setString(1, stats.getName());
                     statement.setString(2, stats.getUuid().toString());
-                    statement.setTimestamp(3, Timestamp.from(stats.getFirstPlay()));
-                    statement.setTimestamp(4, Timestamp.from(stats.getLastPlay()));
+                    statement.setTimestamp(3, toTimestamp(stats.getFirstPlay()));
+                    statement.setTimestamp(4, toTimestamp(stats.getLastPlay()));
                     statement.setInt(5, stats.getWins());
                     statement.setInt(6, stats.getKills());
                     statement.setInt(7, stats.getFinalKills());
@@ -263,7 +271,10 @@ public class MySQL implements IDatabase {
                     statement.setInt(9, stats.getDeaths());
                     statement.setInt(10, stats.getFinalDeaths());
                     statement.setInt(11, stats.getBedsDestroyed());
-                    statement.setInt(12, stats.getGamesPlayed());
+                    statement.setInt(12, stats.getBedsLost());
+                    statement.setInt(13, stats.getAssists());
+                    statement.setInt(14, stats.getFinalAssists());
+                    statement.setInt(15, stats.getGamesPlayed());
                     statement.executeUpdate();
                 }
             }
@@ -277,7 +288,7 @@ public class MySQL implements IDatabase {
     public IPlayerStats fetchStats(UUID uuid) {
         PlayerStats stats = new PlayerStats(uuid);
         String sql = "SELECT name, first_play, last_play, wins, kills, final_kills, looses, deaths, final_deaths," +
-                "beds_destroyed, games_played FROM global_stats WHERE uuid = ?;";
+                "beds_destroyed, beds_lost, assists, final_assists, games_played FROM global_stats WHERE uuid = ?;";
         try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, uuid.toString());
@@ -295,7 +306,10 @@ public class MySQL implements IDatabase {
                         stats.setDeaths(result.getInt(8));
                         stats.setFinalDeaths(result.getInt(9));
                         stats.setBedsDestroyed(result.getInt(10));
-                        stats.setGamesPlayed(result.getInt(11));
+                        stats.setBedsLost(result.getInt(11));
+                        stats.setAssists(result.getInt(12));
+                        stats.setFinalAssists(result.getInt(13));
+                        stats.setGamesPlayed(result.getInt(14));
                     }
                 }
             }
@@ -312,8 +326,8 @@ public class MySQL implements IDatabase {
             delete.executeUpdate();
         }
 
-        String sql = "INSERT INTO player_stats_modes (uuid, mode, first_play, last_play, wins, kills, final_kills, looses, deaths, final_deaths, beds_destroyed, games_played) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO player_stats_modes (uuid, mode, first_play, last_play, wins, kills, final_kills, looses, deaths, final_deaths, beds_destroyed, beds_lost, assists, final_assists, games_played) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             for (Map.Entry<StatsMode, ModeStats> entry : stats.getTrackedModeStats().entrySet()) {
                 if (!entry.getValue().hasActivity()) continue;
@@ -328,7 +342,10 @@ public class MySQL implements IDatabase {
                 statement.setInt(9, entry.getValue().getDeaths());
                 statement.setInt(10, entry.getValue().getFinalDeaths());
                 statement.setInt(11, entry.getValue().getBedsDestroyed());
-                statement.setInt(12, entry.getValue().getGamesPlayed());
+                statement.setInt(12, entry.getValue().getBedsLost());
+                statement.setInt(13, entry.getValue().getAssists());
+                statement.setInt(14, entry.getValue().getFinalAssists());
+                statement.setInt(15, entry.getValue().getGamesPlayed());
                 statement.addBatch();
             }
             statement.executeBatch();
@@ -352,10 +369,29 @@ public class MySQL implements IDatabase {
                     modeStats.setDeaths(result.getInt("deaths"));
                     modeStats.setFinalDeaths(result.getInt("final_deaths"));
                     modeStats.setBedsDestroyed(result.getInt("beds_destroyed"));
+                    modeStats.setBedsLost(result.getInt("beds_lost"));
+                    modeStats.setAssists(result.getInt("assists"));
+                    modeStats.setFinalAssists(result.getInt("final_assists"));
                     modeStats.setGamesPlayed(result.getInt("games_played"));
                     stats.setModeStats(mode, modeStats);
                 }
             }
+        }
+    }
+
+    private void ensureStatsSchema(Connection connection) throws SQLException {
+        ensureColumn(connection, "global_stats", "beds_lost", "INT(200) DEFAULT 0");
+        ensureColumn(connection, "global_stats", "assists", "INT(200) DEFAULT 0");
+        ensureColumn(connection, "global_stats", "final_assists", "INT(200) DEFAULT 0");
+        ensureColumn(connection, "player_stats_modes", "beds_lost", "INT(200) DEFAULT 0");
+        ensureColumn(connection, "player_stats_modes", "assists", "INT(200) DEFAULT 0");
+        ensureColumn(connection, "player_stats_modes", "final_assists", "INT(200) DEFAULT 0");
+    }
+
+    private void ensureColumn(Connection connection, String tableName, String columnName, String definition) throws SQLException {
+        if (columnExists(connection, tableName, columnName)) return;
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + definition + ";");
         }
     }
 

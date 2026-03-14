@@ -12,6 +12,7 @@ import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.arena.Arena;
 import com.tomkeuper.bedwars.arena.LastHit;
 import com.tomkeuper.bedwars.arena.team.BedWarsTeam;
+import com.tomkeuper.bedwars.stats.AssistTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -186,6 +187,7 @@ public class FireballListener implements Listener {
                 lh.setDamager(source);
                 lh.setTime(System.currentTimeMillis());
             } else new LastHit(player, source, System.currentTimeMillis());
+            AssistTracker.recordHit(player, source, arena);
 
             if (player.equals(source)) {
                 if (damageSelf > 0) player.damage(damageSelf);

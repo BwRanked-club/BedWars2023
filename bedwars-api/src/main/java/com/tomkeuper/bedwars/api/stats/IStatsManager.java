@@ -61,6 +61,27 @@ public interface IStatsManager {
     void addBedBreak(Player player);
 
     /**
+     * Adds a bed loss to the player's stats.
+     *
+     * @param player the Player object
+     */
+    void addBedLoss(Player player);
+
+    /**
+     * Adds an assist to the player's stats.
+     *
+     * @param player the Player object
+     */
+    void addAssist(Player player);
+
+    /**
+     * Adds a final assist to the player's stats.
+     *
+     * @param player the Player object
+     */
+    void addFinalAssist(Player player);
+
+    /**
      * Adds a win to the player's stats.
      *
      * @param player the Player object

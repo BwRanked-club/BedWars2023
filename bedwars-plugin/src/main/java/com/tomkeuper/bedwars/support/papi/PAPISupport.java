@@ -10,6 +10,10 @@ import com.tomkeuper.bedwars.api.party.Party;
 import com.tomkeuper.bedwars.api.stats.IPlayerStats;
 import com.tomkeuper.bedwars.arena.Arena;
 import com.tomkeuper.bedwars.commands.shout.ShoutCommand;
+import com.tomkeuper.bedwars.stats.ModeStats;
+import com.tomkeuper.bedwars.stats.PlayerStats;
+import com.tomkeuper.bedwars.stats.StatsMode;
+import com.tomkeuper.bedwars.stats.StatsModeResolver;
 import com.tomkeuper.bedwars.ratings.MapRatingService;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.Bukkit;
@@ -24,6 +28,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static com.tomkeuper.bedwars.api.language.Language.getMsg;
 
@@ -135,32 +140,7 @@ public class PAPISupport extends PlaceholderExpansion {
             if (stats == null) {
                 return null;
             }
-            switch (targetedStat) {
-                case "firstplay":
-                    Instant firstPlay = stats.getFirstPlay();
-                    return new SimpleDateFormat(getMsg(player, Messages.FORMATTING_STATS_DATE_FORMAT)).format(firstPlay != null ? Timestamp.from(firstPlay) : null);
-                case "lastplay":
-                    Instant lastPlay = stats.getLastPlay();
-                    return new SimpleDateFormat(getMsg(player, Messages.FORMATTING_STATS_DATE_FORMAT)).format(lastPlay != null ? Timestamp.from(lastPlay) : null);
-                case "total_kills":
-                    return String.valueOf(stats.getTotalKills());
-                case "kills":
-                    return String.valueOf(stats.getKills());
-                case "wins":
-                    return String.valueOf(stats.getWins());
-                case "finalkills":
-                    return String.valueOf(stats.getFinalKills());
-                case "deaths":
-                    return String.valueOf(stats.getDeaths());
-                case "losses":
-                    return String.valueOf(stats.getLosses());
-                case "finaldeaths":
-                    return String.valueOf(stats.getFinalDeaths());
-                case "bedsdestroyed":
-                    return String.valueOf(stats.getBedsDestroyed());
-                case "gamesplayed":
-                    return String.valueOf(stats.getGamesPlayed());
-            }
+            return resolveStatsPlaceholder(player, stats, targetedStat);
         }
 
         // party placeholders
@@ -430,6 +410,125 @@ public class PAPISupport extends PlaceholderExpansion {
                 break;
         }
         return response;
+    }
+
+    private String resolveStatsPlaceholder(Player player, IPlayerStats stats, String targetedStat) {
+        String normalized = targetedStat.trim().toLowerCase(Locale.ROOT);
+        StatsMode trailingMode = resolveTrailingModeScope(targetedStat);
+        if (trailingMode != null) {
+            String statKey = extractTrailingScopedStatKey(targetedStat, trailingMode);
+            return statKey == null ? null : resolveScopedStat(player, stats, trailingMode, statKey.trim().toLowerCase(Locale.ROOT));
+        }
+
+        StatsMode scopedMode = resolveModeScope(normalized);
+        if (scopedMode != null) {
+            String statKey = extractScopedStatKey(normalized, scopedMode);
+            return statKey == null ? null : resolveScopedStat(player, stats, scopedMode, statKey);
+        }
+
+        return resolveScopedStat(player, stats, StatsMode.OVERALL, normalized);
+    }
+
+    private StatsMode resolveModeScope(String targetedStat) {
+        String normalized = targetedStat.startsWith("mode_") ? targetedStat.substring("mode_".length()) : targetedStat;
+        for (StatsMode mode : StatsMode.values()) {
+            if (mode == StatsMode.OVERALL) continue;
+            if (normalized.startsWith(mode.getId() + "_")) {
+                return mode;
+            }
+        }
+        if (normalized.startsWith("1v1_")) return StatsMode.ONE_VS_ONE;
+        if (normalized.startsWith("2v2_")) return StatsMode.TWO_VS_TWO;
+        if (normalized.startsWith("3v3_")) return StatsMode.THREE_VS_THREE;
+        if (normalized.startsWith("4v4_")) return StatsMode.FOUR_VS_FOUR;
+        return null;
+    }
+
+    private StatsMode resolveTrailingModeScope(String targetedStat) {
+        String normalized = targetedStat.trim().toLowerCase(Locale.ROOT);
+        for (StatsMode mode : StatsMode.values()) {
+            if (mode == StatsMode.OVERALL) continue;
+            for (String token : StatsModeResolver.getPlaceholderTokens(mode)) {
+                String suffix = "_" + token.trim().toLowerCase(Locale.ROOT);
+                if (normalized.endsWith(suffix)) {
+                    return mode;
+                }
+            }
+        }
+        return null;
+    }
+
+    private String extractTrailingScopedStatKey(String targetedStat, StatsMode mode) {
+        String raw = targetedStat.trim();
+        String normalized = raw.toLowerCase(Locale.ROOT);
+        for (String token : StatsModeResolver.getPlaceholderTokens(mode)) {
+            String suffix = "_" + token.trim().toLowerCase(Locale.ROOT);
+            if (normalized.endsWith(suffix)) {
+                return raw.substring(0, raw.length() - suffix.length());
+            }
+        }
+        return null;
+    }
+
+    private String extractScopedStatKey(String targetedStat, StatsMode mode) {
+        String normalized = targetedStat.startsWith("mode_") ? targetedStat.substring("mode_".length()) : targetedStat;
+        String prefix = mode.getId() + "_";
+        if (normalized.startsWith(prefix)) {
+            return normalized.substring(prefix.length());
+        }
+        if (mode == StatsMode.ONE_VS_ONE && normalized.startsWith("1v1_")) {
+            return normalized.substring("1v1_".length());
+        }
+        if (mode == StatsMode.TWO_VS_TWO && normalized.startsWith("2v2_")) {
+            return normalized.substring("2v2_".length());
+        }
+        if (mode == StatsMode.THREE_VS_THREE && normalized.startsWith("3v3_")) {
+            return normalized.substring("3v3_".length());
+        }
+        if (mode == StatsMode.FOUR_VS_FOUR && normalized.startsWith("4v4_")) {
+            return normalized.substring("4v4_".length());
+        }
+        return null;
+    }
+
+    private String resolveScopedStat(Player player, IPlayerStats stats, StatsMode mode, String statKey) {
+        PlayerStats playerStats = stats instanceof PlayerStats ? (PlayerStats) stats : null;
+        ModeStats scopedStats = mode == StatsMode.OVERALL || playerStats == null
+                ? null
+                : playerStats.getModeStatsOrEmpty(mode);
+        ModeStats effectiveModeStats = scopedStats == null ? new ModeStats() : scopedStats;
+
+        return switch (statKey) {
+            case "firstplay", "play_first" -> formatStatDate(player, mode == StatsMode.OVERALL ? stats.getFirstPlay() : effectiveModeStats.getFirstPlay());
+            case "lastplay", "play_last" -> formatStatDate(player, mode == StatsMode.OVERALL ? stats.getLastPlay() : effectiveModeStats.getLastPlay());
+            case "level" -> BedWars.getLevelSupport().getLevel(player);
+            case "level_raw", "levelunformatted", "level_unformatted" -> String.valueOf(BedWars.getLevelSupport().getPlayerLevel(player));
+            case "xp" -> String.valueOf(BedWars.getLevelSupport().getCurrentXp(player));
+            case "xp_formatted", "current_xp", "currentxp" -> BedWars.getLevelSupport().getCurrentXpFormatted(player);
+            case "requiredxp", "required_xp" -> String.valueOf(BedWars.getLevelSupport().getRequiredXp(player));
+            case "requiredxp_formatted", "required_xp_formatted" -> BedWars.getLevelSupport().getRequiredXpFormatted(player);
+            case "progress" -> BedWars.getLevelSupport().getProgressBar(player);
+            case "total_kills", "totalkills" -> String.valueOf(mode == StatsMode.OVERALL ? stats.getTotalKills() : effectiveModeStats.getTotalKills());
+            case "kills" -> String.valueOf(mode == StatsMode.OVERALL ? stats.getKills() : effectiveModeStats.getKills());
+            case "wins" -> String.valueOf(mode == StatsMode.OVERALL ? stats.getWins() : effectiveModeStats.getWins());
+            case "finalkills", "final_kills" -> String.valueOf(mode == StatsMode.OVERALL ? stats.getFinalKills() : effectiveModeStats.getFinalKills());
+            case "deaths" -> String.valueOf(mode == StatsMode.OVERALL ? stats.getDeaths() : effectiveModeStats.getDeaths());
+            case "losses" -> String.valueOf(mode == StatsMode.OVERALL ? stats.getLosses() : effectiveModeStats.getLosses());
+            case "finaldeaths", "final_deaths" -> String.valueOf(mode == StatsMode.OVERALL ? stats.getFinalDeaths() : effectiveModeStats.getFinalDeaths());
+            case "bedsdestroyed", "beds_destroyed", "bedsbroken", "beds_broken", "beds" -> String.valueOf(mode == StatsMode.OVERALL ? stats.getBedsDestroyed() : effectiveModeStats.getBedsDestroyed());
+            case "bedslost", "beds_lost" -> String.valueOf(mode == StatsMode.OVERALL ? stats.getBedsLost() : effectiveModeStats.getBedsLost());
+            case "assists" -> String.valueOf(mode == StatsMode.OVERALL ? stats.getAssists() : effectiveModeStats.getAssists());
+            case "finalassists", "final_assists" -> String.valueOf(mode == StatsMode.OVERALL ? stats.getFinalAssists() : effectiveModeStats.getFinalAssists());
+            case "gamesplayed", "games_played" -> String.valueOf(mode == StatsMode.OVERALL ? stats.getGamesPlayed() : effectiveModeStats.getGamesPlayed());
+            default -> null;
+        };
+    }
+
+    private String formatStatDate(Player player, Instant instant) {
+        if (instant == null) {
+            return getMsg(player, Messages.MEANING_NEVER);
+        }
+        return new SimpleDateFormat(getMsg(player, Messages.FORMATTING_STATS_DATE_FORMAT)).format(Timestamp.from(instant));
     }
 
     private String getSpectatorLetter(Language lang) {

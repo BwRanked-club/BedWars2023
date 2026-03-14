@@ -66,7 +66,8 @@ public class SQLite implements IDatabase {
             sql = "CREATE TABLE IF NOT EXISTS global_stats (id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "name VARCHAR(200), uuid VARCHAR(36), first_play TIMESTAMP NULL DEFAULT NULL, " +
                     "last_play TIMESTAMP DEFAULT NULL, wins INTEGER(10), kills INTEGER(10), " +
-                    "final_kills INTEGER(10), looses INTEGER(10), deaths INTEGER(10), final_deaths INTEGER(10), beds_destroyed INTEGER(10), games_played INTEGER(10));";
+                    "final_kills INTEGER(10), looses INTEGER(10), deaths INTEGER(10), final_deaths INTEGER(10), beds_destroyed INTEGER(10), " +
+                    "beds_lost INTEGER(10), assists INTEGER(10), final_assists INTEGER(10), games_played INTEGER(10));";
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate(sql);
             }
@@ -77,11 +78,13 @@ public class SQLite implements IDatabase {
                         "first_play TIMESTAMP NULL DEFAULT NULL, " +
                         "last_play TIMESTAMP DEFAULT NULL, " +
                         "wins INTEGER(10), kills INTEGER(10), final_kills INTEGER(10), looses INTEGER(10), " +
-                        "deaths INTEGER(10), final_deaths INTEGER(10), beds_destroyed INTEGER(10), games_played INTEGER(10), " +
+                        "deaths INTEGER(10), final_deaths INTEGER(10), beds_destroyed INTEGER(10), beds_lost INTEGER(10), " +
+                        "assists INTEGER(10), final_assists INTEGER(10), games_played INTEGER(10), " +
                         "PRIMARY KEY (uuid, mode)" +
                         ");";
                 statement.executeUpdate(sql);
             }
+            ensureStatsSchema();
             try (Statement st = connection.createStatement()) {
                 sql = "CREATE TABLE IF NOT EXISTS quick_buy (uuid VARCHAR(36) PRIMARY KEY, " +
                         "slot_19 VARCHAR(200), slot_20 VARCHAR(200), slot_21 VARCHAR(200), slot_22 VARCHAR(200), slot_23 VARCHAR(200), slot_24 VARCHAR(200), slot_25 VARCHAR(200)," +
@@ -182,7 +185,7 @@ public class SQLite implements IDatabase {
             checkConnection();
 
             if (hasStats(stats.getUuid())) {
-                sql = "UPDATE global_stats SET last_play=?, wins=?, kills=?, final_kills=?, looses=?, deaths=?, final_deaths=?, beds_destroyed=?, games_played=?, name=? WHERE uuid = ?;";
+                sql = "UPDATE global_stats SET last_play=?, wins=?, kills=?, final_kills=?, looses=?, deaths=?, final_deaths=?, beds_destroyed=?, beds_lost=?, assists=?, final_assists=?, games_played=?, name=? WHERE uuid = ?;";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setTimestamp(1, toTimestamp(stats.getLastPlay()));
                     statement.setInt(2, stats.getWins());
@@ -192,13 +195,16 @@ public class SQLite implements IDatabase {
                     statement.setInt(6, stats.getDeaths());
                     statement.setInt(7, stats.getFinalDeaths());
                     statement.setInt(8, stats.getBedsDestroyed());
-                    statement.setInt(9, stats.getGamesPlayed());
-                    statement.setString(10, stats.getName());
-                    statement.setString(11, stats.getUuid().toString());
+                    statement.setInt(9, stats.getBedsLost());
+                    statement.setInt(10, stats.getAssists());
+                    statement.setInt(11, stats.getFinalAssists());
+                    statement.setInt(12, stats.getGamesPlayed());
+                    statement.setString(13, stats.getName());
+                    statement.setString(14, stats.getUuid().toString());
                     statement.executeUpdate();
                 }
             } else {
-                sql = "INSERT INTO global_stats (name, uuid, first_play, last_play, wins, kills, final_kills, looses, deaths, final_deaths, beds_destroyed, games_played) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                sql = "INSERT INTO global_stats (name, uuid, first_play, last_play, wins, kills, final_kills, looses, deaths, final_deaths, beds_destroyed, beds_lost, assists, final_assists, games_played) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setString(1, stats.getName());
                     statement.setString(2, stats.getUuid().toString());
@@ -211,7 +217,10 @@ public class SQLite implements IDatabase {
                     statement.setInt(9, stats.getDeaths());
                     statement.setInt(10, stats.getFinalDeaths());
                     statement.setInt(11, stats.getBedsDestroyed());
-                    statement.setInt(12, stats.getGamesPlayed());
+                    statement.setInt(12, stats.getBedsLost());
+                    statement.setInt(13, stats.getAssists());
+                    statement.setInt(14, stats.getFinalAssists());
+                    statement.setInt(15, stats.getGamesPlayed());
                     statement.executeUpdate();
                 }
             }
@@ -242,6 +251,9 @@ public class SQLite implements IDatabase {
                         stats.setDeaths(result.getInt("deaths"));
                         stats.setFinalDeaths(result.getInt("final_deaths"));
                         stats.setBedsDestroyed(result.getInt("beds_destroyed"));
+                        stats.setBedsLost(result.getInt("beds_lost"));
+                        stats.setAssists(result.getInt("assists"));
+                        stats.setFinalAssists(result.getInt("final_assists"));
                         stats.setGamesPlayed(result.getInt("games_played"));
                     }
                 }
@@ -259,7 +271,7 @@ public class SQLite implements IDatabase {
             delete.executeUpdate();
         }
 
-        String sql = "INSERT INTO player_stats_modes (uuid, mode, first_play, last_play, wins, kills, final_kills, looses, deaths, final_deaths, beds_destroyed, games_played) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO player_stats_modes (uuid, mode, first_play, last_play, wins, kills, final_kills, looses, deaths, final_deaths, beds_destroyed, beds_lost, assists, final_assists, games_played) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             for (Map.Entry<StatsMode, ModeStats> entry : stats.getTrackedModeStats().entrySet()) {
                 if (!entry.getValue().hasActivity()) continue;
@@ -274,7 +286,10 @@ public class SQLite implements IDatabase {
                 statement.setInt(9, entry.getValue().getDeaths());
                 statement.setInt(10, entry.getValue().getFinalDeaths());
                 statement.setInt(11, entry.getValue().getBedsDestroyed());
-                statement.setInt(12, entry.getValue().getGamesPlayed());
+                statement.setInt(12, entry.getValue().getBedsLost());
+                statement.setInt(13, entry.getValue().getAssists());
+                statement.setInt(14, entry.getValue().getFinalAssists());
+                statement.setInt(15, entry.getValue().getGamesPlayed());
                 statement.addBatch();
             }
             statement.executeBatch();
@@ -298,10 +313,29 @@ public class SQLite implements IDatabase {
                     modeStats.setDeaths(result.getInt("deaths"));
                     modeStats.setFinalDeaths(result.getInt("final_deaths"));
                     modeStats.setBedsDestroyed(result.getInt("beds_destroyed"));
+                    modeStats.setBedsLost(result.getInt("beds_lost"));
+                    modeStats.setAssists(result.getInt("assists"));
+                    modeStats.setFinalAssists(result.getInt("final_assists"));
                     modeStats.setGamesPlayed(result.getInt("games_played"));
                     stats.setModeStats(mode, modeStats);
                 }
             }
+        }
+    }
+
+    private void ensureStatsSchema() throws SQLException {
+        ensureColumn("global_stats", "beds_lost", "INTEGER(10) DEFAULT 0");
+        ensureColumn("global_stats", "assists", "INTEGER(10) DEFAULT 0");
+        ensureColumn("global_stats", "final_assists", "INTEGER(10) DEFAULT 0");
+        ensureColumn("player_stats_modes", "beds_lost", "INTEGER(10) DEFAULT 0");
+        ensureColumn("player_stats_modes", "assists", "INTEGER(10) DEFAULT 0");
+        ensureColumn("player_stats_modes", "final_assists", "INTEGER(10) DEFAULT 0");
+    }
+
+    private void ensureColumn(String tableName, String columnName, String definition) throws SQLException {
+        if (columnExists(tableName, columnName)) return;
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + definition + ";");
         }
     }
 

@@ -11,9 +11,11 @@ import com.tomkeuper.bedwars.api.language.Messages;
 import com.tomkeuper.bedwars.api.region.Region;
 import com.tomkeuper.bedwars.api.server.ServerType;
 import com.tomkeuper.bedwars.configuration.Sounds;
+import com.tomkeuper.bedwars.levels.internal.PlayerLevel;
 import com.tomkeuper.bedwars.stats.ModeStats;
 import com.tomkeuper.bedwars.stats.PlayerStats;
 import com.tomkeuper.bedwars.stats.StatsMode;
+import com.tomkeuper.bedwars.stats.StatsModeResolver;
 import com.tomkeuper.bedwars.stats.StatsMenuHolder;
 import com.tomkeuper.bedwars.support.papi.SupportPAPI;
 import com.tomkeuper.bedwars.utils.ItemBuilder;
@@ -376,6 +378,7 @@ public final class Misc {
                                                   @NotNull StatsMode mode,
                                                   boolean papiReplacements) {
         ModeStats selected = targetStats.getModeStatsOrEmpty(mode);
+        PlayerLevel targetLevel = resolveTargetLevel(targetStats, targetPlayer);
         String targetName = resolveStatsTargetName(targetStats, targetPlayer, fallbackName);
         String statsDisplayName = targetPlayer != null ? getPlayerName(targetPlayer) : targetName;
         String prefix = targetPlayer != null ? BedWars.getChatSupport().getPrefix(targetPlayer) : "";
@@ -392,7 +395,17 @@ public final class Misc {
                 .replace("%bw_final_kills%", String.valueOf(selected.getFinalKills()))
                 .replace("%bw_final_deaths%", String.valueOf(selected.getFinalDeaths()))
                 .replace("%bw_beds%", String.valueOf(selected.getBedsDestroyed()))
+                .replace("%bw_beds_broken%", String.valueOf(selected.getBedsDestroyed()))
+                .replace("%bw_beds_lost%", String.valueOf(selected.getBedsLost()))
+                .replace("%bw_assists%", String.valueOf(selected.getAssists()))
+                .replace("%bw_final_assists%", String.valueOf(selected.getFinalAssists()))
                 .replace("%bw_games_played%", String.valueOf(selected.getGamesPlayed()))
+                .replace("%bw_level%", targetLevel == null ? "0" : targetLevel.getLevelName())
+                .replace("%bw_level_unformatted%", targetLevel == null ? "0" : String.valueOf(targetLevel.getLevel()))
+                .replace("%bw_current_xp%", targetLevel == null ? "0" : targetLevel.getFormattedCurrentXp())
+                .replace("%bw_required_xp%", targetLevel == null ? "0" : targetLevel.getFormattedRequiredXp())
+                .replace("%bw_xp%", targetLevel == null ? "0" : targetLevel.getFormattedCurrentXp())
+                .replace("%bw_progress%", targetLevel == null ? "" : targetLevel.getProgress())
                 .replace("%bw_kdr%", formatRatio(selected.getKills(), selected.getDeaths()))
                 .replace("%bw_fkdr%", formatRatio(selected.getFinalKills(), selected.getFinalDeaths()))
                 .replace("%bw_wlr%", formatRatio(selected.getWins(), selected.getLosses()));
@@ -405,8 +418,74 @@ public final class Misc {
 
         s = s.replace("%bw_play_first%", first)
                 .replace("%bw_play_last%", last);
+        s = replaceStatsAliasPlaceholders(s, selected, targetLevel);
+
+        for (StatsMode scopedMode : StatsMode.values()) {
+            if (scopedMode == StatsMode.OVERALL) continue;
+            s = replaceExplicitModePlaceholders(s, targetStats, targetLevel, scopedMode);
+        }
 
         return papiReplacements && targetPlayer != null ? SupportPAPI.getSupportPAPI().replace(targetPlayer, s) : s;
+    }
+
+    private static String replaceExplicitModePlaceholders(String input,
+                                                          PlayerStats targetStats,
+                                                          @Nullable PlayerLevel targetLevel,
+                                                          StatsMode scopedMode) {
+        ModeStats scopedStats = targetStats.getModeStatsOrEmpty(scopedMode);
+
+        String value = input;
+        for (String token : StatsModeResolver.getPlaceholderTokens(scopedMode)) {
+            String[] prefixes = {
+                    "%bw_" + token + "_",
+                    "%bw_mode_" + token + "_",
+                    "%bw_stats_"
+            };
+            for (String prefix : prefixes) {
+                if ("%bw_stats_".equals(prefix)) {
+                    value = value.replace(prefix + "kills_" + token + "%", String.valueOf(scopedStats.getKills()))
+                            .replace(prefix + "total_kills_" + token + "%", String.valueOf(scopedStats.getTotalKills()))
+                            .replace(prefix + "deaths_" + token + "%", String.valueOf(scopedStats.getDeaths()))
+                            .replace(prefix + "losses_" + token + "%", String.valueOf(scopedStats.getLosses()))
+                            .replace(prefix + "wins_" + token + "%", String.valueOf(scopedStats.getWins()))
+                            .replace(prefix + "final_kills_" + token + "%", String.valueOf(scopedStats.getFinalKills()))
+                            .replace(prefix + "final_deaths_" + token + "%", String.valueOf(scopedStats.getFinalDeaths()))
+                            .replace(prefix + "beds_" + token + "%", String.valueOf(scopedStats.getBedsDestroyed()))
+                            .replace(prefix + "beds_broken_" + token + "%", String.valueOf(scopedStats.getBedsDestroyed()))
+                            .replace(prefix + "beds_lost_" + token + "%", String.valueOf(scopedStats.getBedsLost()))
+                            .replace(prefix + "assists_" + token + "%", String.valueOf(scopedStats.getAssists()))
+                            .replace(prefix + "final_assists_" + token + "%", String.valueOf(scopedStats.getFinalAssists()))
+                            .replace(prefix + "games_played_" + token + "%", String.valueOf(scopedStats.getGamesPlayed()))
+                            .replace(prefix + "level_" + token + "%", targetLevel == null ? "0" : targetLevel.getLevelName())
+                            .replace(prefix + "level_unformatted_" + token + "%", targetLevel == null ? "0" : String.valueOf(targetLevel.getLevel()))
+                            .replace(prefix + "xp_" + token + "%", targetLevel == null ? "0" : targetLevel.getFormattedCurrentXp())
+                            .replace(prefix + "current_xp_" + token + "%", targetLevel == null ? "0" : targetLevel.getFormattedCurrentXp())
+                            .replace(prefix + "required_xp_" + token + "%", targetLevel == null ? "0" : targetLevel.getFormattedRequiredXp())
+                            .replace(prefix + "progress_" + token + "%", targetLevel == null ? "" : targetLevel.getProgress());
+                    continue;
+                }
+                value = value.replace(prefix + "kills%", String.valueOf(scopedStats.getKills()))
+                        .replace(prefix + "total_kills%", String.valueOf(scopedStats.getTotalKills()))
+                        .replace(prefix + "deaths%", String.valueOf(scopedStats.getDeaths()))
+                        .replace(prefix + "losses%", String.valueOf(scopedStats.getLosses()))
+                        .replace(prefix + "wins%", String.valueOf(scopedStats.getWins()))
+                        .replace(prefix + "final_kills%", String.valueOf(scopedStats.getFinalKills()))
+                        .replace(prefix + "final_deaths%", String.valueOf(scopedStats.getFinalDeaths()))
+                        .replace(prefix + "beds%", String.valueOf(scopedStats.getBedsDestroyed()))
+                        .replace(prefix + "beds_broken%", String.valueOf(scopedStats.getBedsDestroyed()))
+                        .replace(prefix + "beds_lost%", String.valueOf(scopedStats.getBedsLost()))
+                        .replace(prefix + "assists%", String.valueOf(scopedStats.getAssists()))
+                        .replace(prefix + "final_assists%", String.valueOf(scopedStats.getFinalAssists()))
+                        .replace(prefix + "games_played%", String.valueOf(scopedStats.getGamesPlayed()))
+                        .replace(prefix + "level%", targetLevel == null ? "0" : targetLevel.getLevelName())
+                        .replace(prefix + "level_unformatted%", targetLevel == null ? "0" : String.valueOf(targetLevel.getLevel()))
+                        .replace(prefix + "xp%", targetLevel == null ? "0" : targetLevel.getFormattedCurrentXp())
+                        .replace(prefix + "current_xp%", targetLevel == null ? "0" : targetLevel.getFormattedCurrentXp())
+                        .replace(prefix + "required_xp%", targetLevel == null ? "0" : targetLevel.getFormattedRequiredXp())
+                        .replace(prefix + "progress%", targetLevel == null ? "" : targetLevel.getProgress());
+            }
+        }
+        return value;
     }
 
     private static void applyStatsFiller(@NotNull Inventory inv) {
@@ -441,6 +520,35 @@ public final class Misc {
             return stats.getName();
         }
         return fallbackName == null || fallbackName.isBlank() ? "Unknown" : fallbackName;
+    }
+
+    private static @Nullable PlayerLevel resolveTargetLevel(@NotNull PlayerStats targetStats, @Nullable Player targetPlayer) {
+        if (targetPlayer != null) {
+            return PlayerLevel.getLevelByPlayer(targetPlayer.getUniqueId());
+        }
+        return PlayerLevel.getCachedLevelByPlayer(targetStats.getUuid());
+    }
+
+    private static String replaceStatsAliasPlaceholders(String input, ModeStats stats, @Nullable PlayerLevel targetLevel) {
+        return input.replace("%bw_stats_kills%", String.valueOf(stats.getKills()))
+                .replace("%bw_stats_total_kills%", String.valueOf(stats.getTotalKills()))
+                .replace("%bw_stats_deaths%", String.valueOf(stats.getDeaths()))
+                .replace("%bw_stats_losses%", String.valueOf(stats.getLosses()))
+                .replace("%bw_stats_wins%", String.valueOf(stats.getWins()))
+                .replace("%bw_stats_final_kills%", String.valueOf(stats.getFinalKills()))
+                .replace("%bw_stats_final_deaths%", String.valueOf(stats.getFinalDeaths()))
+                .replace("%bw_stats_beds%", String.valueOf(stats.getBedsDestroyed()))
+                .replace("%bw_stats_beds_broken%", String.valueOf(stats.getBedsDestroyed()))
+                .replace("%bw_stats_beds_lost%", String.valueOf(stats.getBedsLost()))
+                .replace("%bw_stats_assists%", String.valueOf(stats.getAssists()))
+                .replace("%bw_stats_final_assists%", String.valueOf(stats.getFinalAssists()))
+                .replace("%bw_stats_games_played%", String.valueOf(stats.getGamesPlayed()))
+                .replace("%bw_stats_level%", targetLevel == null ? "0" : targetLevel.getLevelName())
+                .replace("%bw_stats_level_unformatted%", targetLevel == null ? "0" : String.valueOf(targetLevel.getLevel()))
+                .replace("%bw_stats_xp%", targetLevel == null ? "0" : targetLevel.getFormattedCurrentXp())
+                .replace("%bw_stats_current_xp%", targetLevel == null ? "0" : targetLevel.getFormattedCurrentXp())
+                .replace("%bw_stats_required_xp%", targetLevel == null ? "0" : targetLevel.getFormattedRequiredXp())
+                .replace("%bw_stats_progress%", targetLevel == null ? "" : targetLevel.getProgress());
     }
 
     private static String formatRatio(int numerator, int denominator) {

@@ -49,7 +49,8 @@ public class H2 implements IDatabase {
             sql = "CREATE TABLE IF NOT EXISTS GLOBAL_STATS (ID INTEGER PRIMARY KEY AUTO_INCREMENT, " +
                     "NAME VARCHAR(200), UUID VARCHAR(36), FIRST_PLAY TIMESTAMP NULL DEFAULT NULL, " +
                     "LAST_PLAY TIMESTAMP DEFAULT NULL, WINS INTEGER, KILLS INTEGER, " +
-                    "FINAL_KILLS INTEGER, LOSES INTEGER, DEATHS INTEGER, FINAL_DEATHS INTEGER, BEDS_DESTROYED INTEGER, GAMES_PLAYED INTEGER);";
+                    "FINAL_KILLS INTEGER, LOSES INTEGER, DEATHS INTEGER, FINAL_DEATHS INTEGER, BEDS_DESTROYED INTEGER, " +
+                    "BEDS_LOST INTEGER, ASSISTS INTEGER, FINAL_ASSISTS INTEGER, GAMES_PLAYED INTEGER);";
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate(sql);
             }
@@ -60,11 +61,13 @@ public class H2 implements IDatabase {
                         "FIRST_PLAY TIMESTAMP NULL DEFAULT NULL, " +
                         "LAST_PLAY TIMESTAMP DEFAULT NULL, " +
                         "WINS INTEGER, KILLS INTEGER, FINAL_KILLS INTEGER, LOSES INTEGER, " +
-                        "DEATHS INTEGER, FINAL_DEATHS INTEGER, BEDS_DESTROYED INTEGER, GAMES_PLAYED INTEGER, " +
+                        "DEATHS INTEGER, FINAL_DEATHS INTEGER, BEDS_DESTROYED INTEGER, BEDS_LOST INTEGER, " +
+                        "ASSISTS INTEGER, FINAL_ASSISTS INTEGER, GAMES_PLAYED INTEGER, " +
                         "PRIMARY KEY (UUID, MODE)" +
                         ");";
                 statement.executeUpdate(sql);
             }
+            ensureStatsSchema();
             try (Statement st = connection.createStatement()) {
                 sql = "CREATE TABLE IF NOT EXISTS QUICK_BUY (UUID VARCHAR(36) PRIMARY KEY, " +
                         "SLOT_19 VARCHAR(200), SLOT_20 VARCHAR(200), SLOT_21 VARCHAR(200), SLOT_22 VARCHAR(200), SLOT_23 VARCHAR(200), SLOT_24 VARCHAR(200), SLOT_25 VARCHAR(200)," +
@@ -165,7 +168,7 @@ public class H2 implements IDatabase {
             checkConnection();
 
             if (hasStats(stats.getUuid())) {
-                sql = "UPDATE GLOBAL_STATS SET last_play=?, wins=?, kills=?, final_kills=?, loses=?, deaths=?, final_deaths=?, beds_destroyed=?, games_played=?, NAME=? WHERE UUID = ?;";
+                sql = "UPDATE GLOBAL_STATS SET last_play=?, wins=?, kills=?, final_kills=?, loses=?, deaths=?, final_deaths=?, beds_destroyed=?, beds_lost=?, assists=?, final_assists=?, games_played=?, NAME=? WHERE UUID = ?;";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setTimestamp(1, toTimestamp(stats.getLastPlay()));
                     statement.setInt(2, stats.getWins());
@@ -175,13 +178,16 @@ public class H2 implements IDatabase {
                     statement.setInt(6, stats.getDeaths());
                     statement.setInt(7, stats.getFinalDeaths());
                     statement.setInt(8, stats.getBedsDestroyed());
-                    statement.setInt(9, stats.getGamesPlayed());
-                    statement.setString(10, stats.getName());
-                    statement.setString(11, stats.getUuid().toString());
+                    statement.setInt(9, stats.getBedsLost());
+                    statement.setInt(10, stats.getAssists());
+                    statement.setInt(11, stats.getFinalAssists());
+                    statement.setInt(12, stats.getGamesPlayed());
+                    statement.setString(13, stats.getName());
+                    statement.setString(14, stats.getUuid().toString());
                     statement.executeUpdate();
                 }
             } else {
-                sql = "INSERT INTO GLOBAL_STATS (Name, UUID, first_play, last_play, wins, kills, final_kills, loses, deaths, final_deaths, beds_destroyed, games_played) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                sql = "INSERT INTO GLOBAL_STATS (Name, UUID, first_play, last_play, wins, kills, final_kills, loses, deaths, final_deaths, beds_destroyed, beds_lost, assists, final_assists, games_played) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
                 try (PreparedStatement statement = connection.prepareStatement(sql)) {
                     statement.setString(1, stats.getName());
                     statement.setString(2, stats.getUuid().toString());
@@ -194,7 +200,10 @@ public class H2 implements IDatabase {
                     statement.setInt(9, stats.getDeaths());
                     statement.setInt(10, stats.getFinalDeaths());
                     statement.setInt(11, stats.getBedsDestroyed());
-                    statement.setInt(12, stats.getGamesPlayed());
+                    statement.setInt(12, stats.getBedsLost());
+                    statement.setInt(13, stats.getAssists());
+                    statement.setInt(14, stats.getFinalAssists());
+                    statement.setInt(15, stats.getGamesPlayed());
                     statement.executeUpdate();
                 }
             }
@@ -226,6 +235,9 @@ public class H2 implements IDatabase {
                         stats.setDeaths(result.getInt("deaths"));
                         stats.setFinalDeaths(result.getInt("final_deaths"));
                         stats.setBedsDestroyed(result.getInt("beds_destroyed"));
+                        stats.setBedsLost(result.getInt("beds_lost"));
+                        stats.setAssists(result.getInt("assists"));
+                        stats.setFinalAssists(result.getInt("final_assists"));
                         stats.setGamesPlayed(result.getInt("games_played"));
                     }
                 }
@@ -243,8 +255,8 @@ public class H2 implements IDatabase {
             delete.executeUpdate();
         }
 
-        String sql = "MERGE INTO PLAYER_STATS_MODES (UUID, MODE, FIRST_PLAY, LAST_PLAY, WINS, KILLS, FINAL_KILLS, LOSES, DEATHS, FINAL_DEATHS, BEDS_DESTROYED, GAMES_PLAYED) " +
-                "KEY (UUID, MODE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String sql = "MERGE INTO PLAYER_STATS_MODES (UUID, MODE, FIRST_PLAY, LAST_PLAY, WINS, KILLS, FINAL_KILLS, LOSES, DEATHS, FINAL_DEATHS, BEDS_DESTROYED, BEDS_LOST, ASSISTS, FINAL_ASSISTS, GAMES_PLAYED) " +
+                "KEY (UUID, MODE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             for (Map.Entry<StatsMode, ModeStats> entry : stats.getTrackedModeStats().entrySet()) {
                 if (!entry.getValue().hasActivity()) continue;
@@ -259,7 +271,10 @@ public class H2 implements IDatabase {
                 statement.setInt(9, entry.getValue().getDeaths());
                 statement.setInt(10, entry.getValue().getFinalDeaths());
                 statement.setInt(11, entry.getValue().getBedsDestroyed());
-                statement.setInt(12, entry.getValue().getGamesPlayed());
+                statement.setInt(12, entry.getValue().getBedsLost());
+                statement.setInt(13, entry.getValue().getAssists());
+                statement.setInt(14, entry.getValue().getFinalAssists());
+                statement.setInt(15, entry.getValue().getGamesPlayed());
                 statement.addBatch();
             }
             statement.executeBatch();
@@ -283,10 +298,29 @@ public class H2 implements IDatabase {
                     modeStats.setDeaths(result.getInt("DEATHS"));
                     modeStats.setFinalDeaths(result.getInt("FINAL_DEATHS"));
                     modeStats.setBedsDestroyed(result.getInt("BEDS_DESTROYED"));
+                    modeStats.setBedsLost(result.getInt("BEDS_LOST"));
+                    modeStats.setAssists(result.getInt("ASSISTS"));
+                    modeStats.setFinalAssists(result.getInt("FINAL_ASSISTS"));
                     modeStats.setGamesPlayed(result.getInt("GAMES_PLAYED"));
                     stats.setModeStats(mode, modeStats);
                 }
             }
+        }
+    }
+
+    private void ensureStatsSchema() throws SQLException {
+        ensureColumn("GLOBAL_STATS", "BEDS_LOST", "INTEGER DEFAULT 0");
+        ensureColumn("GLOBAL_STATS", "ASSISTS", "INTEGER DEFAULT 0");
+        ensureColumn("GLOBAL_STATS", "FINAL_ASSISTS", "INTEGER DEFAULT 0");
+        ensureColumn("PLAYER_STATS_MODES", "BEDS_LOST", "INTEGER DEFAULT 0");
+        ensureColumn("PLAYER_STATS_MODES", "ASSISTS", "INTEGER DEFAULT 0");
+        ensureColumn("PLAYER_STATS_MODES", "FINAL_ASSISTS", "INTEGER DEFAULT 0");
+    }
+
+    private void ensureColumn(String tableName, String columnName, String definition) throws SQLException {
+        if (columnExists(tableName, columnName)) return;
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + definition + ";");
         }
     }
 

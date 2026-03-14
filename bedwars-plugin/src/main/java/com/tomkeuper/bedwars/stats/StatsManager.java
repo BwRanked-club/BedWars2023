@@ -118,6 +118,39 @@ public class StatsManager implements IStatsManager {
     }
 
     @Override
+    public void addBedLoss(Player player) {
+        IArena arena = Arena.getArenaByPlayer(player);
+        PlayerStatChangeEvent ev = new PlayerStatChangeEvent(player, arena, PlayerStatChangeEvent.StatType.BEDS_LOST);
+        Bukkit.getPluginManager().callEvent(ev);
+        if (ev.isCancelled()) {
+            return;
+        }
+        apply(player, arena, stats -> stats.setBedsLost(stats.getBedsLost() + 1));
+    }
+
+    @Override
+    public void addAssist(Player player) {
+        IArena arena = Arena.getArenaByPlayer(player);
+        PlayerStatChangeEvent ev = new PlayerStatChangeEvent(player, arena, PlayerStatChangeEvent.StatType.ASSISTS);
+        Bukkit.getPluginManager().callEvent(ev);
+        if (ev.isCancelled()) {
+            return;
+        }
+        apply(player, arena, stats -> stats.setAssists(stats.getAssists() + 1));
+    }
+
+    @Override
+    public void addFinalAssist(Player player) {
+        IArena arena = Arena.getArenaByPlayer(player);
+        PlayerStatChangeEvent ev = new PlayerStatChangeEvent(player, arena, PlayerStatChangeEvent.StatType.FINAL_ASSISTS);
+        Bukkit.getPluginManager().callEvent(ev);
+        if (ev.isCancelled()) {
+            return;
+        }
+        apply(player, arena, stats -> stats.setFinalAssists(stats.getFinalAssists() + 1));
+    }
+
+    @Override
     public void addWin(Player player) {
         IArena arena = Arena.getArenaByPlayer(player);
         PlayerStatChangeEvent ev = new PlayerStatChangeEvent(player, arena, PlayerStatChangeEvent.StatType.WINS);

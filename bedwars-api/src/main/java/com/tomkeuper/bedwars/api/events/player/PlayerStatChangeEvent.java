@@ -106,6 +106,9 @@ public class PlayerStatChangeEvent extends Event {
         DEATHS,
         FINAL_DEATHS,
         BEDS_DESTROYED,
+        BEDS_LOST,
+        ASSISTS,
+        FINAL_ASSISTS,
         GAMES_PLAYED,
         CUSTOM
     }

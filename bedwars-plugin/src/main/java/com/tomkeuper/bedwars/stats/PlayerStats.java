@@ -113,6 +113,30 @@ public class PlayerStats implements IPlayerStats {
         overallStats.setGamesPlayed(gamePlayed);
     }
 
+    public int getBedsLost() {
+        return overallStats.getBedsLost();
+    }
+
+    public void setBedsLost(int bedsLost) {
+        overallStats.setBedsLost(bedsLost);
+    }
+
+    public int getAssists() {
+        return overallStats.getAssists();
+    }
+
+    public void setAssists(int assists) {
+        overallStats.setAssists(assists);
+    }
+
+    public int getFinalAssists() {
+        return overallStats.getFinalAssists();
+    }
+
+    public void setFinalAssists(int finalAssists) {
+        overallStats.setFinalAssists(finalAssists);
+    }
+
     public int getTotalKills() {
         return overallStats.getTotalKills();
     }
